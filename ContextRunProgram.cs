@@ -7,48 +7,46 @@ namespace kOS
 {
     public class ContextRunProgram : ExecutionContext
     {
-        private int accumulator;
         private File file;
         private String commandBuffer;
-        private List<Command> commands = new List<Command>();
-        private List<Expression> parameters = new List<Expression>();
-        private int executionLine = 0;
+        private readonly List<Command> commands = new List<Command>();
+        private readonly List<Expression> parameters = new List<Expression>();
+        private const int EXECUTION_LINE = 0;
 
-        
-        
+
         public string Filename;
 
         public ContextRunProgram(ExecutionContext parent, List<Expression> parameters, String filename) : base(parent) 
         {
             this.parameters = parameters;
-            this.Filename = filename;
+            Filename = filename;
         }
 
-        public void Run(File file)
+        public void Run(File toRun)
         {
-            this.file = file;
+            file = toRun;
 
             State = ExecutionState.WAIT;
 
-            RunBlock(file);
+            RunBlock(toRun);
         }
 
         private void RunBlock(IEnumerable<string> block)
         {
-            foreach (string line in block.Select(stripComment))
+            foreach (var line in block.Select(StripComment))
             {
                 commandBuffer += line + "\n";
             }
 
             string cmd;
-            int lineNumber = 0;
-            int commandLineStart = 0;
+            var lineNumber = 0;
+            int commandLineStart;
             while (parseNext(ref commandBuffer, out cmd, ref lineNumber, out commandLineStart))
             {
                 try
                 {
                     Line = commandLineStart;
-                    Command cmdObj = Command.Get(cmd, this, commandLineStart);
+                    var cmdObj = Command.Get(cmd, this, commandLineStart);
                     commands.Add(cmdObj);
                 }
                 catch (kOSException e)
@@ -88,7 +86,7 @@ namespace kOS
             return true;
         }
 
-        public string stripComment(string line)
+        public string StripComment(string line)
         {
             for (var i=0; i<line.Length; i++)
             {
@@ -129,7 +127,7 @@ namespace kOS
             catch (Exception e)
             {
                 // Non-kos exception! This is a bug, but no reason to kill the OS
-                StdOut("Flagrant error on line " + executionLine);
+                StdOut("Flagrant error on line " + EXECUTION_LINE);
                 UnityEngine.Debug.Log("Program error");
                 UnityEngine.Debug.Log(e);
                 State = ExecutionState.DONE;
