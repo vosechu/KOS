@@ -28,7 +28,7 @@ namespace kOS
                             return;
                         }
 
-                        var vessel = VesselUtils.GetVesselByName(val.ToString() ,cpu.Vessel);
+                        var vessel = cpu.Vessel.GetVesselByName(val.ToString());
                         if (vessel != null)
                         {
                             VesselUtils.SetTarget(vessel);

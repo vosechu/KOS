@@ -74,29 +74,29 @@ namespace kOS
                 case "DISTANCE":
                     return (float)GetDistance();
                 case "BEARING":
-                    return VesselUtils.GetTargetBearing(context.Vessel, target);
+                    return context.Vessel.GetTargetBearing(target);
                 case "HEADING":
-                    return VesselUtils.GetTargetHeading(context.Vessel, target);
+                    return context.Vessel.GetTargetHeading(target);
                 case "PROGRADE":
                     return GetPrograde();
                 case "RETROGRADE":
                     return GetRetrograde();
                 case "MAXTHRUST":
-                    return VesselUtils.GetMaxThrust(target);
+                    return target.GetMaxThrust();
                 case "VELOCITY":
                     return new VesselVelocity(target);
                 case "GEOPOSITION":
                     return new GeoCoordinates(target);
                 case "LATITUDE":
-                    return VesselUtils.GetVesselLattitude(target);
+                    return target.GetVesselLattitude();
                 case "LONGITUDE":
-                    return VesselUtils.GetVesselLongitude(target);
+                    return target.GetVesselLongitude();
                 case "FACING":
                     return GetFacing();
                 case "UP":
                     return new Direction(target.upAxis, false);
                 case "NORTH":
-                    return new Direction(VesselUtils.GetNorthVector(target), false);
+                    return new Direction(target.GetNorthVector(), false);
                 case "BODY":
                     return target.mainBody.bodyName;
                 case "ANGULARMOMENTUM":
@@ -122,12 +122,12 @@ namespace kOS
                 case "SENSOR":
                     return new VesselSensors(target);
                 case "TERMVELOCITY":
-                    return VesselUtils.GetTerminalVelocity(target);
+                    return target.GetTerminalVelocity();
             }
 
             // Is this a resource?
             double dblValue;
-            return VesselUtils.TryGetResource(target, suffixName, out dblValue) ? dblValue : base.GetSuffix(suffixName);
+            return target.TryGetResource(suffixName, out dblValue) ? dblValue : base.GetSuffix(suffixName);
         }
     }
 }

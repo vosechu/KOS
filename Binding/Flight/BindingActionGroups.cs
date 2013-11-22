@@ -7,10 +7,10 @@ namespace kOS
         {
             manager.AddSetter("SAS", (cpu, val) => cpu.Vessel.ActionGroups.SetGroup(KSPActionGroup.SAS, (bool) val));
             manager.AddSetter("GEAR", (cpu, val) => cpu.Vessel.ActionGroups.SetGroup(KSPActionGroup.Gear, (bool) val));
-            manager.AddSetter("LEGS", (cpu, val) => VesselUtils.LandingLegsCtrl(cpu.Vessel, (bool) val));
-            manager.AddSetter("CHUTES", (cpu, val) => VesselUtils.DeployParachutes(cpu.Vessel, (bool) val));
+            manager.AddSetter("LEGS", (cpu, val) => cpu.Vessel.LandingLegsCtrl((bool) val));
+            manager.AddSetter("CHUTES", (cpu, val) => cpu.Vessel.DeployParachutes((bool) val));
             manager.AddSetter("LIGHTS", (cpu, val) => cpu.Vessel.ActionGroups.SetGroup(KSPActionGroup.Light, (bool) val));
-            manager.AddSetter("PANELS", (cpu, val) => VesselUtils.SolarPanelCtrl(cpu.Vessel, (bool) val));
+            manager.AddSetter("PANELS", (cpu, val) => cpu.Vessel.SolarPanelCtrl((bool) val));
             manager.AddSetter("BRAKES", (cpu, val) => cpu.Vessel.ActionGroups.SetGroup(KSPActionGroup.Brakes, (bool) val));
             manager.AddSetter("RCS", (cpu, val) => cpu.Vessel.ActionGroups.SetGroup(KSPActionGroup.RCS, (bool) val));
             manager.AddSetter("ABORT", (cpu, val) => cpu.Vessel.ActionGroups.SetGroup(KSPActionGroup.Abort, (bool) val));
@@ -27,10 +27,10 @@ namespace kOS
 
             manager.AddGetter("SAS", cpu => cpu.Vessel.ActionGroups[KSPActionGroup.SAS]);
             manager.AddGetter("GEAR", cpu => cpu.Vessel.ActionGroups[KSPActionGroup.Gear]);
-            manager.AddGetter("LEGS", cpu => VesselUtils.GetLandingLegStatus(cpu.Vessel));
-            manager.AddGetter("CHUTES", cpu => VesselUtils.GetChuteStatus(cpu.Vessel));
+            manager.AddGetter("LEGS", cpu => cpu.Vessel.GetLandingLegStatus());
+            manager.AddGetter("CHUTES", cpu => cpu.Vessel.GetChuteStatus());
             manager.AddGetter("LIGHTS", cpu => cpu.Vessel.ActionGroups[KSPActionGroup.Light]);
-            manager.AddGetter("PANELS", cpu => VesselUtils.GetSolarPanelStatus(cpu.Vessel));
+            manager.AddGetter("PANELS", cpu => cpu.Vessel.GetSolarPanelStatus());
             manager.AddGetter("BRAKES", cpu => cpu.Vessel.ActionGroups[KSPActionGroup.Brakes]);
             manager.AddGetter("RCS", cpu => cpu.Vessel.ActionGroups[KSPActionGroup.RCS]);
             manager.AddGetter("ABORT", cpu => cpu.Vessel.ActionGroups[KSPActionGroup.Abort]);

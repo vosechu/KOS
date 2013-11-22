@@ -425,7 +425,7 @@ namespace kOS
             if (name == "Q") { double[] dp = GetParamsAsT<double>(p, 4); return new Direction(new UnityEngine.Quaternion((float)dp[0], (float)dp[1], (float)dp[2], (float)dp[3])); }
             if (name == "T") { double[] dp = GetParamsAsT<double>(p, 1); return new TimeSpan(dp[0]); }
             if (name == "LATLNG") { double[] dp = GetParamsAsT<double>(p, 2); return new GeoCoordinates(executionContext.Vessel, dp[0], dp[1]); }
-            if (name == "VESSEL") { String[] sp = GetParamsAsT<String>(p, 1); return new VesselTarget(VesselUtils.GetVesselByName(sp[0], executionContext.Vessel), executionContext); }
+            if (name == "VESSEL") { String[] sp = GetParamsAsT<String>(p, 1); return new VesselTarget(executionContext.Vessel.GetVesselByName(sp[0]), executionContext); }
             if (name == "BODY") { String[] sp = GetParamsAsT<String>(p, 1); return new BodyTarget(sp[0], executionContext); }
 
             if (name == "HEADING")
@@ -434,7 +434,7 @@ namespace kOS
                 if (pCount < 2 || pCount > 3) throw new kOSException("Wrong number of arguments supplied, expected 2 or 3", executionContext);
 
                 double[] dp = GetParamsAsT<double>(p, pCount);
-                var q = UnityEngine.Quaternion.LookRotation(VesselUtils.GetNorthVector(executionContext.Vessel), executionContext.Vessel.upAxis);
+                var q = UnityEngine.Quaternion.LookRotation(executionContext.Vessel.GetNorthVector(), executionContext.Vessel.upAxis);
                 q *= UnityEngine.Quaternion.Euler(new UnityEngine.Vector3((float)-dp[0], (float)dp[1], (float)(dp.Count() > 2 ? dp[2] : 0)));
 
                 return new Direction(q);

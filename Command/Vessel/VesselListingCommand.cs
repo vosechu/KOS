@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace kOS
@@ -30,17 +31,15 @@ namespace kOS
                     StdOut("Vessel Name              Distance");
                     StdOut("-------------------------------------");
 
-                    double commRange = VesselUtils.GetCommRange(Vessel);
+                    double commRange = Vessel.GetCommRange();
 
                     foreach (Vessel vessel in FlightGlobals.Vessels)
                     {
-                        if (vessel != Vessel)
+                        if (vessel == Vessel) continue;
+                        var vT = new VesselTarget(vessel, this);
+                        if (vT.IsInRange(commRange))
                         {
-                            var vT = new VesselTarget(vessel, this);
-                            if (vT.IsInRange(commRange))
-                            {
-                                StdOut(vT.target.vesselName.PadRight(24) + " " + vT.GetDistance().ToString("0.0").PadLeft(8));
-                            }
+                            StdOut(vT.target.vesselName.PadRight(24) + " " + vT.GetDistance().ToString("0.0").PadLeft(8));
                         }
                     }
 
@@ -77,16 +76,11 @@ namespace kOS
                 case "ENGINES":
                     StdOut("------------------------------------------------");
 
-                    foreach (Part part in VesselUtils.GetListOfActivatedEngines(Vessel))
+                    foreach (Part part in Vessel.GetListOfActivatedEngines())
                     {
-                        foreach (PartModule module in part.Modules)
+                        foreach (var engineMod in part.Modules.OfType<ModuleEngines>())
                         {
-                            if (module is ModuleEngines)
-                            {
-                                var engineMod = (ModuleEngines)module;
-                                
-                                StdOut(part.uid + "  " + part.inverseStage.ToString() + " " + engineMod.moduleName);
-                            }
+                            StdOut(part.uid + "  " + part.inverseStage.ToString() + " " + engineMod.moduleName);
                         }
                     }
 
@@ -99,16 +93,12 @@ namespace kOS
 
                     foreach (Part part in Vessel.Parts)
                     {
-                        foreach (PartModule module in part.Modules)
+                        foreach (var sensor in part.Modules.OfType<ModuleEnviroSensor>())
                         {
-                            ModuleEnviroSensor sensor = module as ModuleEnviroSensor;
-                            if (sensor != null)
-                            {
-                                if (part.partInfo.name.Length > 37)
-                                    StdOut(part.partInfo.title.PadRight(34) + "... " + sensor.sensorType);
-                                else
-                                    StdOut(part.partInfo.title.PadRight(37) + " " + sensor.sensorType);
-                            }
+                            if (part.partInfo.name.Length > 37)
+                                StdOut(part.partInfo.title.PadRight(34) + "... " + sensor.sensorType);
+                            else
+                                StdOut(part.partInfo.title.PadRight(37) + " " + sensor.sensorType);
                         }
                     }
 

@@ -11,8 +11,8 @@ namespace kOS
 
         public GeoCoordinates(Vessel vessel)
         {
-            Lat = VesselUtils.GetVesselLattitude(vessel);
-            Lng = VesselUtils.GetVesselLongitude(vessel);
+            Lat = vessel.GetVesselLattitude();
+            Lng = vessel.GetVesselLongitude();
             Vessel = vessel;
 
             Body = vessel.mainBody;
@@ -38,13 +38,13 @@ namespace kOS
 
         public float GetBearing(Vessel vessel)
         {
-            return VesselUtils.AngleDelta(VesselUtils.GetHeading(vessel), GetHeadingFromVessel(vessel));
+            return VesselUtils.AngleDelta(vessel.GetHeading(), GetHeadingFromVessel(vessel));
         }
     
         public float GetHeadingFromVessel(Vessel vessel)
         {
             var up = vessel.upAxis;
-            var north = VesselUtils.GetNorthVector(vessel);
+            var north = vessel.GetNorthVector();
 
             var targetWorldCoords = vessel.mainBody.GetWorldSurfacePosition(Lat, Lng, vessel.altitude);
             

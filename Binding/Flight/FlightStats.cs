@@ -29,7 +29,7 @@ namespace kOS
             manager.AddGetter("TIME", cpu => new TimeSpan(Planetarium.GetUniversalTime()));
 
             manager.AddGetter("STATUS", cpu => cpu.Vessel.situation.ToString().Replace("_", " "));
-            manager.AddGetter("COMMRANGE", cpu => VesselUtils.GetCommRange(cpu.Vessel));
+            manager.AddGetter("COMMRANGE", cpu => cpu.Vessel.GetCommRange());
             manager.AddGetter("INCOMMRANGE", cpu => Convert.ToDouble(CheckCommRange(cpu.Vessel)));
 
             manager.AddGetter("AV",
@@ -37,7 +37,7 @@ namespace kOS
                               cpu.Vessel.transform.InverseTransformDirection(cpu.Vessel.rigidbody.angularVelocity));
             manager.AddGetter("STAGE", cpu => new StageValues(cpu.Vessel));
 
-            manager.AddGetter("ENCOUNTER", cpu => VesselUtils.TryGetEncounter(cpu.Vessel));
+            manager.AddGetter("ENCOUNTER", cpu => cpu.Vessel.TryGetEncounter());
 
             manager.AddGetter("NEXTNODE",       delegate(CPU cpu)
             {
@@ -82,7 +82,7 @@ namespace kOS
 
             private static bool CheckCommRange(Vessel vessel)
             {
-                return (VesselUtils.GetDistanceToKerbinSurface(vessel) < VesselUtils.GetCommRange(vessel));
+                return (vessel.GetDistanceToKerbinSurface() < vessel.GetCommRange());
             }
   }
 }

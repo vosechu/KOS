@@ -65,7 +65,7 @@ namespace kOS
             public bool locked;
             public object Value;
             public Vessel vessel;
-            String propertyName;
+            readonly string propertyName;
             public CPU cpu;
 
             public LockableControl(String name, String propertyName, CPU cpu, BindingManager manager)
@@ -126,7 +126,7 @@ namespace kOS
 
                     if (Value is VesselTarget)
                     {
-                        bearing = VesselUtils.GetTargetBearing(vessel, ((VesselTarget)Value).target);
+                        bearing = vessel.GetTargetBearing(((VesselTarget)Value).target);
                     }
                     else if (Value is GeoCoordinates)
                     {
@@ -139,7 +139,7 @@ namespace kOS
 
                     if (vessel.horizontalSrfSpeed > 0.1f)
                     { 
-                        if (Mathf.Abs(VesselUtils.AngleDelta(VesselUtils.GetHeading(vessel), VesselUtils.GetVelocityHeading(vessel))) <= 90)
+                        if (Mathf.Abs(VesselUtils.AngleDelta(vessel.GetHeading(), vessel.GetVelocityHeading())) <= 90)
                         {
                             c.wheelSteer = Mathf.Clamp(bearing / -10, -1, 1);
                         }

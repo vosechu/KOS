@@ -7,7 +7,7 @@ namespace kOS
 {
     public static class VesselUtils
     {
-        public static List<Part> GetListOfActivatedEngines(Vessel vessel)
+        public static List<Part> GetListOfActivatedEngines(this Vessel vessel)
         {
             return (from part in vessel.Parts
                     from PartModule module in part.Modules
@@ -17,7 +17,7 @@ namespace kOS
                     select part).ToList();
         }
 
-        public static bool TryGetResource(Vessel vessel, string resourceName, out double total)
+        public static bool TryGetResource(this Vessel vessel, string resourceName, out double total)
         {
             var resourceIsFound = false;
             total = 0;
@@ -39,7 +39,7 @@ namespace kOS
             return resourceIsFound;
         }
 
-        public static double GetResource(Vessel vessel, string resourceName)
+        public static double GetResource(this Vessel vessel, string resourceName)
         {
             resourceName = resourceName.ToUpper();
 
@@ -49,7 +49,7 @@ namespace kOS
                     select resource.amount).Sum();
         }
 
-        public static double GetMaxThrust(Vessel vessel)
+        public static double GetMaxThrust(this Vessel vessel)
         {
             return (from p in vessel.parts
                     from PartModule pm in p.Modules
@@ -59,7 +59,7 @@ namespace kOS
                     .Aggregate(0.0, (current, e) => current + e.maxThrust);
         }
 
-        public static Vessel TryGetVesselByName(String name, Vessel origin)
+        public static Vessel TryGetVesselByName(this Vessel origin, string name)
         {
             return FlightGlobals.Vessels.FirstOrDefault(v => v != origin && v.vesselName.ToUpper() == name.ToUpper());
         }
@@ -69,9 +69,9 @@ namespace kOS
             return FlightGlobals.fetch.bodies.FirstOrDefault(body => name.ToUpper() == body.name.ToUpper());
         }
 
-        public static Vessel GetVesselByName(String name, Vessel origin)
+        public static Vessel GetVesselByName(this Vessel origin, string name)
         {
-            var vessel = TryGetVesselByName(name, origin);
+            var vessel = TryGetVesselByName(origin, name);
 
             if (vessel == null)
             {
@@ -92,7 +92,7 @@ namespace kOS
             // }
         }
 
-        public static double GetCommRange(Vessel vessel)
+        public static double GetCommRange(this Vessel vessel)
         {
             var range = vessel.parts
                 .Where(part => part.partInfo.name == "longAntenna")
@@ -113,7 +113,7 @@ namespace kOS
                 .Aggregate(range, (current, status) => current*200);
         }
 
-        public static double GetDistanceToKerbinSurface(Vessel vessel)
+        public static double GetDistanceToKerbinSurface(this Vessel vessel)
         {
             foreach (var body in FlightGlobals.fetch.bodies.Where(body => body.name.ToUpper() == "KERBIN"))
             {
@@ -133,7 +133,7 @@ namespace kOS
             return delta;
         }
 
-        public static float GetHeading(Vessel vessel)
+        public static float GetHeading(this Vessel vessel)
         {
             var up = vessel.upAxis;
             var north = GetNorthVector(vessel);
@@ -142,7 +142,7 @@ namespace kOS
             return headingQ.eulerAngles.y;
         }
 
-        public static float GetVelocityHeading(Vessel vessel)
+        public static float GetVelocityHeading(this Vessel vessel)
         {
             var up = vessel.upAxis;
             var north = GetNorthVector(vessel);
@@ -151,12 +151,12 @@ namespace kOS
             return headingQ.eulerAngles.y;
         }
 
-        public static float GetTargetBearing(Vessel vessel, Vessel target)
+        public static float GetTargetBearing(this Vessel vessel, Vessel target)
         {
             return AngleDelta(GetHeading(vessel), GetTargetHeading(vessel, target));
         }
 
-        public static float GetTargetHeading(Vessel vessel, Vessel target)
+        public static float GetTargetHeading(this Vessel vessel, Vessel target)
         {
             var up = vessel.upAxis;
             var north = GetNorthVector(vessel);
@@ -166,12 +166,12 @@ namespace kOS
             return headingQ.eulerAngles.y;
         }
 
-        public static Vector3d GetNorthVector(Vessel vessel)
+        public static Vector3d GetNorthVector(this Vessel vessel)
         {
             return Vector3d.Exclude(vessel.upAxis, vessel.mainBody.transform.up);
         }
 
-        public static object TryGetEncounter(Vessel vessel)
+        public static object TryGetEncounter(this Vessel vessel)
         {
             foreach (var patch in vessel.patchedConicSolver.flightPlan.Where(patch => patch.patchStartTransition == Orbit.PatchTransitionType.ENCOUNTER))
             {
@@ -181,13 +181,13 @@ namespace kOS
             return "None";
         }
 
-        public static void LandingLegsCtrl(Vessel vessel, bool state)
+        public static void LandingLegsCtrl(this Vessel vessel, bool state)
         {
             // This appears to work on all legs in 0.22
             vessel.rootPart.SendEvent(state ? "LowerLeg" : "RaiseLeg");
         }
 
-        internal static object GetLandingLegStatus(Vessel vessel)
+        internal static object GetLandingLegStatus(this Vessel vessel)
         {
             var atLeastOneLeg = false; // No legs at all? Always return false
 
@@ -204,7 +204,7 @@ namespace kOS
             return atLeastOneLeg;
         }
 
-        public static object GetChuteStatus(Vessel vessel)
+        public static object GetChuteStatus(this Vessel vessel)
         {
             var atLeastOneChute = false; // No chutes at all? Always return false
 
@@ -225,7 +225,7 @@ namespace kOS
             return atLeastOneChute;
         }
 
-        public static void DeployParachutes(Vessel vessel, bool state)
+        public static void DeployParachutes(this Vessel vessel, bool state)
         {
             if (!vessel.mainBody.atmosphere || !state) return;
 
@@ -239,7 +239,7 @@ namespace kOS
             }
         }
 
-        public static object GetSolarPanelStatus(Vessel vessel)
+        public static object GetSolarPanelStatus(this Vessel vessel)
         {
             var atLeastOneSolarPanel = false; // No panels at all? Always return false
 
@@ -257,13 +257,13 @@ namespace kOS
             return atLeastOneSolarPanel;
         }
 
-        public static void SolarPanelCtrl(Vessel vessel, bool state)
+        public static void SolarPanelCtrl(this Vessel vessel, bool state)
         {
             vessel.rootPart.SendEvent(state ? "Extend" : "Retract");
         }
 
 
-        public static double GetMassDrag(Vessel vessel)
+        public static double GetMassDrag(this Vessel vessel)
         {
             return vessel.parts.Aggregate<Part, double>(0, (current, p) => current + (p.mass + p.GetResourceMass())*p.maximum_drag);
         }
@@ -276,13 +276,13 @@ namespace kOS
             return -body.atmosphereScaleHeight * 1000 * Math.Log(1e-6);
         }
 
-        public static double GetTerminalVelocity(Vessel vessel)
+        public static double GetTerminalVelocity(this Vessel vessel)
         {
             if (vessel.mainBody.GetAltitude(vessel.findWorldCenterOfMass()) > RealMaxAtmosphereAltitude(vessel.mainBody)) return double.PositiveInfinity;
             var densityOfAir = FlightGlobals.getAtmDensity(FlightGlobals.getStaticPressure(vessel.findWorldCenterOfMass(), vessel.mainBody));
             return Math.Sqrt(2 * FlightGlobals.getGeeForceAtPosition(vessel.findWorldCenterOfMass()).magnitude * vessel.GetTotalMass() / (GetMassDrag(vessel) * FlightGlobals.DragMultiplier * densityOfAir));
         }
-        public static float GetVesselLattitude(Vessel vessel)
+        public static float GetVesselLattitude(this Vessel vessel)
         {
             var retVal = (float)vessel.latitude;
 
@@ -292,7 +292,7 @@ namespace kOS
             return retVal;
         }
 
-        public static float GetVesselLongitude(Vessel vessel)
+        public static float GetVesselLongitude(this Vessel vessel)
         {
             var retVal = (float)vessel.longitude;
 
