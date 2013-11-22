@@ -45,20 +45,56 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Binding.cs" />
-    <Compile Include="BindingsFlightStats.cs" />
-    <Compile Include="BindingsRoverStats.cs" />
-    <Compile Include="BindingsTerminalSettings.cs" />
-    <Compile Include="BindingsTest.cs" />
-    <Compile Include="BindingsUniverse.cs" />
+    <Compile Include="Binding\Binding.cs" />
+    <Compile Include="Binding\BindingManager.cs" />
+    <Compile Include="Binding\BoundVariable.cs" />
+    <Compile Include="Binding\Flight\BindingActionGroups.cs" />
+    <Compile Include="Binding\Flight\BindingFlightSettings.cs" />
+    <Compile Include="Binding\Flight\FlightStats.cs" />
+    <Compile Include="Binding\kOSBinding.cs" />
+    <Compile Include="Binding\Rover\RoverStats.cs" />
+    <Compile Include="Binding\Environment\TerminalSettings.cs" />
+    <Compile Include="Binding\Test\Test.cs" />
+    <Compile Include="Binding\Test\TestBindings.cs" />
+    <Compile Include="Binding\Environment\Universe.cs" />
     <Compile Include="BodyTarget.cs" />
-    <Compile Include="Command.cs" />
-    <Compile Include="CommandBasicIO.cs" />
-    <Compile Include="CommandFileIO.cs" />
-    <Compile Include="CommandFlowControl.cs" />
-    <Compile Include="CommandCallExternal.cs" />
-    <Compile Include="CommandTemporal.cs" />
-    <Compile Include="CommandVessel.cs" />
+    <Compile Include="Command\Command.cs" />
+    <Compile Include="Command\BasicIO\ClearScreenCommand.cs" />
+    <Compile Include="Command\AttributeCommand.cs" />
+    <Compile Include="Command\FileIO\EditFileCommand.cs" />
+    <Compile Include="Command\FlowControl\BreakCommand.cs" />
+    <Compile Include="Command\FlowControl\BlockCommand.cs" />
+    <Compile Include="Command\FlowControl\CallExternalCommand.cs" />
+    <Compile Include="Command\CommandRegistry.cs" />
+    <Compile Include="Command\Temporal\WaitCommand.cs" />
+    <Compile Include="Command\Vessel\AddObjectToVesselCommand.cs" />
+    <Compile Include="Command\Vessel\VesselListingCommand.cs" />
+    <Compile Include="Command\BasicIO\DeclareParameterCommand.cs" />
+    <Compile Include="Command\BasicIO\DeclareVariableCommand.cs" />
+    <Compile Include="Command\BasicIO\PrintAtCommand.cs" />
+    <Compile Include="Command\BasicIO\PrintCommand.cs" />
+    <Compile Include="Command\BasicIO\RebootCommand.cs" />
+    <Compile Include="Command\BasicIO\SetCommand.cs" />
+    <Compile Include="Command\BasicIO\SetOffCommand.cs" />
+    <Compile Include="Command\BasicIO\SetOnCommand.cs" />
+    <Compile Include="Command\BasicIO\ShutdownCommand.cs" />
+    <Compile Include="Command\BasicIO\TestKegexCommand.cs" />
+    <Compile Include="Command\BasicIO\ToggleCommand.cs" />
+    <Compile Include="Command\FileIO\CopyCommand.cs" />
+    <Compile Include="Command\FileIO\DeleteCommand.cs" />
+    <Compile Include="Command\FileIO\ListCommand.cs" />
+    <Compile Include="Command\FileIO\LogCommand.cs" />
+    <Compile Include="Command\FileIO\RenameCommand.cs" />
+    <Compile Include="Command\FileIO\RunFileCommand.cs" />
+    <Compile Include="Command\FileIO\SwitchCommand.cs" />
+    <Compile Include="Command\FlowControl\IfCommand.cs" />
+    <Compile Include="Command\FlowControl\UntilLoopCommand.cs" />
+    <Compile Include="Command\Temporal\LockCommand.cs" />
+    <Compile Include="Command\Temporal\OnEventCommand.cs" />
+    <Compile Include="Command\Temporal\UnlockCommand.cs" />
+    <Compile Include="Command\Temporal\WhenCommand.cs" />
+    <Compile Include="Command\Vessel\RemoveObjectFromVesselCommand.cs" />
+    <Compile Include="Command\Vessel\VesselStageCommand.cs" />
     <Compile Include="ContextRunProgram.cs" />
     <Compile Include="DebugTools.cs" />
     <Compile Include="Direction.cs" />
@@ -74,7 +110,7 @@
     <Compile Include="kOSExternalCommand.cs" />
     <Compile Include="kOSIDModule.cs" />
     <Compile Include="kOSProcessor.cs" />
-    <Compile Include="BindingsFlightControl.cs" />
+    <Compile Include="Binding\Flight\FlightControl.cs" />
     <Compile Include="File.cs" />
     <Compile Include="Node.cs" />
     <Compile Include="Orbit.cs" />
@@ -86,19 +122,19 @@
     <Compile Include="Timespan.cs" />
     <Compile Include="Vector.cs" />
     <Compile Include="VersionInfo.cs" />
-    <Compile Include="VesselSensors.cs" />
-    <Compile Include="VesselTarget.cs" />
+    <Compile Include="Vessel\VesselSensors.cs" />
+    <Compile Include="Vessel\VesselTarget.cs" />
     <Compile Include="TermWindow.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CPU.cs" />
     <Compile Include="Core.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="Variable.cs" />
-    <Compile Include="VesselVelocity.cs" />
+    <Compile Include="Vessel\VesselVelocity.cs" />
     <Compile Include="Volume.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="VesselUtils.cs" />
+    <Compile Include="Vessel\VesselUtils.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

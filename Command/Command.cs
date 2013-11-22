@@ -1,42 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
-using System.Reflection;
 
 namespace kOS
 {
-    public class CommandAttribute : Attribute
-    {
-        public string[] Values { get; set; }
-        public CommandAttribute(params string[] values) { Values = values; }
-
-        public override String ToString()
-        {
-            return String.Join(",", Values);
-        }
-    }
-
-    public static class CommandRegistry
-    {
-        public static Dictionary<String, Type> Bindings = new Dictionary<string, Type>();
-
-        static CommandRegistry()
-        {
-            foreach (Type t in Assembly.GetExecutingAssembly().GetTypes())
-            {
-                var attr = (CommandAttribute)t.GetCustomAttributes(typeof(CommandAttribute), true).FirstOrDefault();
-                if (attr != null)
-                {
-                    foreach (var s in attr.Values)
-                    {
-                        Bindings.Add(Utils.BuildRegex(s), t);
-                    }
-                }
-            }
-        }
-    }
-
     public class Command : ExecutionContext
     {
         public float Time;

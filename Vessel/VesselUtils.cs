@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace kOS
 {
-    public class VesselUtils
+    public static class VesselUtils
     {
         public static List<Part> GetListOfActivatedEngines(Vessel vessel)
         {

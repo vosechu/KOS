@@ -6,7 +6,7 @@ namespace kOS
 {
 
     [kOSBinding("ksp")]
-    public class BindingsFlightStats : Binding
+    public class FlightStats : Binding
     {
         public override void AddTo(BindingManager manager)
         {

@@ -14,11 +14,6 @@ namespace kOS
         {
             manager.AddGetter("TEST:RADAR", cpu => new TimeSpan(cpu.SessionTime)); 
         }
-
-        public override void Update(float time)
-        {
-            base.Update(time);
-        }
     }
 }
 
