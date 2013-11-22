@@ -1,6 +1,6 @@
 using System;
 
-namespace kOS
+namespace kOS.Binding
 {
     public class kOSBinding : Attribute
     {

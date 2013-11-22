@@ -1,7 +1,7 @@
 using System;
 using System.Text.RegularExpressions;
 
-namespace kOS
+namespace kOS.Command.BasicIO
 {
     [AttributeCommand("DECLARE %")]
     public class DeclareVariableCommand : Command

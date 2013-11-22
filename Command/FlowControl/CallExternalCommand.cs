@@ -1,7 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-
-namespace kOS
+namespace kOS.Command.FlowControl
 {
     [AttributeCommand("CALL *")]
     public class CallExternalCommand : Command

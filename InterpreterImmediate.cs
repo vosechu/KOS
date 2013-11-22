@@ -14,7 +14,7 @@ namespace kOS
         private String commandBuffer = "";
         private int cursorX;
         private int cursorY;
-        private readonly Queue<Command> queue = new Queue<Command>();
+        private readonly Queue<Command.Command> queue = new Queue<Command.Command>();
 
         private new readonly char[,] buffer = new char[COLUMNS, ROWS];
 
@@ -37,7 +37,7 @@ namespace kOS
             {
                 try
                 {
-                    var cmd = Command.Get(nextCmd, this, comandLineStart);
+                    var cmd = Command.Command.Get(nextCmd, this, comandLineStart);
                     queue.Enqueue(cmd);
                 }
                 catch (kOSException e)

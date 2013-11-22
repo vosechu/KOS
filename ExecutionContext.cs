@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using kOS.Binding;
 
 namespace kOS
 {
@@ -14,7 +15,7 @@ namespace kOS
         public static int ROWS = 36;
 
         public CPU Cpu;
-        public Queue<Command> Queue = new Queue<Command>();
+        public Queue<Command.Command> Queue = new Queue<Command.Command>();
         public String buffer;
         public ExecutionContext ParentContext = null;
         public ExecutionContext ChildContext = null;
@@ -32,7 +33,7 @@ namespace kOS
         public virtual Dictionary<String, Variable> Variables { get { return ParentContext != null ? ParentContext.Variables : null; } }
         public virtual List<kOSExternalFunction> ExternalFunctions { get { return ParentContext != null ? ParentContext.ExternalFunctions : null; } }
         public Dictionary<String, Expression> Locks = new Dictionary<string, Expression>();
-        public List<Command> CommandLocks = new List<Command>();
+        public List<Command.Command> CommandLocks = new List<Command.Command>();
 
         public ExecutionContext()
         {
@@ -83,7 +84,7 @@ namespace kOS
         public virtual void Update(float time)
         {
             // Process Command locks
-            foreach (var command in new List<Command>(CommandLocks))
+            foreach (var command in new List<Command.Command>(CommandLocks))
             {
                 command.Update(time);
             }
@@ -218,7 +219,7 @@ namespace kOS
             return ParentContext == null ? null : ParentContext.GetLock(name);
         }
 
-        public virtual void Lock(Command command)
+        public virtual void Lock(Command.Command command)
         {
             CommandLocks.Add(command);
         }
@@ -235,7 +236,7 @@ namespace kOS
             }
         }
 
-        public virtual void Unlock(Command command)
+        public virtual void Unlock(Command.Command command)
         {
             CommandLocks.Remove(command);
             if (ParentContext != null) ParentContext.Unlock(command);

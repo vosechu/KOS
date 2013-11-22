@@ -1,7 +1,7 @@
 using System;
 using System.Text.RegularExpressions;
 
-namespace kOS
+namespace kOS.Command.FileIO
 {
     [AttributeCommand("COPY &[TO,FROM][VOLUME]? ^")]
     public class CopyCommand : Command

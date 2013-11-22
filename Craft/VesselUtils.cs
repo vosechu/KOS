@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace kOS
+namespace kOS.Craft
 {
     public static class VesselUtils
     {

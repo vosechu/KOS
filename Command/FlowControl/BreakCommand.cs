@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace kOS
+namespace kOS.Command.FlowControl
 {
     [AttributeCommand("BREAK")]
     public class BreakCommand : Command

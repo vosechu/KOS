@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace kOS
+namespace kOS.Command.BasicIO
 {
     [AttributeCommand("% OFF")]
     public class SetOffCommand : Command

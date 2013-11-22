@@ -1,4 +1,4 @@
-﻿namespace kOS
+﻿namespace kOS.Binding.Environment
 {
     [kOSBinding("ksp")]
     public class BindingTimeWarp : Binding

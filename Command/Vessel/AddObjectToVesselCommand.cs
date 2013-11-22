@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace kOS
+namespace kOS.Command.Vessel
 {
     [AttributeCommand("ADD *")]
     public class AddObjectToVesselCommand : Command

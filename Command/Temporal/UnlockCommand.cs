@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace kOS
+namespace kOS.Command.Temporal
 {
     [AttributeCommand("UNLOCK %")]
     public class UnlockCommand : Command

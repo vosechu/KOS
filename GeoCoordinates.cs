@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using kOS.Craft;
 
 namespace kOS
 {

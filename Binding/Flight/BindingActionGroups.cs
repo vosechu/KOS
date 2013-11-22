@@ -1,4 +1,6 @@
-namespace kOS
+using kOS.Craft;
+
+namespace kOS.Binding.Flight
 {
     [kOSBinding("ksp")]
     public class BindingActionGroups : Binding

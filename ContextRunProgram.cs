@@ -9,7 +9,7 @@ namespace kOS
     {
         private File file;
         private String commandBuffer;
-        private readonly List<Command> commands = new List<Command>();
+        private readonly List<Command.Command> commands = new List<Command.Command>();
         private readonly List<Expression> parameters = new List<Expression>();
         private const int EXECUTION_LINE = 0;
 
@@ -46,7 +46,7 @@ namespace kOS
                 try
                 {
                     Line = commandLineStart;
-                    var cmdObj = Command.Get(cmd, this, commandLineStart);
+                    var cmdObj = Command.Command.Get(cmd, this, commandLineStart);
                     commands.Add(cmdObj);
                 }
                 catch (kOSException e)
@@ -139,7 +139,7 @@ namespace kOS
             if (ChildContext != null) return;
             if (commands.Count > 0)
             {
-                Command cmd = commands[0];
+                Command.Command cmd = commands[0];
                 commands.RemoveAt(0);
 
                 ChildContext = cmd;

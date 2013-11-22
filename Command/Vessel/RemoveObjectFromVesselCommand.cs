@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace kOS
+namespace kOS.Command.Vessel
 {
     [AttributeCommand("REMOVE *")]
     public class RemoveObjectFromVesselCommand : Command

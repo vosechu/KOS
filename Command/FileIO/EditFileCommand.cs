@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace kOS
+namespace kOS.Command.FileIO
 {
     [AttributeCommand("EDIT &")]
     public class EditFileCommand : Command

@@ -1,7 +1,7 @@
 using System;
 using System.Text.RegularExpressions;
 
-namespace kOS
+namespace kOS.Command.FileIO
 {
     [AttributeCommand("LIST[VOLUMES,FILES]?")]
     public class ListCommand : Command

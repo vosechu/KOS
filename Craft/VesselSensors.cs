@@ -1,6 +1,6 @@
 using System;
 
-namespace kOS
+namespace kOS.Craft
 {
     public class VesselSensors : SpecialValue
     {

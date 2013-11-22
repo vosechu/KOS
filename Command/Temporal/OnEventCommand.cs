@@ -1,7 +1,7 @@
 using System;
 using System.Text.RegularExpressions;
 
-namespace kOS
+namespace kOS.Command.Temporal
 {
     [AttributeCommand("ON % *")]
     public class OnEventCommand : Command

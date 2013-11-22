@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-
-namespace kOS
+namespace kOS.Command.FlowControl
 {
     [AttributeCommand("^{([\\S\\s]*)}$")]
     public class BlockCommand : Command

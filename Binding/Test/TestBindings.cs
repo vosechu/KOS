@@ -1,4 +1,4 @@
-namespace kOS
+namespace kOS.Binding.Test
 {
     [kOSBinding]
     public class TestBindings : Binding

@@ -1,4 +1,5 @@
 ﻿using System;
+using kOS.Craft;
 
 namespace kOS
 {

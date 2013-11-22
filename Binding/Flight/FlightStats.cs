@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Linq;
 using UnityEngine;
+using kOS.Craft;
 
-namespace kOS
+namespace kOS.Binding.Flight
 {
 
     [kOSBinding("ksp")]

@@ -1,7 +1,7 @@
 using System;
 using System.Text.RegularExpressions;
 
-namespace kOS
+namespace kOS.Command.FileIO
 {
     [AttributeCommand("RENAME[VOLUME,FILE]? ^ TO &")]
     public class RenameCommand : Command

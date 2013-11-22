@@ -1,6 +1,6 @@
 using System;
 
-namespace kOS
+namespace kOS.Command
 {
     public class AttributeCommand : Attribute
     {

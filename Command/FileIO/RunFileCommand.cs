@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace kOS
+namespace kOS.Command.FileIO
 {
     [AttributeCommand(@"^RUN ([a-zA-Z0-9\-_]+?)( ?\((.*?)\))?$")]
     public class RunFileCommand : Command

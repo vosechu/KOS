@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Text.RegularExpressions;
+using kOS.Craft;
 
-namespace kOS
+namespace kOS.Command.Vessel
 {
     [AttributeCommand(@"^LIST (PARTS|RESOURCES|ENGINES|TARGETS|BODIES|SENSORS)$")]
     class VesselListingCommand : Command
@@ -33,7 +34,7 @@ namespace kOS
 
                     double commRange = Vessel.GetCommRange();
 
-                    foreach (Vessel vessel in FlightGlobals.Vessels)
+                    foreach (global::Vessel vessel in FlightGlobals.Vessels)
                     {
                         if (vessel == Vessel) continue;
                         var vT = new VesselTarget(vessel, this);

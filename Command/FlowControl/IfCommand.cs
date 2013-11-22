@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace kOS
+namespace kOS.Command.FlowControl
 {
     [AttributeCommand("IF ~_{}")]
     public class IfCommand : Command

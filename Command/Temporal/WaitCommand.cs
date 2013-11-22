@@ -1,7 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-
-namespace kOS
+namespace kOS.Command.Temporal
 {
     [AttributeCommand("WAIT[UNTIL]? *")]
     public class WaitCommand : Command
