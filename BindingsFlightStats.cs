@@ -19,7 +19,11 @@ namespace kOS
             manager.AddGetter("ALT:PERIAPSIS", cpu => cpu.Vessel.orbit.PeA);
             manager.AddGetter("ETA:APOAPSIS", cpu => cpu.Vessel.orbit.timeToAp);
             manager.AddGetter("ETA:PERIAPSIS", cpu => cpu.Vessel.orbit.timeToPe);
-        
+            manager.AddGetter("OBT:PEROID", cpu => cpu.Vessel.orbit.period);
+            manager.AddGetter("OBT:INCLINATION", cpu => cpu.Vessel.orbit.inclination);
+            manager.AddGetter("OBT:ECCENTRICITY", cpu => cpu.Vessel.orbit.eccentricity);
+            manager.AddGetter("OBT:SEMIMAJORAXIS", cpu => cpu.Vessel.orbit.semiMajorAxis);
+            manager.AddGetter("OBT:SEMIMINORAXIS", cpu => cpu.Vessel.orbit.semiMinorAxis);
 
             manager.AddGetter("MISSIONTIME", cpu => cpu.Vessel.missionTime);
             manager.AddGetter("TIME", cpu => new TimeSpan(Planetarium.GetUniversalTime()));
