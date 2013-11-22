@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-
 using UnityEngine;
 
 namespace kOS
@@ -18,22 +16,12 @@ namespace kOS
 
         public virtual File GetByName(String name)
         {
-            foreach (File p in files)
-            {
-                if (p.Filename.ToUpper() == name.ToUpper()) return p;
-            }
-
-            return null;
+            return files.FirstOrDefault(p => p.Filename.ToUpper() == name.ToUpper());
         }
 
         public virtual void AppendToFile(string name, string str) 
         {
-            File file = GetByName(name);
-
-            if (file == null)
-            {
-                file = new File(name);
-            }
+            var file = GetByName(name) ?? new File(name);
 
             file.Add(str);
 
@@ -42,13 +30,10 @@ namespace kOS
 
         public virtual void DeleteByName(String name)
         {
-            foreach (File p in files)
+            foreach (var p in files.Where(p => p.Filename.ToUpper() == name.ToUpper()))
             {
-                if (p.Filename.ToUpper() == name.ToUpper())
-                {
-                    files.Remove(p);
-                    return;
-                }
+                files.Remove(p);
+                return;
             }
         }
 
@@ -67,14 +52,7 @@ namespace kOS
 
         public virtual List<FileInfo> GetFileList()
         {
-            List<FileInfo> retList = new List<FileInfo>();
-
-            foreach (File file in files)
-            {
-                retList.Add(new FileInfo(file.Filename, file.GetSize()));
-            }
-
-            return retList;
+            return files.Select(file => new FileInfo(file.Filename, file.GetSize())).ToList();
         }
 
         public virtual bool CheckRange()
@@ -87,7 +65,7 @@ namespace kOS
     {
         public string ArchiveFolder = GameDatabase.Instance.PluginDataFolder + "/Plugins/PluginData/Archive/";
 
-        private Vessel vessel;
+        private readonly Vessel vessel;
 
         public Archive(Vessel vessel)
         {
@@ -96,7 +74,7 @@ namespace kOS
             Renameable = false;
             Name = "Archive";
 
-            loadAll();
+            LoadAll();
         }
 
         public override bool IsRoomFor(File newFile)
@@ -104,51 +82,50 @@ namespace kOS
             return true;
         }
 
-        private void loadAll()
+        private void LoadAll()
         {
             Directory.CreateDirectory(ArchiveFolder);
 
             // Attempt to migrate files from old archive drive
-            if (KSP.IO.File.Exists<File>(HighLogic.fetch.GameSaveFolder + "/arc"))
+            if (!KSP.IO.File.Exists<File>(HighLogic.fetch.GameSaveFolder + "/arc")) return;
+
+            var reader = KSP.IO.BinaryReader.CreateForType<File>(HighLogic.fetch.GameSaveFolder + "/arc");
+
+            var fileCount = reader.ReadInt32();
+
+            for (var i = 0; i < fileCount; i++)
             {
-                var reader = KSP.IO.BinaryReader.CreateForType<File>(HighLogic.fetch.GameSaveFolder + "/arc");
-
-                int fileCount = reader.ReadInt32();
-
-                for (int i = 0; i < fileCount; i++)
+                try
                 {
-                    try
-                    {
-                        String filename = reader.ReadString();
-                        String body = reader.ReadString();
+                    var filename = reader.ReadString();
+                    var body = reader.ReadString();
 
-                        File file = new File(filename);
-                        file.Deserialize(body);
+                    var file = new File(filename);
+                    file.Deserialize(body);
 
-                        files.Add(file);
-                        SaveFile(file);
-                    }
-                    catch (EndOfStreamException e)
-                    {
-                        break;
-                    }
+                    files.Add(file);
+                    SaveFile(file);
                 }
-
-                reader.Close();
-
-                KSP.IO.File.Delete<File>(HighLogic.fetch.GameSaveFolder + "/arc");
+                catch (EndOfStreamException)
+                {
+                    break;
+                }
             }
+
+            reader.Close();
+
+            KSP.IO.File.Delete<File>(HighLogic.fetch.GameSaveFolder + "/arc");
         }
 
         public override File GetByName(string name)
         {
             try
             {
-                using (StreamReader infile = new StreamReader(ArchiveFolder + name + ".txt", true))
+                using (var infile = new StreamReader(ArchiveFolder + name + ".txt", true))
                 {
-                    String fileBody = infile.ReadToEnd().Replace("\r\n", "\n") ;
+                    var fileBody = infile.ReadToEnd().Replace("\r\n", "\n") ;
 
-                    File retFile = new File(name);
+                    var retFile = new File(name);
                     retFile.Deserialize(fileBody);
                     
                     base.DeleteByName(name);
@@ -157,7 +134,7 @@ namespace kOS
                     return retFile;
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }
@@ -176,9 +153,9 @@ namespace kOS
 
             try
             {
-                using (StreamWriter outfile = new StreamWriter(ArchiveFolder + file.Filename + ".txt", false))
+                using (var outfile = new StreamWriter(ArchiveFolder + file.Filename + ".txt", false))
                 {
-                    String fileBody = file.Serialize();
+                    var fileBody = file.Serialize();
 
                     if (Application.platform == RuntimePlatform.WindowsPlayer)
                     {
@@ -189,7 +166,7 @@ namespace kOS
                     outfile.Write(fileBody);
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }
@@ -208,15 +185,11 @@ namespace kOS
 
             try
             {
-                foreach (var file in Directory.GetFiles(ArchiveFolder, "*.txt"))
-                {
-                    var sysFileInfo = new System.IO.FileInfo(file);
-                    var fileInfo = new kOS.FileInfo(sysFileInfo.Name.Substring(0, sysFileInfo.Name.Length - 4), (int)sysFileInfo.Length);
-
-                    retList.Add(fileInfo);
-                }
+                retList.AddRange(Directory.GetFiles(ArchiveFolder, "*.txt")
+                    .Select(file => new System.IO.FileInfo(file))
+                    .Select(sysFileInfo => new FileInfo(sysFileInfo.Name.Substring(0, sysFileInfo.Name.Length - 4), (int) sysFileInfo.Length)));
             }
-            catch (DirectoryNotFoundException e)
+            catch (DirectoryNotFoundException)
             {
             }
 

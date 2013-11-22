@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 
 namespace kOS
@@ -15,7 +14,7 @@ namespace kOS
     
     public class BindingManager
     {
-        public CPU cpu;
+        public CPU Cpu;
 
         public Dictionary<String, BindingSetDlg> Setters = new Dictionary<String, BindingSetDlg>();
         public Dictionary<String, BindingGetDlg> Getters = new Dictionary<String, BindingGetDlg>();
@@ -26,31 +25,26 @@ namespace kOS
 
         public BindingManager(CPU cpu, String context)
         {
-            this.cpu = cpu;
+            Cpu = cpu;
 
             var contexts = new string[1];
             contexts[0] = context;
 
-            foreach (Type t in Assembly.GetExecutingAssembly().GetTypes())
+            foreach (var b in from t in Assembly.GetExecutingAssembly().GetTypes() 
+                              let attr = (kOSBinding)t.GetCustomAttributes(typeof(kOSBinding), true).FirstOrDefault() 
+                              where attr != null 
+                              where !attr.Contexts.Any() || attr.Contexts.Intersect(contexts).Any() 
+                              select (Binding)Activator.CreateInstance(t))
             {
-                kOSBinding attr = (kOSBinding)t.GetCustomAttributes(typeof(kOSBinding), true).FirstOrDefault();
-                if (attr != null)
-                {
-                    if (attr.Contexts.Count() == 0 || attr.Contexts.Intersect(contexts).Any())
-                    {
-                        Binding b = (Binding)Activator.CreateInstance(t);
-                        b.AddTo(this);
-                        Bindings.Add(b);
-                    }
-                }
+                b.AddTo(this);
+                Bindings.Add(b);
             }
         }
 
         public void AddGetter(String name, BindingGetDlg dlg)
         {
-            Variable v = cpu.FindVariable(name);
-            if (v == null) v = cpu.FindVariable(name.Split(":".ToCharArray())[0]);
-            
+            var v = Cpu.FindVariable(name) ?? Cpu.FindVariable(name.Split(":".ToCharArray())[0]);
+
             if (v != null)
             {
                 if (v is BoundVariable)
@@ -60,15 +54,15 @@ namespace kOS
             }
             else
             {
-                var bv = cpu.CreateBoundVariable(name);
+                var bv = Cpu.CreateBoundVariable(name);
                 bv.Get = dlg;
-                bv.cpu = cpu;
+                bv.Cpu = Cpu;
             }
         }
 
         public void AddSetter(String name, BindingSetDlg dlg)
         {
-            Variable v = cpu.FindVariable(name.ToLower());
+            var v = Cpu.FindVariable(name.ToLower());
             if (v != null)
             {
                 if (v is BoundVariable)
@@ -78,15 +72,15 @@ namespace kOS
             }
             else
             {
-                var bv = cpu.CreateBoundVariable(name.ToLower());
+                var bv = Cpu.CreateBoundVariable(name.ToLower());
                 bv.Set = dlg;
-                bv.cpu = cpu;
+                bv.Cpu = Cpu;
             }
         }
 
         public void Update(float time)
         {
-            foreach (Binding b in Bindings)
+            foreach (var b in Bindings)
             {
                 b.Update(time);
             }
@@ -104,17 +98,17 @@ namespace kOS
     {
         public BindingManager.BindingSetDlg Set;
         public BindingManager.BindingGetDlg Get;
-        public CPU cpu;
+        public CPU Cpu;
 
         public override object Value
         {
             get
             {
-                return Get(cpu);
+                return Get(Cpu);
             }
             set
             {
-                Set(cpu, value);
+                Set(Cpu, value);
             }
         }
     }

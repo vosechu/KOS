@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 
 namespace kOS
@@ -62,7 +59,7 @@ namespace kOS
             if (suffixName == "PITCH") return euler.x;
             if (suffixName == "YAW") return euler.y;
             if (suffixName == "ROLL") return euler.z;
-            if (suffixName == "VECTOR") return new kOS.Vector(vector);
+            if (suffixName == "VECTOR") return new Vector(vector);
 
             return base.GetSuffix(suffixName);
         }
@@ -87,16 +84,14 @@ namespace kOS
                 // If I remember correctly, order of multiplication DOES matter with quaternions
                 if (!reverseOrder)
                     return this * (Direction)other;
-                else
-                    return (Direction)other * this;
+                return (Direction)other * this;
             }
-            else if (op == "+" && other is Direction) return this + (Direction)other;
-            else if (op == "-" && other is Direction)
+            if (op == "+" && other is Direction) return this + (Direction)other;
+            if (op == "-" && other is Direction)
             {
                 if (!reverseOrder)
                     return this - (Direction)other;
-                else
-                    return (Direction)other - this;
+                return (Direction)other - this;
             }
 
             return null;

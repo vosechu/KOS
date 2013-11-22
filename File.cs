@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using UnityEngine;
 
 namespace kOS
 {
@@ -13,7 +11,7 @@ namespace kOS
         public File(File copy)
         {
             Filename = copy.Filename;
-            foreach (String line in copy)
+            foreach (var line in copy)
             {
                 Add(line);
             }
@@ -21,7 +19,7 @@ namespace kOS
 
         public File(String filename)
         {
-            this.Filename = filename;
+            Filename = filename;
         }
 
         public File(ConfigNode fileNode)
@@ -31,33 +29,24 @@ namespace kOS
 
         public File Copy()
         {
-            File retFile = new File(Filename);
-            foreach (String line in this)
-            {
-                retFile.Add(line);
-            }
+            var retFile = new File(Filename);
+            retFile.AddRange(this);
 
             return retFile;
         }
 
         public int GetSize()
         {
-            int finalSize = 0;
-            foreach (String line in this)
-            {
-                finalSize += line.Length;
-            }
-
-            return finalSize;
+            return this.Sum(line => line.Length);
         }
 
         public ConfigNode Save(string nodeName)
         {
-            ConfigNode node = new ConfigNode(nodeName);
+            var node = new ConfigNode(nodeName);
 
             node.AddValue("filename", Filename);
 
-            foreach (String s in this)
+            foreach (var s in this)
             {
                 node.AddValue("line", EncodeLine(s));
             }
@@ -69,7 +58,7 @@ namespace kOS
         {
             Filename = fileNode.GetValue("filename");
 
-            foreach (String s in fileNode.GetValues("line"))
+            foreach (var s in fileNode.GetValues("line"))
             {
                 Add(DecodeLine(s));
             }
@@ -87,21 +76,14 @@ namespace kOS
         
         public string Serialize()
         {
-            string output = "";
-
-            foreach (String s in this)
-            {
-                output += s + "\n";
-            }
-
-            return output;
+            return this.Aggregate("", (current, s) => current + (s + "\n"));
         }
 
         public void Deserialize(String input)
         {
-            this.Clear();
+            Clear();
 
-            foreach (String s in input.Split('\n'))
+            foreach (var s in input.Split('\n'))
             {
                 Add(s);
             }
@@ -113,10 +95,10 @@ namespace kOS
         public string Name;
         public int Size;
 
-        public FileInfo(string Name, int Size)
+        public FileInfo(string name, int size)
         {
-            this.Name = Name;
-            this.Size = Size;
+            Name = name;
+            Size = size;
         }
     }
 }

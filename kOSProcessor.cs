@@ -1,10 +1,6 @@
-﻿using KSP.IO;
-using System;
+﻿using System.Linq;
+using KSP.IO;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-
 using UnityEngine;
 
 namespace kOS
@@ -13,11 +9,11 @@ namespace kOS
     {
         public CPU cpu;
         public Harddisk hardDisk = null;
-        private int vesselPartCount = 0;
-        private List<kOSProcessor> sisterProcs = new List<kOSProcessor>();
+        private int vesselPartCount;
+        private readonly List<kOSProcessor> sisterProcs = new List<kOSProcessor>();
         private Dictionary<uint, uint> partIdentifiers;
 
-        private static int MemSize = 10000;
+        private const int MemSize = 10000;
         private static int cpuIdMax;
 
         [KSPEvent(guiActive = true, guiName = "Open Terminal")]
@@ -31,16 +27,9 @@ namespace kOS
         {
             if (cpu == null) return;
 
-            if (cpu.Mode != CPU.Modes.OFF)
-            {
-                cpu.Mode = CPU.Modes.OFF;
-            }
-            else
-            {
-                cpu.Mode = CPU.Modes.STARVED;
-            }
+            cpu.Mode = cpu.Mode != CPU.Modes.OFF ? CPU.Modes.OFF : CPU.Modes.STARVED;
         }
-                
+
         [KSPAction("Open Terminal", actionGroup = KSPActionGroup.None)]
         public void Activate(KSPActionParam param) {
             Activate();
@@ -57,7 +46,7 @@ namespace kOS
         [KSPField(isPersistant = true, guiActive = false)]
         public int MaxPartID = 0;
 
-        public override void OnStart(PartModule.StartState state)
+        public override void OnStart(StartState state)
         {
             //Do not start from editor and at KSP first loading
             if (state == StartState.Editor || state == StartState.None)
@@ -73,12 +62,10 @@ namespace kOS
 
         public void initCpu()
         {
-            if (cpu == null)
-            {
-                cpu = new CPU(this, "ksp");
-                cpu.AttachHardDisk(hardDisk);
-                cpu.Boot();
-            }
+            if (cpu != null) return;
+            cpu = new CPU(this, "ksp");
+            cpu.AttachHardDisk(hardDisk);
+            cpu.Boot();
         }
 
         public void RegisterkOSExternalFunction(object[] parameters)
@@ -90,7 +77,7 @@ namespace kOS
         
         private void assignPartIdentifiers()
         {
-            foreach (Part part in vessel.parts)
+            foreach (var part in vessel.parts)
             {
                 if (!partIdentifiers.ContainsKey(part.flightID))
                 {
@@ -101,11 +88,9 @@ namespace kOS
         
         public static int AssignNewID()
         {
-            int id;
-
-            PluginConfiguration config = PluginConfiguration.CreateForType<kOSProcessor>();
+            var config = PluginConfiguration.CreateForType<kOSProcessor>();
             config.load();
-            id = config.GetValue<int>("CpuIDMax") + 1;
+            var id = config.GetValue<int>("CpuIDMax") + 1;
             config.SetValue("CpuIDMax", id);
             config.save();
 
@@ -124,7 +109,7 @@ namespace kOS
 
             cpu.Update(Time.deltaTime);
 
-            cpu.ProcessElectricity(this.part, TimeWarp.fixedDeltaTime);
+            cpu.ProcessElectricity(part, TimeWarp.fixedDeltaTime);
 
             UpdateParts();
         }
@@ -132,39 +117,31 @@ namespace kOS
         public void UpdateParts()
         {
             // Trigger whenever the number of parts in the vessel changes (like when staging, docking or undocking)
-            if (vessel.parts.Count != vesselPartCount)
+            if (vessel.parts.Count == vesselPartCount) return;
+
+            var attachedVolumes = new List<Volume> {cpu.archive, hardDisk};
+
+            // Look for sister units that have newly been added to the vessel
+            sisterProcs.Clear();
+            foreach (var part in vessel.parts)
             {
-                List<Volume> attachedVolumes = new List<Volume>();
-                attachedVolumes.Add(cpu.archive);
-                attachedVolumes.Add(this.hardDisk);
-
-                // Look for sister units that have newly been added to the vessel
-                sisterProcs.Clear();
-                foreach (Part part in vessel.parts)
-                {
-                    kOSProcessor sisterProc;
-                    if (part != this.part && PartIsKosProc(part, out sisterProc))
-                    {
-                        sisterProcs.Add(sisterProc);
-                        attachedVolumes.Add(sisterProc.hardDisk);
-                    }
-                }
-
-                cpu.UpdateVolumeMounts(attachedVolumes);
-
-                vesselPartCount = vessel.parts.Count;
+                kOSProcessor sisterProc;
+                if (part == this.part || !PartIsKosProc(part, out sisterProc)) continue;
+                sisterProcs.Add(sisterProc);
+                attachedVolumes.Add(sisterProc.hardDisk);
             }
+
+            cpu.UpdateVolumeMounts(attachedVolumes);
+
+            vesselPartCount = vessel.parts.Count;
         }
 
         public bool PartIsKosProc(Part input, out kOSProcessor proc)
         {
-            foreach (PartModule module in input.Modules)
+            foreach (var module in input.Modules.OfType<kOSProcessor>())
             {
-                if (module is kOSProcessor)
-                {
-                    proc = (kOSProcessor)module;
-                    return true;
-                }
+                proc = module;
+                return true;
             }
 
             proc = null;
@@ -181,10 +158,9 @@ namespace kOS
             // KSP Seems to want to make an instance of my partModule during initial load
             if (vessel == null) return;
 
-            foreach (ConfigNode hdNode in node.GetNodes("harddisk"))
+            foreach (var newDisk in node.GetNodes("harddisk").Select(hdNode => new Harddisk(hdNode)))
             {
-                Harddisk newDisk = new Harddisk(hdNode);
-                this.hardDisk = newDisk;
+                hardDisk = newDisk;
             }
 
             Debug.Log("******************************* ON LOAD ");

@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 
 
@@ -17,8 +14,8 @@ namespace kOS
 
         public override void Evaluate()
         {
-            Expression e = new Expression(RegexMatch.Groups[2].Value, ParentContext);
-            bool untilClause = (RegexMatch.Groups[1].Value.Trim().ToUpper() == "UNTIL");
+            var e = new Expression(RegexMatch.Groups[2].Value, ParentContext);
+            var untilClause = (RegexMatch.Groups[1].Value.Trim().ToUpper() == "UNTIL");
 
             if (!untilClause)
             {
@@ -45,14 +42,7 @@ namespace kOS
 
         public override bool Type(char c)
         {
-            if (State == ExecutionState.WAIT)
-            {
-                return true;
-            }
-            else
-            {
-                return base.Type(c);
-            }
+            return State == ExecutionState.WAIT || base.Type(c);
         }
 
         public override void Update(float time)
@@ -106,13 +96,11 @@ namespace kOS
                 throw new Exception("Value type error");
             }
 
-            if (originalValue != newValue)
-            {
-                ParentContext.Unlock(this);
+            if (originalValue == newValue) return;
+            ParentContext.Unlock(this);
 
-                targetCommand.Evaluate();
-                ParentContext.Push(targetCommand);
-            }
+            targetCommand.Evaluate();
+            ParentContext.Push(targetCommand);
         }
 
         public bool objToBool(object obj, out bool result)
@@ -121,13 +109,10 @@ namespace kOS
             {
                 return true;
             }
-            else
+            if (obj is float)
             {
-                if (obj is float)
-                {
-                    result = ((float)obj) > 0;
-                    return true;
-                }
+                result = ((float)obj) > 0;
+                return true;
             }
 
             return false;

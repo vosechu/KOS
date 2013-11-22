@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -11,20 +9,20 @@ namespace kOS
     {
         public static string DisplayObjectInfo(Object o)
         {
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
 
             // Include the type of the object
-            System.Type type = o.GetType();
+            var type = o.GetType();
             sb.Append("Type: " + type.Name);
 
             // Include information for each Field
             sb.Append("\r\n\r\nFields:");
-            System.Reflection.FieldInfo[] fi = type.GetFields();
+            var fi = type.GetFields();
             if (fi.Length > 0)
             {
-                foreach (FieldInfo f in fi)
+                foreach (var f in fi)
                 {
-                    sb.Append("\r\n " + f.ToString() + " = " +
+                    sb.Append("\r\n " + f + " = " +
                                 f.GetValue(o));
                 }
             }
@@ -33,12 +31,12 @@ namespace kOS
 
             // Include information for each Property
             sb.Append("\r\n\r\nProperties:");
-            System.Reflection.PropertyInfo[] pi = type.GetProperties();
+            var pi = type.GetProperties();
             if (pi.Length > 0)
             {
                 foreach (PropertyInfo p in pi)
                 {
-                    sb.Append("\r\n " + p.ToString() + " = " +
+                    sb.Append("\r\n " + p + " = " +
                                 p.GetValue(o, null));
                 }
             }

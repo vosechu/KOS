@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace kOS
@@ -26,22 +25,22 @@ namespace kOS
         static Term()
         {
             mathSymbols = new List<string>();
-            mathSymbols.AddRange(new string[] { "+", "-", "*", "/", "^" });
+            mathSymbols.AddRange(new[] { "+", "-", "*", "/", "^" });
 
             comparisonSymbols = new List<string>();
-            comparisonSymbols.AddRange(new string[] { "<=", ">=", "!=", "==", "=", "<", ">" });
+            comparisonSymbols.AddRange(new[] { "<=", ">=", "!=", "==", "=", "<", ">" });
 
             booleanSymbols = new List<string>();
-            booleanSymbols.AddRange(new string[] { " AND ", " OR " });
+            booleanSymbols.AddRange(new[] { " AND ", " OR " });
 
             parameterSeperatorSymbols = new List<string>();
-            parameterSeperatorSymbols.AddRange(new string[] { "," });
+            parameterSeperatorSymbols.AddRange(new[] { "," });
 
             subaccessSymbols = new List<string>();
-            subaccessSymbols.AddRange(new string[] { ":" });
+            subaccessSymbols.AddRange(new[] { ":" });
 
             delimeterSymbols = new List<string>();
-            delimeterSymbols.AddRange(new string[] { "(", ")", "\"" });
+            delimeterSymbols.AddRange(new[] { "(", ")", "\"" });
 
             allSymbols = new List<string>();
             allSymbols.AddRange(mathSymbols.ToArray());
@@ -68,16 +67,16 @@ namespace kOS
 
         public void CopyFrom(ref Term from)
         {
-            this.Text = from.Text;
-            this.SubTerms = from.SubTerms;
-            this.Type = from.Type;
+            Text = from.Text;
+            SubTerms = from.SubTerms;
+            Type = from.Type;
         }
 
         public Term Merge(params Term[] terms)
         {
-            Term output = new Term("");
+            var output = new Term("");
 
-            foreach (Term t in terms)
+            foreach (var t in terms)
             {
                 output.Text += t.Type == TermTypes.PARAMETER_LIST ? "(" + t.Text + ")" :
                                 t.Type == TermTypes.SUFFIX ? ":" + t.Text :
@@ -96,26 +95,42 @@ namespace kOS
 
         public String Demo(int tabIndent)
         {
-            String retString = new String(' ', tabIndent * 4);
+            var retString = new String(' ', tabIndent * 4);
 
-            if (Type == TermTypes.FUNCTION) retString += "FUNCTION->";
-            else if (Type == TermTypes.PARAMETER_LIST) retString += "PARAMS->";
-            else if (Type == TermTypes.COMPARISON) retString += "COMPARISON->";
-            else if (Type == TermTypes.BOOLEAN) retString += "BOOLEAN->";
-            else if (Type == TermTypes.STRUCTURE) retString += "STRUCTURE->";
-            else if (Type == TermTypes.MATH_OPERATOR) retString += "MATH ";
-            else if (Type == TermTypes.COMPARISON_OPERATOR) retString += "COMP ";
-            else if (Type == TermTypes.BOOLEAN_OPERATOR) retString += "BOOL ";
-            else if (Type == TermTypes.SUFFIX) retString += ":";
+            switch (Type)
+            {
+                case TermTypes.FUNCTION:
+                    retString += "FUNCTION->";
+                    break;
+                case TermTypes.PARAMETER_LIST:
+                    retString += "PARAMS->";
+                    break;
+                case TermTypes.COMPARISON:
+                    retString += "COMPARISON->";
+                    break;
+                case TermTypes.BOOLEAN:
+                    retString += "BOOLEAN->";
+                    break;
+                case TermTypes.STRUCTURE:
+                    retString += "STRUCTURE->";
+                    break;
+                case TermTypes.MATH_OPERATOR:
+                    retString += "MATH ";
+                    break;
+                case TermTypes.COMPARISON_OPERATOR:
+                    retString += "COMP ";
+                    break;
+                case TermTypes.BOOLEAN_OPERATOR:
+                    retString += "BOOL ";
+                    break;
+                case TermTypes.SUFFIX:
+                    retString += ":";
+                    break;
+            }
 
             retString += Text + Environment.NewLine;
 
-            foreach (Term t in SubTerms)
-            {
-                retString += t.Demo(tabIndent + 1);
-            }
-
-            return retString;
+            return SubTerms.Aggregate(retString, (current, t) => current + t.Demo(tabIndent + 1));
         }
 
         private void processSymbols()
@@ -130,7 +145,7 @@ namespace kOS
             Text = Regex.Replace(Text, "(\\s|^)<([a-zA-Z]+)>(\\s|$)", " SHIP:$2 ", RegexOptions.IgnoreCase);
 
             // Is this JUST a matched symbol?                
-            String s = matchAt(ref Text, 0, ref allSymbols);
+            var s = matchAt(ref Text, 0, ref allSymbols);
             if (s != null && Text.Length == s.Length)
             {
                 if (mathSymbols.Contains(s)) Type = TermTypes.MATH_OPERATOR;
@@ -148,7 +163,7 @@ namespace kOS
                 var parameterList = parseParameters(Text);
                 if (parameterList != null)
                 {
-                    foreach (String param in parameterList)
+                    foreach (var param in parameterList)
                     {
                         SubTerms.Add(new Term(param));
                     }
@@ -165,14 +180,9 @@ namespace kOS
 
                 foreach (String element in booleanElements)
                 {
-                    if (booleanSymbols.Contains(element))
-                    {
-                        SubTerms.Add(new Term(element, TermTypes.BOOLEAN_OPERATOR));
-                    }
-                    else
-                    {
-                        SubTerms.Add(new Term(element));
-                    }
+                    SubTerms.Add(booleanSymbols.Contains(element)
+                                     ? new Term(element, TermTypes.BOOLEAN_OPERATOR)
+                                     : new Term(element));
                 }
 
                 return;
@@ -184,7 +194,7 @@ namespace kOS
             {
                 Type = TermTypes.COMPARISON;
 
-                foreach (String element in comparisonElements)
+                foreach (var element in comparisonElements)
                 {
                     SubTerms.Add(new Term(element));
                 }
@@ -193,89 +203,91 @@ namespace kOS
             }
 
             // Parse this as a normal term
-            String buffer = "";
-            for (int i = 0; i < Text.Length; i++)
+            var buffer = "";
+            for (var i = 0; i < Text.Length; i++)
             {
                 s = matchAt(ref Text, i, ref allSymbols);
 
-                if (s == null)
+                switch (s)
                 {
-                    buffer += Text[i];
-                }
-                else if (s == "(")
-                {
-                    int startI = i;
-                    Utils.Balance(ref Text, ref i, ')');
+                    case null:
+                        buffer += Text[i];
+                        break;
+                    case "(":
+                        {
+                            int startI = i;
+                            Utils.Balance(ref Text, ref i, ')');
                     
-                    if (buffer.Trim() != "")
-                    {
-                        string functionName = buffer.Trim();
-                        buffer = "";
+                            if (buffer.Trim() != "")
+                            {
+                                string functionName = buffer.Trim();
+                                buffer = "";
 
-                        Term bracketTerm = new Term(Text.Substring(startI + 1, i - startI - 1), TermTypes.PARAMETER_LIST);
-                        Term functionTerm = Merge(new Term(functionName), bracketTerm);
-                        functionTerm.Type = TermTypes.FUNCTION;
+                                Term bracketTerm = new Term(Text.Substring(startI + 1, i - startI - 1), TermTypes.PARAMETER_LIST);
+                                Term functionTerm = Merge(new Term(functionName), bracketTerm);
+                                functionTerm.Type = TermTypes.FUNCTION;
 
-                        SubTerms.Add(functionTerm);
-                    }
-                    else
-                    {
-                        SubTerms.Add(new Term(Text.Substring(startI + 1, i - startI - 1)));
-                    }
-                }
-                else if (s == "\"")
-                {
-                    int startI = i;
-                    i = Utils.FindEndOfString(Text, i + 1);
-                    buffer += Text.Substring(startI, i - startI + 1); 
-                }
-                else if (s == ":")
-                {
-                    int end = findEndOfSuffix(Text, i + 1);
-                    String suffixName = Text.Substring(i + 1, end - i);
-                    i += end - i;
+                                SubTerms.Add(functionTerm);
+                            }
+                            else
+                            {
+                                SubTerms.Add(new Term(Text.Substring(startI + 1, i - startI - 1)));
+                            }
+                        }
+                        break;
+                    case "\"":
+                        {
+                            int startI = i;
+                            i = Utils.FindEndOfString(Text, i + 1);
+                            buffer += Text.Substring(startI, i - startI + 1); 
+                        }
+                        break;
+                    case ":":
+                        {
+                            int end = findEndOfSuffix(Text, i + 1);
+                            String suffixName = Text.Substring(i + 1, end - i);
+                            i += end - i;
 
-                    if (buffer.Trim() != "")
-                    {
-                        SubTerms.Add(new Term(buffer.Trim()));
-                        buffer = "";
-                    }
+                            if (buffer.Trim() != "")
+                            {
+                                SubTerms.Add(new Term(buffer.Trim()));
+                                buffer = "";
+                            }
 
-                    if (SubTerms.Count > 0)
-                    {
-                        Term last = SubTerms.Last();
-                        SubTerms.Remove(last);
+                            if (SubTerms.Count > 0)
+                            {
+                                Term last = SubTerms.Last();
+                                SubTerms.Remove(last);
 
-                        Term structureTerm = Merge(last, new Term(suffixName, TermTypes.SUFFIX));
-                        structureTerm.Type = TermTypes.STRUCTURE;
-                        SubTerms.Add(structureTerm);
-                    }
-                }
-                else if (s == "-")
-                {
-                    if (buffer.Trim() != "" || 
-                        (SubTerms.Count > 0 && SubTerms.Last().Type != TermTypes.MATH_OPERATOR 
-                        && SubTerms.Last().Type != TermTypes.COMPARISON_OPERATOR))
-                    {
-                        // Not a sign, treat as operator
+                                Term structureTerm = Merge(last, new Term(suffixName, TermTypes.SUFFIX));
+                                structureTerm.Type = TermTypes.STRUCTURE;
+                                SubTerms.Add(structureTerm);
+                            }
+                        }
+                        break;
+                    case "-":
+                        if (buffer.Trim() != "" || 
+                            (SubTerms.Count > 0 && SubTerms.Last().Type != TermTypes.MATH_OPERATOR 
+                             && SubTerms.Last().Type != TermTypes.COMPARISON_OPERATOR))
+                        {
+                            // Not a sign, treat as operator
+                            if (buffer.Trim() != "") SubTerms.Add(new Term(buffer.Trim()));
+                            SubTerms.Add(new Term(s));
+
+                            buffer = "";
+                            i += s.Length - 1;
+                        }
+                        else
+                        {
+                            buffer += Text[i];
+                        }
+                        break;
+                    default:
                         if (buffer.Trim() != "") SubTerms.Add(new Term(buffer.Trim()));
                         SubTerms.Add(new Term(s));
-
                         buffer = "";
                         i += s.Length - 1;
-                    }
-                    else
-                    {
-                        buffer += Text[i];
-                    }
-                }
-                else
-                {
-                    if (buffer.Trim() != "") SubTerms.Add(new Term(buffer.Trim()));
-                    SubTerms.Add(new Term(s));
-
-                    buffer = "";
-                    i += s.Length - 1;
+                        break;
                 }
             }
 
@@ -289,18 +301,16 @@ namespace kOS
             if (buffer.Trim() != "") SubTerms.Add(new Term(buffer));
 
             // If I end up with exactly one subTerm, then I AM that subterm. Exception: If I already have a special type
-            if (SubTerms.Count == 1 && this.Type == TermTypes.REGULAR)
-            {
-                Term child = SubTerms[0];
-                SubTerms.Clear();
+            if (SubTerms.Count != 1 || this.Type != TermTypes.REGULAR) return;
+            var child = SubTerms[0];
+            SubTerms.Clear();
 
-                CopyFrom(ref child);
-            }
+            CopyFrom(ref child);
         }
 
         private int findEndOfSuffix(String input, int start)
         {
-            for (int i = start; i < input.Length; i++)
+            for (var i = start; i < input.Length; i++)
             {
                 var match = Regex.Match(input.Substring(i, 1), "[a-zA-Z0-9_]");
                 if (!match.Success)
@@ -312,49 +322,54 @@ namespace kOS
             return input.Length - 1;
         }
 
-        private List<String> splitByListIgnoreBracket(String input, ref List<String> operators)
+        private IEnumerable<string> splitByListIgnoreBracket(String input, ref List<String> operators)
         {
             return splitByListIgnoreBracket(input, ref operators, false);
         }
 
-        private List<String> splitByListIgnoreBracket(String input, ref List<String> operators, bool returnIfOneElement)
+        private IEnumerable<string> splitByListIgnoreBracket(String input, ref List<String> operators, bool returnIfOneElement)
         {
-            String buffer = "";
-            String s;
-            List<String> retList = new List<string>();
+            var buffer = "";
+            var retList = new List<string>();
 
-            for (int i = 0; i < input.Length; i++)
+            for (var i = 0; i < input.Length; i++)
             {
-                if (input[i] == '(')
+                switch (input[i])
                 {
-                    int startI = i;
-                    Utils.Balance(ref Text, ref i, ')');
-                    buffer += Text.Substring(startI, i - startI + 1);
-                }
-                else if (input[i] == '"')
-                {
-                    int startI = i;
-                    i = Utils.FindEndOfString(Text, i + 1);
-                    buffer += Text.Substring(startI, i - startI + 1);
-                }
-                else
-                {
-                    s = matchAt(ref input, i, ref operators);
+                    case '(':
+                        {
+                            int startI = i;
+                            Utils.Balance(ref Text, ref i, ')');
+                            buffer += Text.Substring(startI, i - startI + 1);
+                        }
+                        break;
+                    case '"':
+                        {
+                            int startI = i;
+                            i = Utils.FindEndOfString(Text, i + 1);
+                            buffer += Text.Substring(startI, i - startI + 1);
+                        }
+                        break;
+                    default:
+                        {
+                            var s = matchAt(ref input, i, ref operators);
 
-                    if (s != null)
-                    {
-                        // TODO: If buffer empty, syntax error
+                            if (s != null)
+                            {
+                                // TODO: If buffer empty, syntax error
 
-                        retList.Add(buffer);
-                        retList.Add(s);
-                        buffer = "";
+                                retList.Add(buffer);
+                                retList.Add(s);
+                                buffer = "";
 
-                        i += s.Length - 1;
-                    }
-                    else
-                    {
-                        buffer += input[i];
-                    }
+                                i += s.Length - 1;
+                            }
+                            else
+                            {
+                                buffer += input[i];
+                            }
+                        }
+                        break;
                 }
             }
 
@@ -364,39 +379,24 @@ namespace kOS
             {
                 return retList;
             }
-            else
-            {
-                return retList.Count > 1 ? retList : null;
-            }
+            return retList.Count > 1 ? retList : null;
         }
 
-        private List<String> parseParameters(String input)
+        private IEnumerable<string> parseParameters(String input)
         {
             var splitList = splitByListIgnoreBracket(input, ref parameterSeperatorSymbols, true);
 
-            if (splitList != null)
-            {
-                List<String> retList = new List<string>();
-
-                foreach (var listItem in splitList)
-                {
-                    if (listItem != ",") retList.Add(listItem);
-                }
-
-                return retList;
-            }
-
-            return null;
+            return splitList != null ? splitList.Where(listItem => listItem != ",").ToList() : null;
         }
 
         private String matchAt(ref String input, int i, ref List<String> matchables)
         {
-            foreach (String s in matchables)
+            foreach (var s in matchables)
             {
                 if (s.StartsWith(" "))
                 {
-                    Regex r = new Regex("^" + s.Replace(" ", "\\s"), RegexOptions.IgnoreCase);
-                    Match m = r.Match(input.Substring(i));
+                    var r = new Regex("^" + s.Replace(" ", "\\s"), RegexOptions.IgnoreCase);
+                    var m = r.Match(input.Substring(i));
 
                     if (m.Success)
                     {

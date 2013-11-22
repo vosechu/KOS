@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace kOS
 {
@@ -15,27 +11,27 @@ namespace kOS
 
         public GeoCoordinates(Vessel vessel)
         {
-            this.Lat = (double)VesselUtils.GetVesselLattitude(vessel);
-            this.Lng = (double)VesselUtils.GetVesselLongitude(vessel);
-            this.Vessel = vessel;
+            Lat = VesselUtils.GetVesselLattitude(vessel);
+            Lng = VesselUtils.GetVesselLongitude(vessel);
+            Vessel = vessel;
 
             Body = vessel.mainBody;
         }
 
         public GeoCoordinates(Vessel vessel, float lat, float lng)
         {
-            this.Lat = (double)lat;
-            this.Lng = (double)lng;
-            this.Vessel = vessel;
+            Lat = lat;
+            Lng = lng;
+            Vessel = vessel;
 
             Body = vessel.mainBody;
         }
 
         public GeoCoordinates(Vessel vessel, double lat, double lng)
         {
-            this.Lat = lat;
-            this.Lng = lng;
-            this.Vessel = vessel;
+            Lat = lat;
+            Lng = lng;
+            Vessel = vessel;
 
             Body = vessel.mainBody;
         }
@@ -58,9 +54,9 @@ namespace kOS
             return headingQ.eulerAngles.y;
         }
 
-        public double DistanceFrom(Vessel Vessel)
+        public double DistanceFrom(Vessel vessel)
         {
-            return Vector3d.Distance(Vessel.GetWorldPos3D(), Body.GetWorldSurfacePosition(Lat, Lng, Vessel.altitude));
+            return Vector3d.Distance(vessel.GetWorldPos3D(), Body.GetWorldSurfacePosition(Lat, Lng, vessel.altitude));
         }
 
         public override object GetSuffix(string suffixName)

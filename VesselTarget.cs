@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 
 namespace kOS
@@ -14,7 +11,7 @@ namespace kOS
 
         static VesselTarget()
         {
-            ShortCuttableShipSuffixes = new String[] 
+            ShortCuttableShipSuffixes = new[] 
             {
                 "HEADING", "PROGRADE", "RETROGRADE", "FACING", "MAXTHRUST", "VELOCITY", "GEOPOSITION", "LATITUDE", "LONGITUDE", 
                 "UP", "NORTH", "BODY", "ANGULARMOMENTUM", "ANGULARVEL", "MASS", "VERTICALSPEED", "SURFACESPEED", "AIRSPEED", "VESSELNAME", 
@@ -30,9 +27,7 @@ namespace kOS
 
         public bool IsInRange(double range)
         {
-            if (GetDistance() <= range) return true;
-
-            return false;
+            return GetDistance() <= range;
         }
 
         public double GetDistance()
@@ -49,8 +44,7 @@ namespace kOS
         {
             var up = (target.findLocalMOI(target.findWorldCenterOfMass()) - target.mainBody.position).normalized;
 
-            Direction d = new Direction();
-            d.Rotation = Quaternion.LookRotation(target.orbit.GetVel().normalized, up);
+            var d = new Direction {Rotation = Quaternion.LookRotation(target.orbit.GetVel().normalized, up)};
             return d;
         }
 
@@ -58,8 +52,7 @@ namespace kOS
         {
             var up = (target.findLocalMOI(target.findWorldCenterOfMass()) - target.mainBody.position).normalized;
 
-            Direction d = new Direction();
-            d.Rotation = Quaternion.LookRotation(target.orbit.GetVel().normalized * -1, up);
+            var d = new Direction {Rotation = Quaternion.LookRotation(target.orbit.GetVel().normalized*-1, up)};
             return d;
         }
 
@@ -71,47 +64,70 @@ namespace kOS
 
         public override object GetSuffix(string suffixName)
         {
-            if (suffixName == "DIRECTION")
+            switch (suffixName)
             {
-                var vector = (target.GetWorldPos3D() - context.Vessel.GetWorldPos3D());
-                return new Direction(vector, false);
+                case "DIRECTION":
+                    {
+                        var vector = (target.GetWorldPos3D() - context.Vessel.GetWorldPos3D());
+                        return new Direction(vector, false);
+                    }
+                case "DISTANCE":
+                    return (float)GetDistance();
+                case "BEARING":
+                    return VesselUtils.GetTargetBearing(context.Vessel, target);
+                case "HEADING":
+                    return VesselUtils.GetTargetHeading(context.Vessel, target);
+                case "PROGRADE":
+                    return GetPrograde();
+                case "RETROGRADE":
+                    return GetRetrograde();
+                case "MAXTHRUST":
+                    return VesselUtils.GetMaxThrust(target);
+                case "VELOCITY":
+                    return new VesselVelocity(target);
+                case "GEOPOSITION":
+                    return new GeoCoordinates(target);
+                case "LATITUDE":
+                    return VesselUtils.GetVesselLattitude(target);
+                case "LONGITUDE":
+                    return VesselUtils.GetVesselLongitude(target);
+                case "FACING":
+                    return GetFacing();
+                case "UP":
+                    return new Direction(target.upAxis, false);
+                case "NORTH":
+                    return new Direction(VesselUtils.GetNorthVector(target), false);
+                case "BODY":
+                    return target.mainBody.bodyName;
+                case "ANGULARMOMENTUM":
+                    return  new Direction(target.angularMomentum, true);
+                case "ANGULARVEL":
+                    return new Direction(target.angularVelocity, true);
+                case "MASS":
+                    return  target.GetTotalMass();
+                case "VERTICALSPEED":
+                    return  target.verticalSpeed;
+                case "SURFACESPEED":
+                    return  target.horizontalSrfSpeed;
+                case "AIRSPEED":
+                    return (target.orbit.GetVel() - FlightGlobals.currentMainBody.getRFrmVel(target.GetWorldPos3D())).magnitude; //the velocity of the vessel relative to the air);
+                case "VESSELNAME":
+                    return  target.vesselName;
+                case "ALTITUDE":
+                    return target.altitude;
+                case "APOAPSIS":
+                    return  target.orbit.ApA;
+                case "PERIAPSIS":
+                    return  target.orbit.PeA;
+                case "SENSOR":
+                    return new VesselSensors(target);
+                case "TERMVELOCITY":
+                    return VesselUtils.GetTerminalVelocity(target);
             }
-
-            if (suffixName == "DISTANCE") return (float)GetDistance();
-            if (suffixName == "BEARING") return VesselUtils.GetTargetBearing(context.Vessel, target);
-            if (suffixName == "HEADING") return VesselUtils.GetTargetHeading(context.Vessel, target);
-            if (suffixName == "PROGRADE") return GetPrograde();
-            if (suffixName == "RETROGRADE") return GetRetrograde();
-            if (suffixName == "MAXTHRUST") return VesselUtils.GetMaxThrust(target);
-            if (suffixName == "VELOCITY") return new VesselVelocity(target);
-            if (suffixName == "GEOPOSITION") return new GeoCoordinates(target);
-            if (suffixName == "LATITUDE") return VesselUtils.GetVesselLattitude(target);
-            if (suffixName == "LONGITUDE") return VesselUtils.GetVesselLongitude(target);
-            if (suffixName == "FACING") return GetFacing();
-            if (suffixName == "UP") return new Direction(target.upAxis, false);
-            if (suffixName == "NORTH") return new Direction(VesselUtils.GetNorthVector(target), false);
-            if (suffixName == "BODY") return target.mainBody.bodyName;
-            if (suffixName == "ANGULARMOMENTUM") return  new Direction(target.angularMomentum, true);
-            if (suffixName == "ANGULARVEL") return new Direction(target.angularVelocity, true);
-            if (suffixName == "MASS") return  target.GetTotalMass();
-            if (suffixName == "VERTICALSPEED") return  target.verticalSpeed;
-            if (suffixName == "SURFACESPEED") return  target.horizontalSrfSpeed;
-            if (suffixName == "AIRSPEED") return (target.orbit.GetVel() - FlightGlobals.currentMainBody.getRFrmVel(target.GetWorldPos3D())).magnitude; //the velocity of the vessel relative to the air);
-            if (suffixName == "VESSELNAME") return  target.vesselName;
-            if (suffixName == "ALTITUDE") return target.altitude;
-            if (suffixName == "APOAPSIS") return  target.orbit.ApA;
-            if (suffixName == "PERIAPSIS") return  target.orbit.PeA; 
-            if (suffixName == "SENSOR") return new VesselSensors(target);
-            if (suffixName == "TERMVELOCITY") return VesselUtils.GetTerminalVelocity(target);
 
             // Is this a resource?
             double dblValue;
-            if (VesselUtils.TryGetResource(target, suffixName, out dblValue))
-            {
-                return dblValue;
-            }
-
-            return base.GetSuffix(suffixName);
+            return VesselUtils.TryGetResource(target, suffixName, out dblValue) ? dblValue : base.GetSuffix(suffixName);
         }
     }
 }

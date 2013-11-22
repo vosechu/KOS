@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace kOS
+﻿namespace kOS
 {
     public class VersionInfo : SpecialValue
     {
@@ -12,14 +7,19 @@ namespace kOS
 
         public VersionInfo(double major, double minor)
         {
-            this.Major = major;
-            this.Minor = minor;
+            Major = major;
+            Minor = minor;
         }
 
         public override object GetSuffix(string suffixName)
         {
-            if (suffixName == "MAJOR") return Major;
-            if (suffixName == "MINOR") return Minor;
+            switch (suffixName)
+            {
+                case "MAJOR":
+                    return Major;
+                case "MINOR":
+                    return Minor;
+            }
 
             return base.GetSuffix(suffixName);
         }

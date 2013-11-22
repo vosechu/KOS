@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using UnityEngine;
 
 namespace kOS
@@ -28,43 +27,42 @@ namespace kOS
         {
             // I take no credit for this, this is a stripped down, rearranged version of MechJeb's attitude control system
 
-            var CoM = vessel.findWorldCenterOfMass();
-            var MoI = vessel.findLocalMOI(CoM);
+            var coM = vessel.findWorldCenterOfMass();
+            var moI = vessel.findLocalMOI(coM);
             var mass = vessel.GetTotalMass();
-            var up = (CoM - vessel.mainBody.position).normalized;
+            var up = (coM - vessel.mainBody.position).normalized;
 
             var target = targetDir.Rotation;
             var vesselR = vessel.transform.rotation;
 
-            Quaternion delta;
-            delta = Quaternion.Inverse(Quaternion.Euler(90, 0, 0) * Quaternion.Inverse(vesselR) * target);
+            var delta = Quaternion.Inverse(Quaternion.Euler(90, 0, 0) * Quaternion.Inverse(vesselR) * target);
 
-            Vector3d deltaEuler = ReduceAngles(delta.eulerAngles);
+            var deltaEuler = ReduceAngles(delta.eulerAngles);
             deltaEuler.y *= -1;
 
-            Vector3d torque = GetTorque(vessel, c.mainThrottle);
-            Vector3d inertia = GetEffectiveInertia(vessel, torque);
+            var torque = GetTorque(vessel, c.mainThrottle);
+            var inertia = GetEffectiveInertia(vessel, torque);
 
-            Vector3d err = deltaEuler * Math.PI / 180.0F;
+            var err = deltaEuler * Math.PI / 180.0F;
             err += new Vector3d(inertia.x, inertia.z, inertia.y);
             //err.Scale(SwapYZ(Vector3d.Scale(MoI, Inverse(torque))));
 
             prev_err = err;
 
-            Vector3d act = 120.0f * err;
+            var act = 120.0f * err;
 
-            float precision = Mathf.Clamp((float)torque.x * 20f / MoI.magnitude, 0.5f, 10f);
-            float drive_limit = Mathf.Clamp01((float)(err.magnitude * 380.0f / precision));
+            var precision = Mathf.Clamp((float)torque.x * 20f / moI.magnitude, 0.5f, 10f);
+            var driveLimit = Mathf.Clamp01((float)(err.magnitude * 380.0f / precision));
 
-            act.x = Mathf.Clamp((float)act.x, -drive_limit, drive_limit);
-            act.y = Mathf.Clamp((float)act.y, -drive_limit, drive_limit);
-            act.z = Mathf.Clamp((float)act.z, -drive_limit, drive_limit);
+            act.x = Mathf.Clamp((float)act.x, -driveLimit, driveLimit);
+            act.y = Mathf.Clamp((float)act.y, -driveLimit, driveLimit);
+            act.z = Mathf.Clamp((float)act.z, -driveLimit, driveLimit);
 
             //act = averageVector3d(averagedAct, act, 2);
 
-            c.roll = Mathf.Clamp((float)(c.roll + act.z), -drive_limit, drive_limit);
-            c.pitch = Mathf.Clamp((float)(c.pitch + act.x), -drive_limit, drive_limit);
-            c.yaw = Mathf.Clamp((float)(c.yaw + act.y), -drive_limit, drive_limit);
+            c.roll = Mathf.Clamp((float)(c.roll + act.z), -driveLimit, driveLimit);
+            c.pitch = Mathf.Clamp((float)(c.pitch + act.x), -driveLimit, driveLimit);
+            c.yaw = Mathf.Clamp((float)(c.yaw + act.y), -driveLimit, driveLimit);
 
             /*
             // This revised version from 0.6 gave people problems with gravity turns. I've reverted but may try to make it work
@@ -120,15 +118,15 @@ namespace kOS
 
         public static Vector3d GetEffectiveInertia(Vessel vessel, Vector3d torque)
         {
-            var CoM = vessel.findWorldCenterOfMass();
-            var MoI = vessel.findLocalMOI(CoM);
+            var coM = vessel.findWorldCenterOfMass();
+            var moI = vessel.findLocalMOI(coM);
             var angularVelocity = Quaternion.Inverse(vessel.transform.rotation) * vessel.rigidbody.angularVelocity;
-            var angularMomentum = new Vector3d(angularVelocity.x * MoI.x, angularVelocity.y * MoI.y, angularVelocity.z * MoI.z);
+            var angularMomentum = new Vector3d(angularVelocity.x * moI.x, angularVelocity.y * moI.y, angularVelocity.z * moI.z);
 
             var retVar = Vector3d.Scale
             (
                 Sign(angularMomentum) * 2.0f,
-                Vector3d.Scale(Pow(angularMomentum, 2), Inverse(Vector3d.Scale(torque, MoI)))
+                Vector3d.Scale(Pow(angularMomentum, 2), Inverse(Vector3d.Scale(torque, moI)))
             );
 
             retVar.y *= 10;
@@ -138,14 +136,14 @@ namespace kOS
 
         public static Vector3d GetTorque(Vessel vessel, float thrust)
         {
-            var CoM = vessel.findWorldCenterOfMass();
+            var coM = vessel.findWorldCenterOfMass();
             
             float pitchYaw = 0;
             float roll = 0;
 
-            foreach (Part part in vessel.parts)
+            foreach (var part in vessel.parts)
             {
-                var relCoM = part.Rigidbody.worldCenterOfMass - CoM;
+                var relCoM = part.Rigidbody.worldCenterOfMass - coM;
 
                 if (part is CommandPod)
                 {
@@ -155,22 +153,15 @@ namespace kOS
 
                 if (part is RCSModule)
                 {
-                    float max = 0;
-                    foreach (float power in ((RCSModule)part).thrusterPowers)
-                    {
-                        max = Mathf.Max(max, power);
-                    }
+                    var max = ((RCSModule) part).thrusterPowers.Aggregate<float, float>(0, Mathf.Max);
 
                     pitchYaw += max * relCoM.magnitude;
                 }
 
-                foreach (PartModule module in part.Modules)
+                foreach (var module in part.Modules.OfType<ModuleReactionWheel>())
                 {
-                    if (module is ModuleReactionWheel)
-                    {
-                        pitchYaw += ((ModuleReactionWheel)module).PitchTorque;
-                        roll += ((ModuleReactionWheel)module).RollTorque;
-                    }
+                    pitchYaw += (module).PitchTorque;
+                    roll += (module).RollTorque;
                 }
 
                 pitchYaw += (float)GetThrustTorque(part, vessel) * thrust;
@@ -181,7 +172,7 @@ namespace kOS
 
         public static double GetThrustTorque(Part p, Vessel vessel)
         {
-            var CoM = vessel.CoM;
+            var coM = vessel.CoM;
 
             if (p.State == PartStates.ACTIVE)
             {
@@ -189,21 +180,21 @@ namespace kOS
                 {
                     if (((LiquidEngine)p).thrustVectoringCapable)
                     {
-                        return Math.Sin(Math.Abs(((LiquidEngine)p).gimbalRange) * Math.PI / 180) * ((LiquidEngine)p).maxThrust * (p.Rigidbody.worldCenterOfMass - CoM).magnitude;
+                        return Math.Sin(Math.Abs(((LiquidEngine)p).gimbalRange) * Math.PI / 180) * ((LiquidEngine)p).maxThrust * (p.Rigidbody.worldCenterOfMass - coM).magnitude;
                     }
                 }
                 else if (p is LiquidFuelEngine)
                 {
                     if (((LiquidFuelEngine)p).thrustVectoringCapable)
                     {
-                        return Math.Sin(Math.Abs(((LiquidFuelEngine)p).gimbalRange) * Math.PI / 180) * ((LiquidFuelEngine)p).maxThrust * (p.Rigidbody.worldCenterOfMass - CoM).magnitude;
+                        return Math.Sin(Math.Abs(((LiquidFuelEngine)p).gimbalRange) * Math.PI / 180) * ((LiquidFuelEngine)p).maxThrust * (p.Rigidbody.worldCenterOfMass - coM).magnitude;
                     }
                 }
                 else if (p is AtmosphericEngine)
                 {
                     if (((AtmosphericEngine)p).thrustVectoringCapable)
                     {
-                        return Math.Sin(Math.Abs(((AtmosphericEngine)p).gimbalRange) * Math.PI / 180) * ((AtmosphericEngine)p).maximumEnginePower * ((AtmosphericEngine)p).totalEfficiency * (p.Rigidbody.worldCenterOfMass - CoM).magnitude;
+                        return Math.Sin(Math.Abs(((AtmosphericEngine)p).gimbalRange) * Math.PI / 180) * ((AtmosphericEngine)p).maximumEnginePower * ((AtmosphericEngine)p).totalEfficiency * (p.Rigidbody.worldCenterOfMass - coM).magnitude;
                     }
                 }
             }
@@ -230,14 +221,14 @@ namespace kOS
             return new Vector3d(Math.Sign(vector.x), Math.Sign(vector.y), Math.Sign(vector.z));
         }
 
-        private static Vector3d averageVector3d(Vector3d[] vectorArray, Vector3d newVector, int n)
+        private static Vector3d averageVector3d(IList<Vector3d> vectorArray, Vector3d newVector, int n)
         {
             double x = 0.0, y = 0.0, z = 0.0;
-            int k = 0;
+            var k = 0;
 
             // Loop through the array to determine average
             // Give more weight to newer items and less weight to older items
-            for (int i = 0; i < n; i++)
+            for (var i = 0; i < n; i++)
             {
                 k += i + 1;
                 if (i < n - 1) { vectorArray[i] = vectorArray[i + 1]; }

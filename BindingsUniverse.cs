@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace kOS
+﻿namespace kOS
 {
     [kOSBinding("ksp")]
     public class BindingTimeWarp : Binding
     {
         public override void AddTo(BindingManager manager)
         {
-            manager.AddGetter("WARP", delegate(CPU cpu) { return TimeWarp.fetch.current_rate_index; });
+            manager.AddGetter("WARP", cpu => TimeWarp.fetch.current_rate_index);
             manager.AddSetter("WARP", delegate(CPU cpu, object val)
             {
                 int newRate;
@@ -20,9 +15,10 @@ namespace kOS
                 }
             });
 
-            foreach (CelestialBody body in FlightGlobals.fetch.bodies)
+            foreach (var body in FlightGlobals.fetch.bodies)
             {
-                manager.AddGetter(body.name, delegate(CPU cpu) { return new BodyTarget(body, cpu); });
+                var celestialBody = body;
+                manager.AddGetter(body.name, cpu => new BodyTarget(celestialBody, cpu));
             }
         }
     }

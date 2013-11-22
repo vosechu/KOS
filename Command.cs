@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Reflection;
 
@@ -10,7 +9,7 @@ namespace kOS
     public class CommandAttribute : Attribute
     {
         public string[] Values { get; set; }
-        public CommandAttribute(params string[] values) { this.Values = values; }
+        public CommandAttribute(params string[] values) { Values = values; }
 
         public override String ToString()
         {
@@ -26,10 +25,10 @@ namespace kOS
         {
             foreach (Type t in Assembly.GetExecutingAssembly().GetTypes())
             {
-                CommandAttribute attr = (CommandAttribute)t.GetCustomAttributes(typeof(CommandAttribute), true).FirstOrDefault();
+                var attr = (CommandAttribute)t.GetCustomAttributes(typeof(CommandAttribute), true).FirstOrDefault();
                 if (attr != null)
                 {
-                    foreach (String s in attr.Values)
+                    foreach (var s in attr.Values)
                     {
                         Bindings.Add(Utils.BuildRegex(s), t);
                     }
@@ -49,12 +48,12 @@ namespace kOS
         public Command(Match regexMatch, ExecutionContext context) : base(context)
         {
             Input = regexMatch.ToString();
-            this.RegexMatch = regexMatch;
+            RegexMatch = regexMatch;
         }
 
         public Command(String input, ExecutionContext context) : base(context)
         {
-            this.Input = input;
+            Input = input;
         }
 
         public virtual void Verify()
@@ -77,7 +76,7 @@ namespace kOS
             catch (kOSException e)
             {
                 e.LineNumber = line;
-                throw e;
+                throw;
             }
         }
 
@@ -100,7 +99,7 @@ namespace kOS
 
         public virtual void Refresh()
         {
-            this.State = ExecutionState.NEW;
+            State = ExecutionState.NEW;
         }
 
         public override void Lock(Command command)

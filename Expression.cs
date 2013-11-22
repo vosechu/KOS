@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Globalization;
 
@@ -10,19 +8,19 @@ namespace kOS
 {
     public class Expression
     {
-        Term rootTerm;
-        ExecutionContext executionContext;
+        readonly Term rootTerm;
+        readonly ExecutionContext executionContext;
 
         public Expression(Term term, ExecutionContext context)
         {
             rootTerm = term;
-            this.executionContext = context;
+            executionContext = context;
         }
 
         public Expression(String text, ExecutionContext context)
         {
             rootTerm = new Term(text);
-            this.executionContext = context;
+            executionContext = context;
         }
 
         public object GetValue()
@@ -34,43 +32,37 @@ namespace kOS
         {
             object output;
 
-            if (term.Type == Term.TermTypes.FINAL) // 'Final' terms can't be boiled down further, they should always be constants or variables
+            switch (term.Type)
             {
-                output = RecognizeConstant(term.Text);
-                if (output != null) return output;
-
-                output = AttemptGetVariableValue(term.Text);
-                if (output != null) return output;
-            }
-            else if (term.Type == Term.TermTypes.REGULAR) 
-            {
-                output = TryProcessMathStatement(term);
-                if (output != null) return output;
-            }
-            else if (term.Type == Term.TermTypes.FUNCTION)
-            {
-                output = TryProcessFunction(term);
-                if (output != null) return output;
-            }
-            else if (term.Type == Term.TermTypes.STRUCTURE)
-            {
-                output = TryProcessStructure(term);
-                if (output != null) return output;
-            }
-            else if (term.Type == Term.TermTypes.COMPARISON)
-            {
-                output = TryProcessComparison(term);
-                if (output != null) return output;
-            }
-            else if (term.Type == Term.TermTypes.BOOLEAN)
-            {
-                output = TryProcessBoolean(term);
-                if (output != null) return output;
+                case Term.TermTypes.FINAL:
+                    output = RecognizeConstant(term.Text);
+                    if (output != null) return output;
+                    output = AttemptGetVariableValue(term.Text);
+                    if (output != null) return output;
+                    break;
+                case Term.TermTypes.REGULAR:
+                    output = TryProcessMathStatement(term);
+                    if (output != null) return output;
+                    break;
+                case Term.TermTypes.FUNCTION:
+                    output = TryProcessFunction(term);
+                    if (output != null) return output;
+                    break;
+                case Term.TermTypes.STRUCTURE:
+                    output = TryProcessStructure(term);
+                    if (output != null) return output;
+                    break;
+                case Term.TermTypes.COMPARISON:
+                    output = TryProcessComparison(term);
+                    if (output != null) return output;
+                    break;
+                case Term.TermTypes.BOOLEAN:
+                    output = TryProcessBoolean(term);
+                    if (output != null) return output;
+                    break;
             }
             
             throw new kOSException("Unrecognized term: '" + term.Text + "'", executionContext);
-
-            return null;
         }
 
         private object RecognizeConstant(String text)
@@ -79,7 +71,7 @@ namespace kOS
 
             // Numbers
             double testDouble;
-            NumberStyles styles = NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite | NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint;
+            const NumberStyles styles = NumberStyles.AllowLeadingWhite | NumberStyles.AllowTrailingWhite | NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint;
             if (double.TryParse(text, styles, CultureInfo.InvariantCulture, out testDouble)) return testDouble;
 
             // Booleans
@@ -104,22 +96,22 @@ namespace kOS
 
         private object TryProcessMathStatement(Term input)
         {
-            List<StatementChunk> chunks = new List<StatementChunk>();
+            var chunks = new List<StatementChunk>();
 
-            for (int i = 0; i < input.SubTerms.Count; i += 2)
+            for (var i = 0; i < input.SubTerms.Count; i += 2)
             {
-                object termValue = GetValueOfTerm(input.SubTerms[i]);
+                var termValue = GetValueOfTerm(input.SubTerms[i]);
 
                 if (i + 1 < input.SubTerms.Count)
                 {
-                    Term opTerm = input.SubTerms[i + 1];
+                    var opTerm = input.SubTerms[i + 1];
                     if (opTerm.Type == Term.TermTypes.MATH_OPERATOR)
                     {
                         chunks.Add(new StatementChunk(termValue, opTerm.Text));
                     }
                     else
                     {
-                        throw new kOSException("Expression error processing statement '" + input.ToString() + "'", executionContext);
+                        throw new kOSException("Expression error processing statement '" + input + "'", executionContext);
                     }
                 }
                 else
@@ -212,37 +204,34 @@ namespace kOS
 
         private object TryProcessFunction(Term input)
         {
-            object output;
-            Term[] p = input.SubTerms[1].SubTerms.ToArray();
+            var p = input.SubTerms[1].SubTerms.ToArray();
 
-            output = TryCreateSV(input.SubTerms[0].Text, p);
+            object output = TryCreateSV(input.SubTerms[0].Text, p);
             if (output != null) return output;
 
             output = TryMathFunction(input.SubTerms[0].Text, p);
             if (output != null) return output;
 
             output = TryExternalFunction(input.SubTerms[0].Text, p);
-            if (output != null) return output;
-
-            return null;
+            return output;
         }
 
         private object TryProcessStructure(Term input)
         {   
-            Term baseTerm = input.SubTerms[0];
-            Term suffixTerm = input.SubTerms[1];
-            object output;
+            var baseTerm = input.SubTerms[0];
+            var suffixTerm = input.SubTerms[1];
 
             if (suffixTerm.Type == Term.TermTypes.SUFFIX)
             {
                 // First, see if this is just a variable with a comma in it (old-style structure)
+                object output;
                 if (Regex.Match(baseTerm.Text, "^[a-zA-Z]+$").Success)
                 {
                     output = AttemptGetVariableValue(baseTerm.Text + ":" + suffixTerm.Text);
                     if (output != null) return output;
                 }
 
-                object baseTermValue = GetValueOfTerm(baseTerm);
+                var baseTermValue = GetValueOfTerm(baseTerm);
                 if (baseTermValue is SpecialValue)
                 {
                     output = ((SpecialValue)baseTermValue).GetSuffix(suffixTerm.Text.ToUpper());
@@ -250,10 +239,7 @@ namespace kOS
 
                     throw new kOSException("Suffix '" + suffixTerm.Text + "' not found on object", executionContext);
                 }
-                else
-                {
-                    throw new kOSException("Values of type " + GetFriendlyNameOfItem(baseTermValue) + " cannot have suffixes", executionContext);
-                }
+                throw new kOSException("Values of type " + GetFriendlyNameOfItem(baseTermValue) + " cannot have suffixes", executionContext);
             }
 
             return null;
@@ -261,22 +247,22 @@ namespace kOS
 
         private object TryProcessComparison(Term input)
         {
-            List<StatementChunk> chunks = new List<StatementChunk>();
+            var chunks = new List<StatementChunk>();
 
-            for (int i = 0; i < input.SubTerms.Count; i += 2)
+            for (var i = 0; i < input.SubTerms.Count; i += 2)
             {
-                object termValue = GetValueOfTerm(input.SubTerms[i]);
+                var termValue = GetValueOfTerm(input.SubTerms[i]);
 
                 if (i + 1 < input.SubTerms.Count)
                 {
-                    Term opTerm = input.SubTerms[i + 1];
+                    var opTerm = input.SubTerms[i + 1];
                     if (opTerm.Type == Term.TermTypes.COMPARISON_OPERATOR)
                     {
                         chunks.Add(new StatementChunk(termValue, opTerm.Text));
                     }
                     else
                     {
-                        throw new kOSException("Expression error processing comparison '" + input.ToString() + "'", executionContext);
+                        throw new kOSException("Expression error processing comparison '" + input + "'", executionContext);
                     }
                 }
                 else
@@ -285,18 +271,34 @@ namespace kOS
                 }
             }
 
-            for (int i = 0; i < chunks.Count - 1; i++)
+            for (var i = 0; i < chunks.Count - 1; i++)
             {
                 var c1 = chunks[i];
                 var c2 = chunks[i + 1];
                 object resultValue = null;
 
-                if (c1.Opr == "==" || c1.Opr == "=") resultValue = AttemptEq(c1.Value, c2.Value);
-                else if (c1.Opr == "!=") resultValue = AttemptNotEq(c1.Value, c2.Value);
-                else if (c1.Opr == "<") resultValue = AttemptLT(c1.Value, c2.Value);
-                else if (c1.Opr == ">") resultValue = AttemptGT(c1.Value, c2.Value);
-                else if (c1.Opr == "<=") resultValue = AttemptLTE(c1.Value, c2.Value);
-                else if (c1.Opr == ">=") resultValue = AttemptGTE(c1.Value, c2.Value);
+                switch (c1.Opr)
+                {
+                    case "=":
+                    case "==":
+                        resultValue = AttemptEq(c1.Value, c2.Value);
+                        break;
+                    case "!=":
+                        resultValue = AttemptNotEq(c1.Value, c2.Value);
+                        break;
+                    case "<":
+                        resultValue = AttemptLT(c1.Value, c2.Value);
+                        break;
+                    case ">":
+                        resultValue = AttemptGT(c1.Value, c2.Value);
+                        break;
+                    case "<=":
+                        resultValue = AttemptLTE(c1.Value, c2.Value);
+                        break;
+                    case ">=":
+                        resultValue = AttemptGTE(c1.Value, c2.Value);
+                        break;
+                }
 
                 if (resultValue == null) throw new kOSException("Can't compare " + GetFriendlyNameOfItem(c1.Value) + " to " + GetFriendlyNameOfItem(c2.Value) + " using " + c1.Opr, executionContext);
 
@@ -304,32 +306,27 @@ namespace kOS
                 i--;
             }
             
-            if (chunks.Count == 1)
-            {
-                return chunks[0].Value;
-            }
-
-            return null;
+            return chunks.Count == 1 ? chunks[0].Value : null;
         }
 
         private object TryProcessBoolean(Term input)
         {
-            List<StatementChunk> chunks = new List<StatementChunk>();
+            var chunks = new List<StatementChunk>();
 
-            for (int i = 0; i < input.SubTerms.Count; i += 2)
+            for (var i = 0; i < input.SubTerms.Count; i += 2)
             {
-                object termValue = GetValueOfTerm(input.SubTerms[i]);
+                var termValue = GetValueOfTerm(input.SubTerms[i]);
 
                 if (i + 1 < input.SubTerms.Count)
                 {
-                    Term opTerm = input.SubTerms[i + 1];
+                    var opTerm = input.SubTerms[i + 1];
                     if (opTerm.Type == Term.TermTypes.BOOLEAN_OPERATOR)
                     {
                         chunks.Add(new StatementChunk(termValue, opTerm.Text));
                     }
                     else
                     {
-                        throw new kOSException("Expression error processing boolean operation '" + input.ToString() + "'", executionContext);
+                        throw new kOSException("Expression error processing boolean operation '" + input + "'", executionContext);
                     }
                 }
                 else
@@ -363,21 +360,18 @@ namespace kOS
 
         private object TryExternalFunction(String name, Term[] p)
         {
-            foreach (kOSExternalFunction f in executionContext.ExternalFunctions)
+            foreach (var f in executionContext.ExternalFunctions.Where(f => f.Name.ToUpper() == name.ToUpper()))
             {
-                if (f.Name.ToUpper() == name.ToUpper())
+                if (p.Count() != f.ParameterCount) throw new Exception("Wrong number of arguments, expected " + f.ParameterCount);
+
+                var sp = new String[f.ParameterCount];
+                for (var i = 0; i < f.ParameterCount; i++)
                 {
-                    if (p.Count() != f.ParameterCount) throw new Exception("Wrong number of arguments, expected " + f.ParameterCount);
-
-                    String[] sp = new String[f.ParameterCount];
-                    for (int i = 0; i < f.ParameterCount; i++)
-                    {
-                        sp[i] = GetValueOfTerm(p[i]).ToString();
-                    }
-
-                    object output = executionContext.CallExternalFunction(f.Name, sp);
-                    if (output != null) return output;
+                    sp[i] = GetValueOfTerm(p[i]).ToString();
                 }
+
+                var output = executionContext.CallExternalFunction(f.Name, sp);
+                if (output != null) return output;
             }
 
             return null;
@@ -403,15 +397,18 @@ namespace kOS
 
             if (name == "ROUND")
             {
-                if (p.Count() == 1)
+                switch (p.Count())
                 {
-                    double[] dp = GetParamsAsT<double>(p, 1);
-                    return Math.Round(dp[0]);
-                }
-                else if (p.Count() == 2)
-                {
-                    double[] dp = GetParamsAsT<double>(p, 2);
-                    return Math.Round(dp[0], (int)dp[1]);
+                    case 1:
+                        {
+                            double[] dp = GetParamsAsT<double>(p, 1);
+                            return Math.Round(dp[0]);
+                        }
+                    case 2:
+                        {
+                            double[] dp = GetParamsAsT<double>(p, 2);
+                            return Math.Round(dp[0], (int)dp[1]);
+                        }
                 }
             }
 
@@ -465,7 +462,7 @@ namespace kOS
                 throw new kOSException("Wrong number of arguments supplied, expected " + size, executionContext);
             }
 
-            T[] retVal = new T[size];
+            var retVal = new T[size];
 
             for (var i = 0; i < size; i++)
             {
@@ -597,18 +594,15 @@ namespace kOS
         private bool ObjectToBool(object input, out bool result)
         {
             if (input is bool) { result = (bool)input; return true; }
-            else if (input is double) { result = (bool)((double)input > 0); return true; }
-            else if (input is String)
+            if (input is double) { result = (double)input > 0; return true; }
+            if (input is String)
             {
                 if (bool.TryParse((String)input, out result)) return true;
-                else
+                double dblVal;
+                if (double.TryParse((String)input, out dblVal))
                 {
-                    double dblVal;
-                    if (double.TryParse((String)input, out dblVal))
-                    {
-                        result = dblVal > 0;
-                        return true;
-                    }
+                    result = dblVal > 0;
+                    return true;
                 }
             }
 
@@ -638,19 +632,19 @@ namespace kOS
 
         public bool IsNull()
         {
-            object value = GetValue();
+            var value = GetValue();
 
             return value == null;
         }
 
         public bool IsTrue()
         {
-            object value = GetValue();
+            var value = GetValue();
 
             if (value == null) return false;
-            else if (value is bool) return (bool)value;
-            else if (value is double) return (double)value > 0;
-            else if (value is string)
+            if (value is bool) return (bool)value;
+            if (value is double) return (double)value > 0;
+            if (value is string)
             {
                 bool boolVal;
                 if (bool.TryParse((string)value, out boolVal)) return boolVal;
@@ -660,22 +654,17 @@ namespace kOS
 
                 return ((string)value).Trim() != "";
             }
-            else if (value is SpecialValue)
-            {
-                return true;
-            }
-
-            return false;
+            return value is SpecialValue;
         }
 
         public double Double()
         {
-            object value = GetValue();
+            var value = GetValue();
 
             if (value == null) return 0;
-            else if (value is bool) return (bool)value ? 1 : 0;
-            else if (value is double) return (double)value;
-            else if (value is string)
+            if (value is bool) return (bool)value ? 1 : 0;
+            if (value is double) return (double)value;
+            if (value is string)
             {
                 double numberVal;
                 if (double.TryParse((string)value, out numberVal)) return (double)numberVal;
@@ -700,12 +689,12 @@ namespace kOS
         {
             public StatementChunk(object value, String opr)
             {
-                this.Value = value;
-                this.Opr = opr;
+                Value = value;
+                Opr = opr;
             }
 
-            public object Value;
-            public String Opr;
+            public readonly object Value;
+            public readonly String Opr;
         }
     }
     

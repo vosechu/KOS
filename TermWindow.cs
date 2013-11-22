@@ -1,9 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-
 using UnityEngine;
 
 namespace kOS
@@ -11,16 +7,16 @@ namespace kOS
     // Blockotronix 550 Computor Monitor
     public class TermWindow : MonoBehaviour
     {
-        private static string root = KSPUtil.ApplicationRootPath.Replace("\\", "/");
+        private static readonly string root = KSPUtil.ApplicationRootPath.Replace("\\", "/");
 
         private Rect windowRect = new Rect(60, 50, 470, 395);
         private Texture2D fontImage = new Texture2D(0, 0, TextureFormat.DXT1, false);
         private Texture2D terminalImage = new Texture2D(0, 0, TextureFormat.DXT1, false);
-        private bool isOpen = false;
-        private bool showPilcrows = false;
+        private bool isOpen;
+        private bool showPilcrows;
         private CameraManager cameraManager;
         private CameraManager.CameraMode cameraModeWhenOpened;
-        private bool isLocked = false;
+        private bool isLocked;
         private float cursorBlinkTime;
         public static int CHARSIZE = 8;
         public static int CHARS_PER_ROW = 16;
@@ -76,35 +72,31 @@ namespace kOS
 
         private void Lock()
         {
-            if (!isLocked)
-            {
-                isLocked = true;
+            if (isLocked) return;
+            isLocked = true;
 
-                cameraManager = CameraManager.Instance;
-                cameraModeWhenOpened = cameraManager.currentCameraMode;
-                cameraManager.enabled = false;
+            cameraManager = CameraManager.Instance;
+            cameraModeWhenOpened = cameraManager.currentCameraMode;
+            cameraManager.enabled = false;
 
-                InputLockManager.SetControlLock("kOSTerminal");
+            InputLockManager.SetControlLock("kOSTerminal");
 
-                // Prevent editor keys from being pressed while typing
-                EditorLogic editor = EditorLogic.fetch;
-                if (editor != null && !EditorLogic.softLock) editor.Lock(true, true, true);
-            }
+            // Prevent editor keys from being pressed while typing
+            var editor = EditorLogic.fetch;
+            if (editor != null && !EditorLogic.softLock) editor.Lock(true, true, true);
         }
 
         private void Unlock()
         {
-            if (isLocked)
-            {
-                isLocked = false;
+            if (!isLocked) return;
+            isLocked = false;
 
-                InputLockManager.RemoveControlLock("kOSTerminal");
+            InputLockManager.RemoveControlLock("kOSTerminal");
 
-                cameraManager.enabled = true;
+            cameraManager.enabled = true;
 
-                EditorLogic editor = EditorLogic.fetch;
-                if (editor != null) editor.Unlock();
-            }
+            var editor = EditorLogic.fetch;
+            if (editor != null) editor.Unlock();
         }
 
         void OnGUI()
@@ -141,8 +133,6 @@ namespace kOS
             if (cursorBlinkTime > 1) cursorBlinkTime -= 1;
         }
 
-        private List<KeyEvent> KeyStates = new List<KeyEvent>();
-
         public class KeyEvent
         {
             public KeyCode code;
@@ -151,52 +141,98 @@ namespace kOS
         
         void ProcessKeyStrokes()
         {
-            if (Event.current.type == EventType.KeyDown)
-            {
-                if (Event.current.character != 0 && Event.current.character != 13 && Event.current.character != 10)
-                {
-                    Type(Event.current.character);
-                }
-                else if (Event.current.keyCode != KeyCode.None) 
-                {
-                    Keydown(Event.current.keyCode);
-                }
+            if (Event.current.type != EventType.KeyDown) return;
 
-                cursorBlinkTime = 0.0f;
+            if (Event.current.character != 0 && Event.current.character != 13 && Event.current.character != 10)
+            {
+                Type(Event.current.character);
             }
+            else if (Event.current.keyCode != KeyCode.None) 
+            {
+                Keydown(Event.current.keyCode);
+            }
+
+            cursorBlinkTime = 0.0f;
         }
 
         private void Keydown(KeyCode code)
         {
-            bool shift = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
-            bool control = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
+            var shift = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+            var control = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
 
-            if (code == (KeyCode.Break)) { SpecialKey(kOSKeys.BREAK); return; }
-            if (code == (KeyCode.C) && control) { SpecialKey(kOSKeys.BREAK); return; }
-
-            if (code == (KeyCode.F1)) { SpecialKey(kOSKeys.F1); return; }
-            if (code == (KeyCode.F2)) { SpecialKey(kOSKeys.F2); return; }
-            if (code == (KeyCode.F3)) { SpecialKey(kOSKeys.F3); return; }
-            if (code == (KeyCode.F4)) { SpecialKey(kOSKeys.F4); return; }
-            if (code == (KeyCode.F5)) { SpecialKey(kOSKeys.F5); return; }
-            if (code == (KeyCode.F6)) { SpecialKey(kOSKeys.F6); return; }
-            if (code == (KeyCode.F7)) { SpecialKey(kOSKeys.F7); return; }
-            if (code == (KeyCode.F8)) { SpecialKey(kOSKeys.F8); return; }
-            if (code == (KeyCode.F9)) { SpecialKey(kOSKeys.F9); return; }
-            if (code == (KeyCode.F10)) { SpecialKey(kOSKeys.F10); return; }
-            if (code == (KeyCode.F11)) { SpecialKey(kOSKeys.F11); return; }
-            if (code == (KeyCode.F12)) { SpecialKey(kOSKeys.F12); return; }
-
-            if (code == (KeyCode.UpArrow)) { SpecialKey(kOSKeys.UP); return; }
-            if (code == (KeyCode.DownArrow)) { SpecialKey(kOSKeys.DOWN); return; }
-            if (code == (KeyCode.LeftArrow)) { SpecialKey(kOSKeys.LEFT); return; }
-            if (code == (KeyCode.RightArrow)) { SpecialKey(kOSKeys.RIGHT); return; }
-            if (code == (KeyCode.Home)) { SpecialKey(kOSKeys.HOME); return; }
-            if (code == (KeyCode.End)) { SpecialKey(kOSKeys.END); return; }
-            if (code == (KeyCode.Backspace)) { Type((char)8); return; }
-            if (code == (KeyCode.Delete)) { SpecialKey(kOSKeys.DEL); return; }
-
-            if (code == (KeyCode.Return) || code == (KeyCode.KeypadEnter)) { Type((char)13); return; }
+            switch (code)
+            {
+                case (KeyCode.C):
+                    if(control) SpecialKey(kOSKeys.BREAK);
+                    return;
+                case (KeyCode.Break):
+                    SpecialKey(kOSKeys.BREAK);
+                    break;
+                case (KeyCode.F1):
+                    SpecialKey(kOSKeys.F1);
+                    break;
+                case KeyCode.F2:
+                    SpecialKey(kOSKeys.F2);
+                    break;
+                case KeyCode.F3:
+                    SpecialKey(kOSKeys.F3);
+                    break;
+                case KeyCode.F4:
+                    SpecialKey(kOSKeys.F4);
+                    break;
+                case KeyCode.F5:
+                    SpecialKey(kOSKeys.F5);
+                    break;
+                case KeyCode.F6:
+                    SpecialKey(kOSKeys.F6);
+                    break;
+                case KeyCode.F7:
+                    SpecialKey(kOSKeys.F7);
+                    break;
+                case KeyCode.F8:
+                    SpecialKey(kOSKeys.F8);
+                    break;
+                case KeyCode.F9:
+                    SpecialKey(kOSKeys.F9);
+                    break;
+                case KeyCode.F10:
+                    SpecialKey(kOSKeys.F10);
+                    break;
+                case KeyCode.F11:
+                    SpecialKey(kOSKeys.F11);
+                    break;
+                case KeyCode.F12:
+                    SpecialKey(kOSKeys.F12);
+                    break;
+                case (KeyCode.UpArrow):
+                    SpecialKey(kOSKeys.UP);
+                    break;
+                case (KeyCode.DownArrow):
+                    SpecialKey(kOSKeys.DOWN);
+                    break;
+                case (KeyCode.LeftArrow):
+                    SpecialKey(kOSKeys.LEFT);
+                    break;
+                case (KeyCode.RightArrow):
+                    SpecialKey(kOSKeys.RIGHT);
+                    break;
+                case (KeyCode.Home):
+                    SpecialKey(kOSKeys.HOME);
+                    break;
+                case (KeyCode.End):
+                    SpecialKey(kOSKeys.END);
+                    break;
+                case (KeyCode.Backspace):
+                    Type((char)8);
+                    break;
+                case (KeyCode.Delete):
+                    SpecialKey(kOSKeys.DEL);
+                    break;
+                case (KeyCode.KeypadEnter):
+                case (KeyCode.Return):
+                    Type((char)13);
+		    break;
+            }
         }
         
         public void ClearScreen()
@@ -257,39 +293,38 @@ namespace kOS
 
             GUI.DragWindow(new Rect(0, 0, 10000, 500));
 
-            if (Cpu != null && Cpu.Mode == CPU.Modes.READY && Cpu.IsAlive())
+            if (Cpu == null || Cpu.Mode != CPU.Modes.READY || !Cpu.IsAlive()) return;
+
+            var textColor = isLocked ? TEXTCOLOR : TEXTCOLOR_ALPHA;
+
+            GUI.BeginGroup(new Rect(31, 38, 420, 340));
+
+            if (Cpu != null)
             {
-                Color textColor = isLocked ? TEXTCOLOR : TEXTCOLOR_ALPHA;
+                var buffer = Cpu.GetBuffer();
 
-                GUI.BeginGroup(new Rect(31, 38, 420, 340));
-
-                if (Cpu != null)
-                {
-                    char[,] buffer = Cpu.GetBuffer();
-
-                    for (var x = 0; x < buffer.GetLength(0); x++)
-                        for (var y = 0; y < buffer.GetLength(1); y++)
-                        {
-                            char c = buffer[x, y];
-
-                            if (c != 0 && c != 9 && c != 32) ShowCharacterByAscii(buffer[x, y], x, y, textColor);
-                        }
-
-                    bool blinkOn = cursorBlinkTime < 0.5f;
-                    if (blinkOn && Cpu.GetCursorX() > -1)
+                for (var x = 0; x < buffer.GetLength(0); x++)
+                    for (var y = 0; y < buffer.GetLength(1); y++)
                     {
-                        ShowCharacterByAscii((char)1, Cpu.GetCursorX(), Cpu.GetCursorY(), textColor);
-                    }
-                }
+                        var c = buffer[x, y];
 
-                GUI.EndGroup();
+                        if (c != 0 && c != 9 && c != 32) ShowCharacterByAscii(buffer[x, y], x, y, textColor);
+                    }
+
+                var blinkOn = cursorBlinkTime < 0.5f;
+                if (blinkOn && Cpu.GetCursorX() > -1)
+                {
+                    ShowCharacterByAscii((char)1, Cpu.GetCursorX(), Cpu.GetCursorY(), textColor);
+                }
             }
+
+            GUI.EndGroup();
         }
 
         void ShowCharacterByAscii(char ch, int x, int y, Color textColor)
         {
-            int tx = ch % CHARS_PER_ROW;
-            int ty = ch / CHARS_PER_ROW;
+            var tx = ch % CHARS_PER_ROW;
+            var ty = ch / CHARS_PER_ROW;
 
             ShowCharacterByXY(x, y, tx, ty, textColor);
         }
@@ -309,7 +344,7 @@ namespace kOS
 
         internal void AttachTo(CPU cpu)
         {
-            this.Cpu = cpu;
+            Cpu = cpu;
         }
 
         internal void PrintLine(string line)

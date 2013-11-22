@@ -1,54 +1,46 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace kOS
 {
-    public class InterpreterEdit : ExecutionContext
+    public sealed class InterpreterEdit : ExecutionContext
     {
         int BufferWidth { get { return buffer.GetLength(0); } }
         int BufferHeight { get { return buffer.GetLength(1); } }
-        int CursorLine = 0;
-        int CursorCol = 0;
-        int ProgramSize = 0;
-        String CurrentLine { get { return File[CursorLine]; } set { File[CursorLine] = value; } }
-        int LocalCursorCol { get { return CursorCol < CurrentLine.Length ? CursorCol : CurrentLine.Length; } }
-        int ScrollY = 0;
-        int ScrollX = 0;
-        int CursorX = 0;
-        int CursorY = 0;
+        int cursorLine;
+        int cursorCol;
+        int programSize;
+        String CurrentLine { get { return file[cursorLine]; } set { file[cursorLine] = value; } }
+        int LocalCursorCol { get { return cursorCol < CurrentLine.Length ? cursorCol : CurrentLine.Length; } }
+        int scrollY;
+        int scrollX;
+        int cursorX;
+        int cursorY;
 
-        private new char[,] buffer = new char[COLUMNS, ROWS];
+        private new readonly char[,] buffer = new char[COLUMNS, ROWS];
 
-        String StatusAnimString = "";
-        float StatusAnimProg = 0;
-        bool StatusAnimActive = false;
+        String statusAnimString = "";
+        float statusAnimProg;
+        bool statusAnimActive;
 
-        File File;
+        readonly File file;
 
         public override int GetCursorX()
         {
-            return ChildContext != null ? ChildContext.GetCursorX() : CursorX;
+            return ChildContext != null ? ChildContext.GetCursorX() : cursorX;
         }
 
         public override int GetCursorY()
         {
-            return ChildContext != null ? ChildContext.GetCursorX() : CursorY;
+            return ChildContext != null ? ChildContext.GetCursorX() : cursorY;
         }
 
         public InterpreterEdit(String fileName, ExecutionContext parent) : base(parent) 
         {
-            File = SelectedVolume.GetByName(fileName);
+            file = SelectedVolume.GetByName(fileName) ?? new File(fileName) {""};
 
-            if (File == null)
-            {
-                File = new File(fileName);
-                File.Add("");
-            }
-
-            CursorX = 0;
-            CursorY = 2;
+            cursorX = 0;
+            cursorY = 2;
 
             RecalcProgramSize();
         }
@@ -57,54 +49,54 @@ namespace kOS
         {
             ClearScreen();
 
-            Print(0, 0, File.Filename, 20);
+            Print(0, 0, file.Filename, 20);
             PrintBorder(1);
             PrintBorder(BufferHeight - 2);
 
-            String LineColReadout = "Ln " + CursorLine + " Col " + LocalCursorCol;
-            Print(BufferWidth - LineColReadout.Length, 0, LineColReadout);
+            var lineColReadout = "Ln " + cursorLine + " Col " + LocalCursorCol;
+            Print(BufferWidth - lineColReadout.Length, 0, lineColReadout);
              
-            String ProgramSizeStr = ProgramSize.ToString() + "B";
-            Print(BufferWidth - ProgramSizeStr.Length, BufferHeight - 1, ProgramSizeStr);
+            var programSizeStr = programSize.ToString() + "B";
+            Print(BufferWidth - programSizeStr.Length, BufferHeight - 1, programSizeStr);
 
-            if (LocalCursorCol > ScrollX + BufferWidth) ScrollX = LocalCursorCol - BufferWidth;
-            else if (LocalCursorCol < ScrollX) ScrollX = 0;
+            if (LocalCursorCol > scrollX + BufferWidth) scrollX = LocalCursorCol - BufferWidth;
+            else if (LocalCursorCol < scrollX) scrollX = 0;
 
-            if (CursorLine > ScrollY + (BufferHeight - 5)) ScrollY = CursorLine - (BufferHeight - 5);
-            else if (CursorLine < ScrollY) ScrollY = CursorLine;
+            if (cursorLine > scrollY + (BufferHeight - 5)) scrollY = cursorLine - (BufferHeight - 5);
+            else if (cursorLine < scrollY) scrollY = cursorLine;
 
             UpdateBuffer();
 
-            CursorX = LocalCursorCol - ScrollX;
-            CursorY = CursorLine - ScrollY + 2;
+            cursorX = LocalCursorCol - scrollX;
+            cursorY = cursorLine - scrollY + 2;
 
             // Status bar
-            if (StatusAnimActive)
+            if (statusAnimActive)
             {
-                StatusAnimProg += time;
-                if (StatusAnimProg > 3) StatusAnimActive = false;
+                statusAnimProg += time;
+                if (statusAnimProg > 3) statusAnimActive = false;
 
-                int charsToDisp = (int)(StatusAnimProg * 20);
+                var charsToDisp = (int)(statusAnimProg * 20);
 
-                Print(0, BufferHeight - 1, StatusAnimString, charsToDisp);
+                Print(0, BufferHeight - 1, statusAnimString, charsToDisp);
             }
             else
             {
-                String MenuOptions = "[F5:Save] [F10:Exit]";
-                Print(0, BufferHeight - 1, MenuOptions);
+                const string menuOptions = "[F5:Save] [F10:Exit]";
+                Print(0, BufferHeight - 1, menuOptions);
             }
         }
 
         private void RecalcProgramSize()
         {
-            ProgramSize = File.GetSize();
+            programSize = file.GetSize();
         }
 
         private void ClearScreen()
         {
-            for (int y = 0; y < buffer.GetLength(1); y++)
+            for (var y = 0; y < buffer.GetLength(1); y++)
             {
-                for (int x = 0; x < buffer.GetLength(0); x++)
+                for (var x = 0; x < buffer.GetLength(0); x++)
                 {
                     buffer[x, y] = (char)0;
                 }
@@ -118,16 +110,15 @@ namespace kOS
 
         private void UpdateBuffer()
         {
-            for (int y = 2; y < BufferHeight - 2; y++)
+            for (var y = 2; y < BufferHeight - 2; y++)
             {
-                int row = (y - 2) + ScrollY;
+                var row = (y - 2) + scrollY;
 
-                if (row < File.Count())
+                if (row >= file.Count()) continue;
+		
+                if (scrollX < file[row].Length)
                 {
-                    if (ScrollX < File[row].Length)
-                    {
-                        Print(0, y, File[row].Substring(ScrollX));
-                    }
+                    Print(0, y, file[row].Substring(scrollX));
                 }
             }
         }
@@ -145,8 +136,8 @@ namespace kOS
                     break;
 
                 default:
-                    File[CursorLine] = File[CursorLine].Insert(LocalCursorCol, new String(ch, 1));
-                    CursorCol = LocalCursorCol + 1;
+                    file[cursorLine] = file[cursorLine].Insert(LocalCursorCol, new String(ch, 1));
+                    cursorCol = LocalCursorCol + 1;
                     break;
             }
 
@@ -157,37 +148,36 @@ namespace kOS
 
         public void ArrowKey(kOSKeys key)
         {
-            if (key == kOSKeys.UP && CursorLine > 0) CursorLine--;
-            if (key == kOSKeys.DOWN && CursorLine < File.Count - 1) CursorLine++;
+            if (key == kOSKeys.UP && cursorLine > 0) cursorLine--;
+            if (key == kOSKeys.DOWN && cursorLine < file.Count - 1) cursorLine++;
             if (key == kOSKeys.RIGHT) 
             {
-                if (CursorCol < CurrentLine.Length)
+                if (cursorCol < CurrentLine.Length)
                 {
-                    CursorCol = LocalCursorCol + 1;
+                    cursorCol = LocalCursorCol + 1;
                 }
                 else
                 {
-                    if (CursorLine < File.Count - 1)
+                    if (cursorLine < file.Count - 1)
                     {
-                        CursorLine ++;
-                        CursorCol = 0;
+                        cursorLine ++;
+                        cursorCol = 0;
                     }
                 }
             }
 
-            if (key == kOSKeys.LEFT)
+            if (key != kOSKeys.LEFT) return;
+
+            if (cursorCol > 0)
             {
-                if (CursorCol > 0)
+                cursorCol = LocalCursorCol - 1;
+            }
+            else
+            {
+                if (cursorLine > 0)
                 {
-                    CursorCol = LocalCursorCol - 1;
-                }
-                else
-                {
-                    if (CursorLine > 0)
-                    {
-                        CursorLine--;
-                        CursorCol = CurrentLine.Length;
-                    }
+                    cursorLine--;
+                    cursorCol = CurrentLine.Length;
                 }
             }
         }
@@ -205,11 +195,11 @@ namespace kOS
                     return true;
 
                 case kOSKeys.HOME:
-                    CursorCol = 0;
+                    cursorCol = 0;
                     return true;
 
                 case kOSKeys.END:
-                    CursorCol = CurrentLine.Length;
+                    cursorCol = CurrentLine.Length;
                     return true;
                     
                 case kOSKeys.DEL:
@@ -232,26 +222,26 @@ namespace kOS
             String fragment = CurrentLine.Substring(LocalCursorCol);
             CurrentLine = CurrentLine.Substring(0, LocalCursorCol);
 
-            File.Insert(CursorLine + 1, fragment);
-            CursorCol = 0;
-            CursorLine++;
+            file.Insert(cursorLine + 1, fragment);
+            cursorCol = 0;
+            cursorLine++;
         }
 
         private void Backspace()
         {
             if (LocalCursorCol > 0)
             {
-                CursorCol = LocalCursorCol - 1;
-                File[CursorLine] = File[CursorLine].Remove(LocalCursorCol, 1);
+                cursorCol = LocalCursorCol - 1;
+                file[cursorLine] = file[cursorLine].Remove(LocalCursorCol, 1);
             }
             else
             {
-                if (CursorLine > 0)
+                if (cursorLine > 0)
                 {
                     String fragment = CurrentLine.Trim();
-                    CursorLine--;
-                    File.RemoveAt(CursorLine + 1);
-                    CursorCol = CurrentLine.Length;
+                    cursorLine--;
+                    file.RemoveAt(cursorLine + 1);
+                    cursorCol = CurrentLine.Length;
                     CurrentLine += fragment;
                 }
             }
@@ -259,14 +249,14 @@ namespace kOS
 
         public  void Delete()
         {
-            if (CursorCol < CurrentLine.Length)
+            if (cursorCol < CurrentLine.Length)
             {
-                File[CursorLine] = File[CursorLine].Remove(LocalCursorCol, 1);
+                file[cursorLine] = file[cursorLine].Remove(LocalCursorCol, 1);
             }
-            else if (File.Count() > CursorLine + 1)
+            else if (file.Count() > cursorLine + 1)
             {
-                String otherLine = File[CursorLine + 1];
-                File.RemoveAt(CursorLine + 1);
+                var otherLine = file[cursorLine + 1];
+                file.RemoveAt(cursorLine + 1);
                 CurrentLine += otherLine;
             }
         }
@@ -278,9 +268,9 @@ namespace kOS
 
         public void Print(int sx, int sy, String value, int max)
         {
-            char[] chars = value.ToCharArray();
-            int i = 0;
-            for (int x = sx; (x < BufferWidth && i < chars.Count() && i < max); x++)
+            var chars = value.ToCharArray();
+            var i = 0;
+            for (var x = sx; (x < BufferWidth && i < chars.Count() && i < max); x++)
             {
                 buffer[x, sy] = chars[i];
                 i++;
@@ -289,7 +279,7 @@ namespace kOS
 
         public void PrintBorder(int y)
         {
-            for (int x = 0; x < BufferWidth; x++)
+            for (var x = 0; x < BufferWidth; x++)
             {
                 buffer[x, y] = '-';
             }
@@ -302,17 +292,10 @@ namespace kOS
 
         private void Save()
         {
-            if (SelectedVolume.SaveFile(File))
-            {
-                StatusAnimString = "SAVED.";
-            }
-            else
-            {
-                StatusAnimString = "CAN'T SAVE - DISK FULL.";
-            }
+            statusAnimString = SelectedVolume.SaveFile(file) ? "SAVED." : "CAN'T SAVE - DISK FULL.";
 
-            StatusAnimActive = true;
-            StatusAnimProg = 0;
+            statusAnimActive = true;
+            statusAnimProg = 0;
         }
     }
 }

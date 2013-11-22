@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace kOS
 {
@@ -16,15 +13,15 @@ namespace kOS
 
         public kOSException(String message)
         {
-            this.Message = message;
+            Message = message;
             //this.commandObj = commandObj;
         }
 
         public kOSException(String message, ExecutionContext context) : this (message)
         {
-            this.LineNumber = context.Line;
-            this.Context = context;
-            this.Program = context.FindClosestParentOfType<ContextRunProgram>();
+            LineNumber = context.Line;
+            Context = context;
+            Program = context.FindClosestParentOfType<ContextRunProgram>();
         }
     }
 

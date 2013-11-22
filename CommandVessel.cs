@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
 using System.Text.RegularExpressions;
 
 namespace kOS
@@ -28,8 +24,8 @@ namespace kOS
 
         public override void Evaluate()
         {
-            Expression ex = new Expression(RegexMatch.Groups[1].Value, this);
-            object obj = ex.GetValue();
+            var ex = new Expression(RegexMatch.Groups[1].Value, this);
+            var obj = ex.GetValue();
 
             if (obj is kOS.Node)
             {

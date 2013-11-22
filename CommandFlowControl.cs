@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 
 
@@ -27,15 +25,10 @@ namespace kOS
 
             while (parseNext(ref innerText, out cmd, ref lineCount, out commandLineStart))
             {
-                commands.Add(Command.Get(cmd, this, commandLineStart));
+                commands.Add(Get(cmd, this, commandLineStart));
             }
 
             State = (commands.Count == 0) ? ExecutionState.DONE : ExecutionState.WAIT;
-        }
-
-        public override bool SpecialKey(kOSKeys key)
-        {
-            return base.SpecialKey(key);
         }
 
         public override void Refresh()
@@ -89,7 +82,7 @@ namespace kOS
             expression = new Expression(RegexMatch.Groups[1].Value, ParentContext);
 
             int numLinesChild = Utils.NewLineCount(Input.Substring(0, RegexMatch.Groups[2].Index));
-            targetCommand = Command.Get(RegexMatch.Groups[2].Value, this, Line + numLinesChild);
+            targetCommand = Get(RegexMatch.Groups[2].Value, this, Line + numLinesChild);
 
             if (expression.IsTrue())
             {
@@ -130,7 +123,7 @@ namespace kOS
             waitExpression = new Expression(RegexMatch.Groups[1].Value, ParentContext);
 
             int numLinesChild = Utils.NewLineCount(Input.Substring(0, RegexMatch.Groups[2].Index));
-            targetCommand = Command.Get(RegexMatch.Groups[2].Value, this, Line + numLinesChild);
+            targetCommand = Get(RegexMatch.Groups[2].Value, this, Line + numLinesChild);
 
             //commandString = RegexMatch.Groups[2].Value;
 

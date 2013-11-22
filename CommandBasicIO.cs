@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using UnityEngine;
 
 namespace kOS
 {    
@@ -50,9 +46,9 @@ namespace kOS
 
         public override void Evaluate()
         {
-            Expression e = new Expression(RegexMatch.Groups[1].Value, ParentContext);
-            Expression ex = new Expression(RegexMatch.Groups[2].Value, ParentContext);
-            Expression ey = new Expression(RegexMatch.Groups[3].Value, ParentContext);
+            var e = new Expression(RegexMatch.Groups[1].Value, ParentContext);
+            var ex = new Expression(RegexMatch.Groups[2].Value, ParentContext);
+            var ey = new Expression(RegexMatch.Groups[3].Value, ParentContext);
 
             if (e.IsNull()) throw new kOSException("Null value in print statement");
 
@@ -78,7 +74,7 @@ namespace kOS
 
         public override void Evaluate()
         {
-            Expression e = new Expression(RegexMatch.Groups[1].Value, ParentContext);
+            var e = new Expression(RegexMatch.Groups[1].Value, ParentContext);
 
             if (e.IsNull())
             {
@@ -100,7 +96,7 @@ namespace kOS
 
         public override void Evaluate()
         {
-            Expression e = new Expression(RegexMatch.Groups[1].Value, ParentContext);
+            var e = new Expression(RegexMatch.Groups[1].Value, ParentContext);
 
             StdOut(e.GetValue().ToString());
 
@@ -153,12 +149,12 @@ namespace kOS
 
         public override void Evaluate()
         {
-            Term targetTerm = new Term(RegexMatch.Groups[1].Value);
-            Expression e = new Expression(RegexMatch.Groups[2].Value, ParentContext);
+            var targetTerm = new Term(RegexMatch.Groups[1].Value);
+            var e = new Expression(RegexMatch.Groups[2].Value, ParentContext);
 
             if (targetTerm.Type == Term.TermTypes.STRUCTURE)
             {
-                object baseObj = new Expression(targetTerm.SubTerms[0], ParentContext).GetValue();
+                var baseObj = new Expression(targetTerm.SubTerms[0], ParentContext).GetValue();
 
                 if (baseObj is SpecialValue)
                 {
@@ -167,27 +163,15 @@ namespace kOS
                         State = ExecutionState.DONE;
                         return;
                     }
-                    else
-                    {
-                        throw new kOSException("Suffix '" + targetTerm.SubTerms[1].Text + "' doesn't exist or is read only", this);
-                    }
+                    throw new kOSException("Suffix '" + targetTerm.SubTerms[1].Text + "' doesn't exist or is read only", this);
                 }
-                else
-                {
-                    throw new kOSException("Can't set subvalues on a " + Expression.GetFriendlyNameOfItem(baseObj), this);
-                }
+                throw new kOSException("Can't set subvalues on a " + Expression.GetFriendlyNameOfItem(baseObj), this);
             }
-            else
-            {
-                Variable v = FindOrCreateVariable(targetTerm.Text);
+            Variable v = FindOrCreateVariable(targetTerm.Text);
 
-                if (v != null)
-                {
-                    v.Value = e.GetValue();
-                    State = ExecutionState.DONE;
-                    return;
-                }
-            }
+            if (v == null) return;
+            v.Value = e.GetValue();
+            State = ExecutionState.DONE;
         }
     }
     
@@ -198,30 +182,27 @@ namespace kOS
 
         public override void Evaluate()
         {
-            String varName = RegexMatch.Groups[1].Value;
-            Variable v = FindOrCreateVariable(varName);
+            var varName = RegexMatch.Groups[1].Value;
+            var v = FindOrCreateVariable(varName);
 
-            if (v != null)
+            if (v == null)
             {
-                if (v.Value is bool)
-                {
-                    v.Value = !((bool)v.Value);
-                    State = ExecutionState.DONE;
-                }
-                else if (v.Value is float)
-                {
-                    bool val = ((float)v.Value > 0) ? true : false;
-                    v.Value = !val;
-                    State = ExecutionState.DONE;
-                }
-                else
-                {
-                    throw new kOSException("That variable can't be toggled.", this);
-                }
+                throw new kOSException("Can't find or create variable '" + varName + "'", this);
+            }
+            if (v.Value is bool)
+            {
+                v.Value = !((bool) v.Value);
+                State = ExecutionState.DONE;
+            }
+            else if (v.Value is float)
+            {
+                var val = ((float) v.Value > 0);
+                v.Value = !val;
+                State = ExecutionState.DONE;
             }
             else
             {
-                throw new kOSException("Can't find or create variable '" + varName + "'", this);
+                throw new kOSException("That variable can't be toggled.", this);
             }
         }
     }
@@ -233,25 +214,19 @@ namespace kOS
 
         public override void Evaluate()
         {
-            String varName = RegexMatch.Groups[1].Value;
-            Variable v = FindOrCreateVariable(varName);
+            var varName = RegexMatch.Groups[1].Value;
+            var v = FindOrCreateVariable(varName);
 
-            if (v != null)
-            {
-                if (v.Value is bool || v.Value is float)
-                {
-                    v.Value = true;
-                    State = ExecutionState.DONE;
-                }
-                else
-                {
-                    throw new kOSException("That variable can't be set to 'ON'.", this);
-                }
-            }
-            else
+            if (v == null)
             {
                 throw new kOSException("Can't find or create variable '" + varName + "'", this);
             }
+            if (!(v.Value is bool) && !(v.Value is float))
+            {
+                throw new kOSException("That variable can't be set to 'ON'.", this);
+            }
+            v.Value = true;
+            State = ExecutionState.DONE;
         }
     }
 
@@ -262,25 +237,19 @@ namespace kOS
 
         public override void Evaluate()
         {
-            String varName = RegexMatch.Groups[1].Value;
-            Variable v = FindOrCreateVariable(varName);
+            var varName = RegexMatch.Groups[1].Value;
+            var v = FindOrCreateVariable(varName);
 
-            if (v != null)
-            {
-                if (v.Value is bool || v.Value is float)
-                {
-                    v.Value = false;
-                    State = ExecutionState.DONE;
-                }
-                else
-                {
-                    throw new kOSException("That variable can't be set to 'OFF'.", this);
-                }
-            }
-            else
+            if (v == null)
             {
                 throw new kOSException("Can't find or create variable '" + varName + "'", this);
             }
+            if (!(v.Value is bool) && !(v.Value is float))
+            {
+                throw new kOSException("That variable can't be set to 'OFF'.", this);
+            }
+            v.Value = false;
+            State = ExecutionState.DONE;
         }
     }
 }

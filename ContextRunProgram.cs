@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 
 
 namespace kOS
@@ -35,11 +33,10 @@ namespace kOS
             RunBlock(file);
         }
 
-        private void RunBlock(List<String> block)
+        private void RunBlock(IEnumerable<string> block)
         {
-            foreach (String rawLine in block)
+            foreach (string line in block.Select(stripComment))
             {
-                String line = stripComment(rawLine);
                 commandBuffer += line + "\n";
             }
 
@@ -63,13 +60,10 @@ namespace kOS
                         State = ExecutionState.DONE;
                         return;
                     }
-                    else
-                    {
-                        // Error occurs in the top level program
-                        StdOut("Error on line " + e.LineNumber + ": " + e.Message);
-                        State = ExecutionState.DONE;
-                        return;
-                    }
+                    // Error occurs in the top level program
+                    StdOut("Error on line " + e.LineNumber + ": " + e.Message);
+                    State = ExecutionState.DONE;
+                    return;
                 }
                 catch (Exception e)
                 {
@@ -82,11 +76,9 @@ namespace kOS
                 }
             }
 
-            if (commandBuffer.Trim() != "")
-            {
-                StdOut("End of file reached inside unterminated statement");
-                State = ExecutionState.DONE;
-            }
+            if (commandBuffer.Trim() == "") return;
+            StdOut("End of file reached inside unterminated statement");
+            State = ExecutionState.DONE;
         }
 
         public override bool Break()
@@ -130,13 +122,9 @@ namespace kOS
                     State = ExecutionState.DONE;
                     return;
                 }
-                else
-                {
-                    // Error occurs in the top level program
-                    StdOut("Error on line " + e.LineNumber + ": " + e.Message);
-                    State = ExecutionState.DONE;
-                    return;
-                }
+                // Error occurs in the top level program
+                StdOut("Error on line " + e.LineNumber + ": " + e.Message);
+                State = ExecutionState.DONE;
             }
             catch (Exception e)
             {
@@ -145,26 +133,23 @@ namespace kOS
                 UnityEngine.Debug.Log("Program error");
                 UnityEngine.Debug.Log(e);
                 State = ExecutionState.DONE;
-                return;
             }
         }
 
         private void EvaluateNextCommand()
         {
-            if (this.ChildContext == null)
+            if (ChildContext != null) return;
+            if (commands.Count > 0)
             {
-                if (commands.Count > 0)
-                {
-                    Command cmd = commands[0];
-                    commands.RemoveAt(0);
+                Command cmd = commands[0];
+                commands.RemoveAt(0);
 
-                    ChildContext = cmd;
-                    cmd.Evaluate();
-                }
-                else
-                {
-                    State = ExecutionState.DONE;
-                }
+                ChildContext = cmd;
+                cmd.Evaluate();
+            }
+            else
+            {
+                State = ExecutionState.DONE;
             }
         }
 

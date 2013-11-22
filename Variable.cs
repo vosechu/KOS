@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace kOS
+﻿namespace kOS
 {
     public class Variable
     {
@@ -12,16 +7,12 @@ namespace kOS
         {
             get 
             { 
-                return this.value; 
+                return value; 
             }
             set 
             { 
                 this.value = value; 
             }
-        }
-
-        public Variable()
-        {
         }
 
         public virtual object GetSubValue(string svName)

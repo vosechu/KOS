@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace kOS
 {
@@ -15,12 +12,12 @@ namespace kOS
 
         public kOSExternalFunction(String name, object parent, String methodName, int parameterCount)
         {
-            this.Name = name;
-            this.Parent = parent;
-            this.ParameterCount = parameterCount;
-            this.MethodName = methodName;
+            Name = name;
+            Parent = parent;
+            ParameterCount = parameterCount;
+            MethodName = methodName;
 
-            this.regex = Utils.BuildRegex(name + "_(" + parameterCount + ")");
+            regex = Utils.BuildRegex(name + "_(" + parameterCount + ")");
         }
     }
 }

@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using UnityEngine;
 
 namespace kOS
 {
@@ -14,7 +12,7 @@ namespace kOS
 
         public override void Evaluate()
         {
-            String fileName = RegexMatch.Groups[1].Value;
+            var fileName = RegexMatch.Groups[1].Value;
 
             if (ParentContext is ImmediateMode)
             {
@@ -34,51 +32,37 @@ namespace kOS
           
         public override void Evaluate()
         {
-            String fileName = RegexMatch.Groups[1].Value;
-            File file = SelectedVolume.GetByName(fileName);
+            var fileName = RegexMatch.Groups[1].Value;
+            var file = SelectedVolume.GetByName(fileName);
             var parameters = new List<Expression>();
 
             if (RegexMatch.Groups.Count > 1)
             {
-                String paramString = RegexMatch.Groups[3].Value;
-                foreach (String param in Utils.ProcessParams(paramString))
-                {
-                    Expression subEx = new Expression(param, this);
-                    parameters.Add(subEx);
-                }
+                var paramString = RegexMatch.Groups[3].Value;
+                parameters.AddRange(Utils.ProcessParams(paramString).Select(param => new Expression(param, this)));
             }
 
-            if (file != null)
+            if (file == null)
             {
-                ContextRunProgram runContext = new ContextRunProgram(this, parameters, fileName);
-                Push(runContext);
+                throw new kOSException("File not found '" + fileName + "'.", this);
+            }
+            var runContext = new ContextRunProgram(this, parameters, fileName);
+            Push(runContext);
 
-                if (file.Count > 0)
-                {
-                    runContext.Run(file);
-                    State = ExecutionState.WAIT;
-                }
-                else
-                {
-                    State = ExecutionState.DONE;
-                }
+            if (file.Count > 0)
+            {
+                runContext.Run(file);
+                State = ExecutionState.WAIT;
             }
             else
             {
-                throw new kOSException("File not found '" + fileName + "'.", this);
+                State = ExecutionState.DONE;
             }
         }
 
         public override bool Type(char c)
         {
-            if (State == ExecutionState.WAIT)
-            {
-                return true;
-            }
-            else
-            {
-                return base.Type(c);
-            }
+            return State == ExecutionState.WAIT || base.Type(c);
         }
 
         public override bool SpecialKey(kOSKeys key)
@@ -122,7 +106,7 @@ namespace kOS
 
         public override void Evaluate()
         {
-            String targetVolume = RegexMatch.Groups[1].Value.Trim();
+            var targetVolume = RegexMatch.Groups[1].Value.Trim();
             int volID;
 
             if (int.TryParse(targetVolume, out volID))
@@ -151,13 +135,13 @@ namespace kOS
 
         public override void Evaluate()
         {
-            String operation = RegexMatch.Groups[1].Value.Trim();
-            String identifier = RegexMatch.Groups[2].Value.Trim();
-            String newName = RegexMatch.Groups[3].Value.Trim();
+            var operation = RegexMatch.Groups[1].Value.Trim();
+            var identifier = RegexMatch.Groups[2].Value.Trim();
+            var newName = RegexMatch.Groups[3].Value.Trim();
 
             if (operation.ToUpper() == "VOLUME")
             {
-                Volume targetVolume = GetVolume(identifier); // Will throw if not found
+                var targetVolume = GetVolume(identifier); // Will throw if not found
 
                 int intTry;
                 if (int.TryParse(newName.Substring(0, 1), out intTry)) throw new kOSException("Volume name cannot start with numeral", this);
@@ -168,7 +152,7 @@ namespace kOS
                 State = ExecutionState.DONE;
                 return;
             }
-            else if (operation.ToUpper() == "FILE" || String.IsNullOrEmpty(operation))
+            if (operation.ToUpper() == "FILE" || String.IsNullOrEmpty(operation))
             {
                 File f = SelectedVolume.GetByName(identifier);
                 if (f == null) throw new kOSException("File '" + identifier + "' not found", this);
@@ -267,11 +251,10 @@ namespace kOS
             String volumeName = RegexMatch.Groups[3].Value.Trim();
 
             File file = null;
-            Volume targetVolume = null;
 
             if (volumeName.Trim() != "")
             {
-                targetVolume = GetVolume(volumeName); // Will throw if not found
+                Volume targetVolume = GetVolume(volumeName);
                 file = targetVolume.GetByName(targetFile);
                 if (file == null) throw new kOSException("File '" + targetFile + "' not found", this);
                 targetVolume.DeleteByName(targetFile);
@@ -316,7 +299,7 @@ namespace kOS
                 State = ExecutionState.DONE;
                 return;
             }
-            else if (listType == "VOLUMES")
+            if (listType == "VOLUMES")
             {
                 StdOut("");
                 StdOut("ID    Name                    Size");

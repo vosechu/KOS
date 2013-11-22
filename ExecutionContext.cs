@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-
-using UnityEngine;
 
 namespace kOS
 {
@@ -45,7 +41,7 @@ namespace kOS
         
         public ExecutionContext(ExecutionContext parent)
         {
-            this.ParentContext = parent;
+            ParentContext = parent;
         }
 
         public virtual void VerifyMount()
@@ -55,25 +51,18 @@ namespace kOS
 
         public bool KeyInput(char c)
         {
-            if (ChildContext != null) return ChildContext.Type(c);
-
-            return Type(c);
+            return ChildContext != null ? ChildContext.Type(c) : Type(c);
         }
 
-        
 
         public virtual bool Type(char c)
         {
-            if (ChildContext != null) return ChildContext.Type(c);
-
-            return false;
+            return ChildContext != null && ChildContext.Type(c);
         }
 
         public virtual bool SpecialKey(kOSKeys key)
         {
-            if (ChildContext != null) return ChildContext.SpecialKey(key);
-
-            return false;
+            return ChildContext != null && ChildContext.SpecialKey(key);
         }
 
         public virtual char[,] GetBuffer()
@@ -94,21 +83,19 @@ namespace kOS
         public virtual void Update(float time)
         {
             // Process Command locks
-            foreach (Command command in new List<Command>(CommandLocks))
+            foreach (var command in new List<Command>(CommandLocks))
             {
                 command.Update(time);
             }
 
-            if (ChildContext != null)
+            if (ChildContext == null) return;
+            if (ChildContext.State == ExecutionState.DONE)
             {
-                if (ChildContext.State == ExecutionState.DONE)
-                {
-                    ChildContext = null;
-                }
-                else
-                {
-                    ChildContext.Update(time);
-                }
+                ChildContext = null;
+            }
+            else
+            {
+                ChildContext.Update(time);
             }
         }
 
@@ -119,16 +106,14 @@ namespace kOS
 
         public virtual bool Break()
         {
-            if (ParentContext != null) return ParentContext.Break();
-
-            return false;
+            return ParentContext != null && ParentContext.Break();
         }
 
         public Variable FindVariable(string varName)
         {
             varName = varName.ToLower();
 
-            Variable v = Variables.ContainsKey(varName) ? Variables[varName] : null;
+            var v = Variables.ContainsKey(varName) ? Variables[varName] : null;
 
             if (v == null && ParentContext != null)
             {
@@ -156,12 +141,7 @@ namespace kOS
         {
             varName = varName.ToLower();
 
-            Variable v = FindVariable(varName);
-
-            if (v == null)
-            {
-                v = CreateVariable(varName);
-            }
+            var v = FindVariable(varName) ?? CreateVariable(varName);
 
             return v;
         }
@@ -173,16 +153,12 @@ namespace kOS
 
         public virtual bool SwitchToVolume(int volID)
         {
-            if (ParentContext != null) return ParentContext.SwitchToVolume(volID);
-
-            return false;
+            return ParentContext != null && ParentContext.SwitchToVolume(volID);
         }
 
         public virtual bool SwitchToVolume(String volName)
         {
-            if (ParentContext != null) return ParentContext.SwitchToVolume(volName);
-
-            return false;
+            return ParentContext != null && ParentContext.SwitchToVolume(volName);
         }
 
         public virtual Volume GetVolume(object volID)
@@ -193,7 +169,7 @@ namespace kOS
             }
             else if (volID is String)
             {
-                String volName = volID.ToString().ToUpper();
+                var volName = volID.ToString().ToUpper();
 
                 foreach (Volume targetVolume in Volumes)
                 {
@@ -210,7 +186,7 @@ namespace kOS
                 }
             }
 
-            throw new kOSException("Volume '" + volID.ToString() + "' not found");
+            throw new kOSException("Volume '" + volID + "' not found");
         }
 
         public ExecutionContext GetDeepestChildContext()
@@ -221,18 +197,16 @@ namespace kOS
         public T FindClosestParentOfType<T>() where T : ExecutionContext
         {
             if (this is T) return (T)this;
-            else if (ParentContext == null) return null;
-            else return ParentContext.FindClosestParentOfType<T>();
+            if (ParentContext == null) return null;
+            return ParentContext.FindClosestParentOfType<T>();
         }
-        
+
         public void UpdateLock(String name)
         {
-            Expression e = GetLock(name);
-            if (e != null)
-            {
-                var v = FindVariable(name);
-                v.Value = e.GetValue();
-            }
+            var e = GetLock(name);
+            if (e == null) return;
+            var v = FindVariable(name);
+            v.Value = e.GetValue();
         }
 
         public virtual Expression GetLock(String name)
@@ -241,10 +215,7 @@ namespace kOS
             {
                 return Locks[name.ToUpper()];
             }
-            else
-            {
-                return ParentContext == null ? null : ParentContext.GetLock(name);
-            }
+            return ParentContext == null ? null : ParentContext.GetLock(name);
         }
 
         public virtual void Lock(Command command)
@@ -294,45 +265,42 @@ namespace kOS
         {
             lineStart = -1;
 
-            for (int i = 0; i < buffer.Length; i++)
+            for (var i = 0; i < buffer.Length; i++)
             {
-                string c = buffer.Substring(i, 1);
+                var c = buffer.Substring(i, 1);
 
                 if (lineStart < 0 && Regex.Match(c, "\\S").Success) lineStart = lineCount;
                 else if (c == "\n") lineCount++;
 
-                if (c == "\"")
+                switch (c)
                 {
-                    i = Utils.FindEndOfString(buffer, i + 1);
+                    case "\"":
+                        i = Utils.FindEndOfString(buffer, i + 1);
+                        if (i == -1)
+                        {
+                            cmd = "";
+                            return false;
+                        }
+                        break;
+                    case ".":
+                        {
+                            int pTest;
+                            if (i == buffer.Length - 1 || int.TryParse(buffer.Substring(i + 1, 1), out pTest) == false)
+                            {
+                                cmd = buffer.Substring(0, i);
+                                buffer = buffer.Substring(i + 1).Trim();
 
-                    if (i == -1)
-                    {
-                        cmd = "";
-                        return false;
-                    }
-                }
-                else if (c == ".")
-                {
-                    int pTest;
-                    if (i == buffer.Length - 1 || int.TryParse(buffer.Substring(i + 1, 1), out pTest) == false)
-                    {
-                        cmd = buffer.Substring(0, i);
-                        buffer = buffer.Substring(i + 1).Trim();
-
-                        return true;
-                    }
-                }
-                else if (c == "{")
-                {
-                    i = Utils.BraceMatch(buffer, i);
-
-                    if (i == -1)
-                    {
-                        cmd = "";
-                        return false;
-                    }
-                    else
-                    {
+                                return true;
+                            }
+                        }
+                        break;
+                    case "{":
+                        i = Utils.BraceMatch(buffer, i);
+                        if (i == -1)
+                        {
+                            cmd = "";
+                            return false;
+                        }
                         // Do you see a period after this right brace? If not, let's just pretend there is one ok?
                         if (!buffer.Substring(i + 1).StartsWith("."))
                         {
@@ -341,7 +309,7 @@ namespace kOS
 
                             return true;
                         }
-                    }
+                        break;
                 }
             }
 
@@ -366,23 +334,19 @@ namespace kOS
 
         public virtual object CallExternalFunction(String name, string[] parameters)
         {
-            if (ParentContext != null) return ParentContext.CallExternalFunction(name, parameters);
-
-            return null;
+            return ParentContext != null ? ParentContext.CallExternalFunction(name, parameters) : null;
         }
 
         public virtual bool FindExternalFunction(String name)
         {
-            if (ParentContext != null) return ParentContext.FindExternalFunction(name);
-
-            return false;
+            return ParentContext != null && ParentContext.FindExternalFunction(name);
         }
 
         public virtual void OnSave(ConfigNode node)
         {
-            ConfigNode contextNode = new ConfigNode("context");
+            var contextNode = new ConfigNode("context");
 
-            contextNode.AddValue("context-type", this.GetType().ToString());
+            contextNode.AddValue("context-type", GetType().ToString());
 
             if (ChildContext != null)
             {
@@ -396,11 +360,9 @@ namespace kOS
         {
         }
 
-        public virtual string GetVolumeBestIdentifier(Volume SelectedVolume)
+        public virtual string GetVolumeBestIdentifier(Volume selectedVolume)
         {
-            if (ParentContext != null) return ParentContext.GetVolumeBestIdentifier(SelectedVolume);
-
-            return "";
+            return ParentContext != null ? ParentContext.GetVolumeBestIdentifier(selectedVolume) : "";
         }
     }
 }
