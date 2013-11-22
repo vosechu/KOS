@@ -66,7 +66,7 @@ namespace kOS
             return (input > high ? high : (input < low ? low : input));
         }
 
-        public static int BraceMatch(String text, int start)
+        public static int BraceMatch(this string text, int start)
         {
             var input = text.ToCharArray();
             var braceLevel = 0;

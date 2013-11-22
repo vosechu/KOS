@@ -104,19 +104,19 @@ namespace kOS
                 {
                     if (Value is String && ((string)Value).ToUpper() == "KILL")
                     {
-                        SteeringHelper.KillRotation(c, vessel);
+                        vessel.KillRotation(c);
                     }
                     else if (Value is Direction)
                     {
-                        SteeringHelper.SteerShipToward((Direction)Value, c, vessel);
+                        vessel.SteerShipToward((Direction)Value, c);
                     }
                     else if (Value is Vector)
                     {
-                        SteeringHelper.SteerShipToward(((Vector)Value).ToDirection(), c, vessel);
+                        vessel.SteerShipToward(((Vector)Value).ToDirection(), c);
                     }
                     else if (Value is Node)
                     {
-                        SteeringHelper.SteerShipToward(((Node)Value).GetBurnVector().ToDirection(), c, vessel);
+                        vessel.SteerShipToward(((Node)Value).GetBurnVector().ToDirection(), c);
                     }
                 }
 

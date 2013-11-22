@@ -5,14 +5,13 @@ using UnityEngine;
 
 namespace kOS
 {
-    
     public static class SteeringHelper
     {
         public static Vector3d prev_err;
         public static Vector3d integral;
         private static Vector3d[] averagedAct = new Vector3d[5];
 
-        public static void KillRotation(FlightCtrlState c, Vessel vessel)
+        public static void KillRotation(this Vessel vessel, FlightCtrlState c)
         {
             var act = vessel.transform.InverseTransformDirection(vessel.rigidbody.angularVelocity).normalized;
             
@@ -23,7 +22,7 @@ namespace kOS
             c.killRot = true;
         }
 
-        public static void SteerShipToward(Direction targetDir, FlightCtrlState c, Vessel vessel)
+        public static void SteerShipToward(this Vessel vessel, Direction targetDir, FlightCtrlState c)
         {
             // I take no credit for this, this is a stripped down, rearranged version of MechJeb's attitude control system
 
@@ -40,8 +39,8 @@ namespace kOS
             var deltaEuler = ReduceAngles(delta.eulerAngles);
             deltaEuler.y *= -1;
 
-            var torque = GetTorque(vessel, c.mainThrottle);
-            var inertia = GetEffectiveInertia(vessel, torque);
+            var torque = vessel.GetTorque(c.mainThrottle);
+            var inertia = vessel.GetEffectiveInertia(torque);
 
             var err = deltaEuler * Math.PI / 180.0F;
             err += new Vector3d(inertia.x, inertia.z, inertia.y);
@@ -116,7 +115,7 @@ namespace kOS
             return new Vector3d(Math.Pow(v3d.x, exponent), Math.Pow(v3d.y, exponent), Math.Pow(v3d.z, exponent));
         }
 
-        public static Vector3d GetEffectiveInertia(Vessel vessel, Vector3d torque)
+        public static Vector3d GetEffectiveInertia(this Vessel vessel, Vector3d torque)
         {
             var coM = vessel.findWorldCenterOfMass();
             var moI = vessel.findLocalMOI(coM);
@@ -134,7 +133,7 @@ namespace kOS
             return retVar;
         }
 
-        public static Vector3d GetTorque(Vessel vessel, float thrust)
+        public static Vector3d GetTorque(this Vessel vessel, float thrust)
         {
             var coM = vessel.findWorldCenterOfMass();
             
@@ -164,13 +163,13 @@ namespace kOS
                     roll += (module).RollTorque;
                 }
 
-                pitchYaw += (float)GetThrustTorque(part, vessel) * thrust;
+                pitchYaw += (float)part.GetThrustTorque(vessel) * thrust;
             }
             
             return new Vector3d(pitchYaw, roll, pitchYaw);
         }
 
-        public static double GetThrustTorque(Part p, Vessel vessel)
+        public static double GetThrustTorque(this Part p, Vessel vessel)
         {
             var coM = vessel.CoM;
 

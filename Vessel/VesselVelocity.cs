@@ -10,7 +10,7 @@
         {
             orbitVelocity = new Vector(v.obt_velocity);
             surfaceVelocity = new Vector(v.srf_velocity);
-            velocityHeading = VesselUtils.GetVelocityHeading(v);
+            velocityHeading = v.GetVelocityHeading();
         }
 
         public override object GetSuffix(string suffixName)

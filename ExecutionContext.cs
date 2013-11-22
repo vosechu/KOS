@@ -295,7 +295,7 @@ namespace kOS
                         }
                         break;
                     case "{":
-                        i = Utils.BraceMatch(buffer, i);
+                        i = buffer.BraceMatch(i);
                         if (i == -1)
                         {
                             cmd = "";
