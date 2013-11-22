@@ -24,16 +24,29 @@ namespace kOS
         {
             if (target == null) throw new kOSException("BODY structure appears to be empty!");
 
-            if (suffixName == "NAME") return target.name;
-            if (suffixName == "DESCRIPTION") return target.bodyDescription;
-            if (suffixName == "MASS") return target.Mass;
-            if (suffixName == "POSITION") return new Vector(target.position);
-            if (suffixName == "ALTITUDE") return target.orbit.altitude;
-            if (suffixName == "APOAPSIS") return target.orbit.ApA;
-            if (suffixName == "PERIAPSIS") return target.orbit.PeA;
-            if (suffixName == "VELOCITY") return new Vector(target.orbit.GetVel());
-            if (suffixName == "DISTANCE") return (float)GetDistance();
-            if (suffixName == "BODY") return new BodyTarget(target.orbit.referenceBody, context);
+            switch (suffixName)
+            {
+                case "NAME":
+                    return target.name;
+                case "DESCRIPTION":
+                    return target.bodyDescription;
+                case "MASS":
+                    return target.Mass;
+                case "POSITION":
+                    return new Vector(target.position);
+                case "ALTITUDE":
+                    return target.orbit.altitude;
+                case "APOAPSIS":
+                    return target.orbit.ApA;
+                case "PERIAPSIS":
+                    return target.orbit.PeA;
+                case "VELOCITY":
+                    return new Vector(target.orbit.GetVel());
+                case "DISTANCE":
+                    return (float)GetDistance();
+                case "BODY":
+                    return new BodyTarget(target.orbit.referenceBody, context);
+            }
 
             return base.GetSuffix(suffixName);
         }

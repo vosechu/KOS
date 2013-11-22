@@ -15,10 +15,10 @@ namespace kOS
         public float SessionTime;
         public int ClockSpeed = 5;
         
-        private Dictionary<String, Variable> variables = new Dictionary<String, Variable>();
+        private readonly Dictionary<String, Variable> variables = new Dictionary<String, Variable>();
         private Volume selectedVolume = null;
         private List<Volume> volumes = new List<Volume>();
-        private List<kOSExternalFunction> externalFunctions = new List<kOSExternalFunction>();
+        private readonly List<kOSExternalFunction> externalFunctions = new List<kOSExternalFunction>();
         
         public override Vessel Vessel { get { return ((kOSProcessor)Parent).vessel; } }
         public override Dictionary<String, Variable> Variables { get { return variables; } }
@@ -349,7 +349,7 @@ namespace kOS
 
         public override string GetVolumeBestIdentifier(Volume SelectedVolume)
         {
-            int localIndex = volumes.IndexOf(SelectedVolume);
+            var localIndex = volumes.IndexOf(SelectedVolume);
 
             if (!String.IsNullOrEmpty(SelectedVolume.Name)) return "#" + localIndex + ": \"" + SelectedVolume.Name + "\"";
             return "#" + localIndex;
