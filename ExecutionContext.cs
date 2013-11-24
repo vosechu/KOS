@@ -11,17 +11,10 @@ namespace kOS
 
     public class ExecutionContext
     {
-        public static int COLUMNS = 50;
-        public static int ROWS = 36;
+        protected const int COLUMNS = 50;
+        protected const int ROWS = 36;
+        private readonly List<Command.Command> commandLocks = new List<Command.Command>();
 
-        public CPU Cpu;
-        public Queue<Command.Command> Queue = new Queue<Command.Command>();
-        public String buffer;
-        public ExecutionContext ParentContext = null;
-        public ExecutionContext ChildContext = null;
-        public ExecutionState State = ExecutionState.NEW;
-        public int Line = 0;
-        
         public virtual Volume SelectedVolume
         { 
             get { return ParentContext != null ? ParentContext.SelectedVolume : null; }
@@ -32,16 +25,24 @@ namespace kOS
         public virtual List<Volume> Volumes { get { return ParentContext != null ? ParentContext.Volumes : null; } }
         public virtual Dictionary<String, Variable> Variables { get { return ParentContext != null ? ParentContext.Variables : null; } }
         public virtual List<kOSExternalFunction> ExternalFunctions { get { return ParentContext != null ? ParentContext.ExternalFunctions : null; } }
-        public Dictionary<String, Expression> Locks = new Dictionary<string, Expression>();
-        public List<Command.Command> CommandLocks = new List<Command.Command>();
+        public int Line { get; protected set; }
+        public ExecutionState State { get; set; }
+        public Dictionary<string, Expression> Locks { get; set; }
+        public ExecutionContext ChildContext { get; protected set; }
+        public ExecutionContext ParentContext { get; private set; }
 
         public ExecutionContext()
         {
-
+            Locks = new Dictionary<string, Expression>();
+            State = ExecutionState.NEW;
+            Line = 0;
         }
-        
+
         public ExecutionContext(ExecutionContext parent)
         {
+            Locks = new Dictionary<string, Expression>();
+            State = ExecutionState.NEW;
+            Line = 0;
             ParentContext = parent;
         }
 
@@ -84,7 +85,7 @@ namespace kOS
         public virtual void Update(float time)
         {
             // Process Command locks
-            foreach (var command in new List<Command.Command>(CommandLocks))
+            foreach (var command in new List<Command.Command>(commandLocks))
             {
                 command.Update(time);
             }
@@ -221,7 +222,7 @@ namespace kOS
 
         public virtual void Lock(Command.Command command)
         {
-            CommandLocks.Add(command);
+            commandLocks.Add(command);
         }
 
         public virtual void Lock(String name, Expression expression)
@@ -238,7 +239,7 @@ namespace kOS
 
         public virtual void Unlock(Command.Command command)
         {
-            CommandLocks.Remove(command);
+            commandLocks.Remove(command);
             if (ParentContext != null) ParentContext.Unlock(command);
         }
 

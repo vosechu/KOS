@@ -85,7 +85,7 @@ namespace kOS.Binding.Flight
 
             public void OnFlyByWire(ref FlightCtrlState c)
             {
-                Expression e = cpu.GetDeepestChildContext().GetLock(propertyName);
+                var e = cpu.GetDeepestChildContext().GetLock(propertyName);
 
                 if (e == null) return;
 

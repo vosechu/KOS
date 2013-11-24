@@ -127,7 +127,7 @@ namespace kOS
             catch (Exception e)
             {
                 // Non-kos exception! This is a bug, but no reason to kill the OS
-                StdOut("Flagrant error on line " + EXECUTION_LINE);
+                StdOut("Flagrant error on line " + Line);
                 UnityEngine.Debug.Log("Program error");
                 UnityEngine.Debug.Log(e);
                 State = ExecutionState.DONE;
