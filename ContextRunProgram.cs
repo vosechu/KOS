@@ -11,7 +11,6 @@ namespace kOS
         private String commandBuffer;
         private readonly List<Command.Command> commands = new List<Command.Command>();
         private readonly List<Expression> parameters = new List<Expression>();
-        private const int EXECUTION_LINE = 0;
 
 
         public string Filename;

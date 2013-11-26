@@ -2,6 +2,7 @@
 
 namespace kOS
 {
+    [Serializable]
     public class kOSException : Exception
     {
         public new String Message;

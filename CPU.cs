@@ -21,9 +21,9 @@ namespace kOS
         private List<Volume> volumes = new List<Volume>();
         private readonly List<kOSExternalFunction> externalFunctions = new List<kOSExternalFunction>();
         
-        public override Vessel Vessel { get { return ((kOSProcessor)Parent).vessel; } }
+        public override sealed Vessel Vessel { get { return ((kOSProcessor)Parent).vessel; } }
         public override Dictionary<String, Variable> Variables { get { return variables; } }
-        public override List<Volume> Volumes { get  { return volumes; } }
+        public override sealed List<Volume> Volumes { get  { return volumes; } }
         public override List<kOSExternalFunction> ExternalFunctions { get { return externalFunctions; } }
 
         public static kOSRunType RunType = kOSRunType.KSP;

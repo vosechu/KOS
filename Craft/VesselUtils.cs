@@ -276,6 +276,11 @@ namespace kOS.Craft
             return -body.atmosphereScaleHeight * 1000 * Math.Log(1e-6);
         }
 
+	public static double GetThrustToWeight(this Vessel vessel)
+	{
+	    throw new NotImplementedException();
+	}
+
         public static double GetTerminalVelocity(this Vessel vessel)
         {
             if (vessel.mainBody.GetAltitude(vessel.findWorldCenterOfMass()) > RealMaxAtmosphereAltitude(vessel.mainBody)) return double.PositiveInfinity;

@@ -83,6 +83,8 @@ namespace kOS.Craft
                     return GetRetrograde();
                 case "MAXTHRUST":
                     return target.GetMaxThrust();
+                case "TWR":
+                    return target.GetThrustToWeight();
                 case "VELOCITY":
                     return new VesselVelocity(target);
                 case "GEOPOSITION":
