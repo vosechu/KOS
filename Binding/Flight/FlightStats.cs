@@ -12,10 +12,9 @@ namespace kOS.Binding.Flight
         public override void AddTo(BindingManager manager)
         {
             manager.AddGetter("ALT:RADAR",
-                              cpu =>
-                              cpu.Vessel.heightFromTerrain > 0
-                                  ? Mathf.Min(cpu.Vessel.heightFromTerrain, (float) cpu.Vessel.altitude)
-                                  : (float) cpu.Vessel.altitude);
+                              cpu => cpu.Vessel.heightFromTerrain > 0
+                                         ? Math.Min(cpu.Vessel.heightFromTerrain, cpu.Vessel.altitude)
+                                         : cpu.Vessel.altitude);
             manager.AddGetter("ALT:APOAPSIS", cpu => cpu.Vessel.orbit.ApA);
             manager.AddGetter("ALT:PERIAPSIS", cpu => cpu.Vessel.orbit.PeA);
             manager.AddGetter("ETA:APOAPSIS", cpu => cpu.Vessel.orbit.timeToAp);
@@ -31,7 +30,7 @@ namespace kOS.Binding.Flight
 
             manager.AddGetter("STATUS", cpu => cpu.Vessel.situation.ToString().Replace("_", " "));
             manager.AddGetter("COMMRANGE", cpu => cpu.Vessel.GetCommRange());
-            manager.AddGetter("INCOMMRANGE", cpu => Convert.ToDouble(CheckCommRange(cpu.Vessel)));
+            manager.AddGetter("INCOMMRANGE", cpu => CheckCommRange(cpu.Vessel));
 
             manager.AddGetter("AV",
                               cpu =>

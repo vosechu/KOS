@@ -44,7 +44,7 @@ namespace kOS
                 case "VELOCITY":
                     return new Vector(target.orbit.GetVel());
                 case "DISTANCE":
-                    return (float)GetDistance();
+                    return GetDistance();
                 case "BODY":
                     return new BodyTarget(target.orbit.referenceBody, context);
             }
