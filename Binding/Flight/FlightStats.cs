@@ -11,19 +11,20 @@ namespace kOS.Binding.Flight
     {
         public override void AddTo(BindingManager manager)
         {
-            manager.AddGetter("ALT:RADAR",
+            manager.AddSmooth("ALT:RADAR",
                               cpu => cpu.Vessel.heightFromTerrain > 0
                                          ? Math.Min(cpu.Vessel.heightFromTerrain, cpu.Vessel.altitude)
                                          : cpu.Vessel.altitude);
-            manager.AddGetter("ALT:APOAPSIS", cpu => cpu.Vessel.orbit.ApA);
-            manager.AddGetter("ALT:PERIAPSIS", cpu => cpu.Vessel.orbit.PeA);
-            manager.AddGetter("ETA:APOAPSIS", cpu => cpu.Vessel.orbit.timeToAp);
-            manager.AddGetter("ETA:PERIAPSIS", cpu => cpu.Vessel.orbit.timeToPe);
-            manager.AddGetter("OBT:PERIOD", cpu => cpu.Vessel.orbit.period);
-            manager.AddGetter("OBT:INCLINATION", cpu => cpu.Vessel.orbit.inclination);
-            manager.AddGetter("OBT:ECCENTRICITY", cpu => cpu.Vessel.orbit.eccentricity);
-            manager.AddGetter("OBT:SEMIMAJORAXIS", cpu => cpu.Vessel.orbit.semiMajorAxis);
-            manager.AddGetter("OBT:SEMIMINORAXIS", cpu => cpu.Vessel.orbit.semiMinorAxis);
+            manager.AddSmooth("ALT:APOAPSIS", cpu => cpu.Vessel.orbit.ApA);
+            manager.AddSmooth("ALT:PERIAPSIS", cpu => cpu.Vessel.orbit.PeA);
+            manager.AddSmooth("ETA:APOAPSIS", cpu => cpu.Vessel.orbit.timeToAp);
+            manager.AddSmooth("ETA:PERIAPSIS", cpu => cpu.Vessel.orbit.timeToPe);
+            manager.AddSmooth("OBT:PERIOD", cpu => cpu.Vessel.orbit.period);
+            manager.AddSmooth("OBT:INCLINATION", cpu => cpu.Vessel.orbit.inclination);
+            manager.AddSmooth("OBT:ECCENTRICITY", cpu => cpu.Vessel.orbit.eccentricity);
+            manager.AddSmooth("OBT:SEMIMAJORAXIS", cpu => cpu.Vessel.orbit.semiMajorAxis);
+            manager.AddSmooth("OBT:SEMIMINORAXIS", cpu => cpu.Vessel.orbit.semiMinorAxis);
+            manager.AddSmooth("OBT:SEMIMINORAXIS", cpu => cpu.Vessel.orbit.semiMinorAxis);
 
             manager.AddGetter("MISSIONTIME", cpu => cpu.Vessel.missionTime);
             manager.AddGetter("TIME", cpu => new TimeSpan(Planetarium.GetUniversalTime()));

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using kOS.Stats;
 
 namespace kOS.Binding
 {
@@ -9,9 +10,10 @@ namespace kOS.Binding
     {
         public CPU Cpu;
 
-        public Dictionary<string, BindingSetDlg> Setters = new Dictionary<string, BindingSetDlg>();
-        public Dictionary<string, BindingGetDlg> Getters = new Dictionary<string, BindingGetDlg>();
-        public List<Binding> Bindings = new List<Binding>();
+        private Dictionary<string, BindingSetDlg> Setters = new Dictionary<string, BindingSetDlg>();
+        private Dictionary<string, BindingGetDlg> Getters = new Dictionary<string, BindingGetDlg>();
+	private readonly List<SmoothVariable> Updatable = new List<SmoothVariable>(); 
+        private readonly List<Binding> Bindings = new List<Binding>();
         
         public delegate void BindingSetDlg      (CPU cpu, object val);
         public delegate object BindingGetDlg    (CPU cpu);
@@ -53,6 +55,30 @@ namespace kOS.Binding
             }
         }
 
+	public void AddSmooth(string name, BindingGetDlg dlg)
+	{
+	    AddGetter(name, dlg);
+	    var smoothName = name + ":SMOOTH";
+
+		var v = Cpu.FindVariable(smoothName) ?? Cpu.FindVariable(smoothName.Split(":".ToCharArray())[0]);
+
+		if (v != null)
+		{
+		    var variable = v as SmoothVariable;
+		    if (variable != null)
+		    {
+			variable.Get = dlg;
+		    }
+		}
+		else
+		{
+		    var bv = Cpu.CreateBoundVariable<SmoothVariable>(smoothName);
+		    bv.Get = dlg;
+		    Updatable.Add(bv);
+		}
+	    
+	}
+
         public void AddSetter(String name, BindingSetDlg dlg)
         {
             var v = Cpu.FindVariable(name.ToLower());
@@ -76,6 +102,10 @@ namespace kOS.Binding
             foreach (var b in Bindings)
             {
                 b.Update(time);
+            }
+            foreach (var smoothVariable in Updatable)
+            {
+                smoothVariable.Update();
             }
         }
     }
