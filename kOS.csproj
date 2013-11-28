@@ -118,6 +118,7 @@
     <Compile Include="SpecialValue.cs" />
     <Compile Include="SpecialValueTester.cs" />
     <Compile Include="StageValues.cs" />
+    <Compile Include="Stats\MovingAverage.cs" />
     <Compile Include="SteeringHelper.cs" />
     <Compile Include="Timespan.cs" />
     <Compile Include="Vector.cs" />
