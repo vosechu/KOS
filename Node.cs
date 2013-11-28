@@ -4,52 +4,52 @@ namespace kOS
 {
     public class Node : SpecialValue
     {
-        ManeuverNode nodeRef;
-        Vessel vesselRef;
-        public double UT;
-        public double Pro;
-        public double RadOut;
-        public double Norm;
+        private ManeuverNode nodeRef;
+        private Vessel vesselRef;
+        private double ut;
+        private double prograde;
+        private double radialOut;
+        private double normal;
 
-        public static Dictionary<ManeuverNode, Node> NodeLookup = new Dictionary<ManeuverNode, Node>();
+        private static readonly Dictionary<ManeuverNode, Node> _nodeLookup = new Dictionary<ManeuverNode, Node>();
 
         public Node(double ut, double radialOut, double normal, double prograde)
         {
-            UT = ut;
-            Pro = prograde;
-            RadOut = radialOut;
-            Norm = normal;
+            this.ut = ut;
+            this.prograde = prograde;
+            this.radialOut = radialOut;
+            this.normal = normal;
         }
 
         public Node(Vessel v, ManeuverNode existingNode)
         {
             nodeRef = existingNode;
             vesselRef = v;
-            NodeLookup.Add(existingNode, this);
+            _nodeLookup.Add(existingNode, this);
 
             UpdateValues();
         }
 
         public static Node FromExisting(Vessel v, ManeuverNode existingNode)
         {
-            return NodeLookup.ContainsKey(existingNode) ? NodeLookup[existingNode] : new Node(v, existingNode);
+            return _nodeLookup.ContainsKey(existingNode) ? _nodeLookup[existingNode] : new Node(v, existingNode);
         }
 
         public void AddToVessel(Vessel v)
         {
-            if (nodeRef != null) throw new kOSException("Node has already been added");
+            if (nodeRef != null) throw new KOSException("Node has already been added");
 
             vesselRef = v;
-            nodeRef = v.patchedConicSolver.AddManeuverNode(UT);
+            nodeRef = v.patchedConicSolver.AddManeuverNode(ut);
 
             UpdateNodeDeltaV();
 
             v.patchedConicSolver.UpdateFlightPlan();
 
-            NodeLookup.Add(nodeRef, this);
+            _nodeLookup.Add(nodeRef, this);
         }
 
-        public void UpdateAll()
+        private void UpdateAll()
         {
             UpdateNodeDeltaV();
             if (vesselRef != null) vesselRef.patchedConicSolver.UpdateFlightPlan();
@@ -58,15 +58,15 @@ namespace kOS
         private void UpdateNodeDeltaV()
         {
             if (nodeRef == null) return;
-            var dv = new Vector3d(RadOut, Norm, Pro);
+            var dv = new Vector3d(radialOut, normal, prograde);
             nodeRef.DeltaV = dv;
         }
 
-        public void CheckNodeRef()
+        private void CheckNodeRef()
         {
             if (nodeRef == null)
             {
-                throw new kOSException("Must attach node first");
+                throw new KOSException("Must attach node first");
             }
         }
 
@@ -82,11 +82,11 @@ namespace kOS
             // If this node is attached, and the values on the attached node have chaged, I need to reflect that
             if (nodeRef == null) return;
 
-            UT = nodeRef.UT;
+            ut = nodeRef.UT;
 
-            RadOut = nodeRef.DeltaV.x;
-            Norm = nodeRef.DeltaV.y;
-            Pro = nodeRef.DeltaV.z;
+            radialOut = nodeRef.DeltaV.x;
+            normal = nodeRef.DeltaV.y;
+            prograde = nodeRef.DeltaV.z;
         }
                 
         public override object GetSuffix(string suffixName)
@@ -98,20 +98,20 @@ namespace kOS
                 case "BURNVECTOR":
                     return GetBurnVector();
                 case "ETA":
-                    return UT - Planetarium.GetUniversalTime();
+                    return ut - Planetarium.GetUniversalTime();
                 case "DELTAV":
                     return GetBurnVector();
                 case "PROGRADE":
-                    return Pro;
+                    return prograde;
                 case "RADIALOUT":
-                    return RadOut;
+                    return radialOut;
                 case "NORMAL":
-                    return Norm;
+                    return normal;
                 case "APOAPSIS":
-                    if (nodeRef == null) throw new kOSException("Node must be added to flight plan first");
+                    if (nodeRef == null) throw new KOSException("Node must be added to flight plan first");
                     return nodeRef.nextPatch.ApA;
                 case "PERIAPSIS":
-                    if (nodeRef == null) throw new kOSException("Node must be added to flight plan first");
+                    if (nodeRef == null) throw new KOSException("Node must be added to flight plan first");
                     return nodeRef.nextPatch.PeA;
             }
 
@@ -125,17 +125,17 @@ namespace kOS
                 case "DELTAV":
                 case "ETA":
                 case "BURNVECTOR":
-                    throw new kOSReadOnlyException(suffixName);
+                    throw new KOSReadOnlyException(suffixName);
                 case "PROGRADE":
-                    Pro = (double)value;
+                    prograde = (double)value;
                     UpdateAll();
                     return true;
                 case "RADIALOUT":
-                    RadOut = (double)value;
+                    radialOut = (double)value;
                     UpdateAll();
                     return true;
                 case "NORMAL":
-                    Norm = (double)value;
+                    normal = (double)value;
                     UpdateAll();
                     return true;
             }
@@ -146,7 +146,7 @@ namespace kOS
         public void Remove()
         {
             if (nodeRef == null) return;
-            NodeLookup.Remove(nodeRef);
+            _nodeLookup.Remove(nodeRef);
 
             vesselRef.patchedConicSolver.RemoveManeuverNode(nodeRef);
 
@@ -156,7 +156,7 @@ namespace kOS
 
         public override string ToString()
         {
-            return "NODE(" + UT + "," + RadOut + "," + Norm + "," + Pro + ")";
+            return "NODE(" + ut + "," + radialOut + "," + normal + "," + prograde + ")";
         }
     }
 }

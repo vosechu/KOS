@@ -5,15 +5,15 @@ using UnityEngine;
 
 namespace kOS
 {
-    public class kOSProcessor : PartModule
+    public class KOSProcessor : PartModule
     {
-        public CPU cpu;
-        public Harddisk hardDisk = null;
+        private CPU cpu;
+        private Harddisk hardDisk = null;
         private int vesselPartCount;
-        private readonly List<kOSProcessor> sisterProcs = new List<kOSProcessor>();
+        private readonly List<KOSProcessor> sisterProcs = new List<KOSProcessor>();
         private Dictionary<uint, uint> partIdentifiers;
 
-        private const int MemSize = 10000;
+        private const int MEM_SIZE = 10000;
         private static int cpuIdMax;
 
         [KSPEvent(guiActive = true, guiName = "Open Terminal")]
@@ -54,13 +54,13 @@ namespace kOS
                 return;
             }
 
-            if (hardDisk == null) hardDisk = new Harddisk(MemSize);
+            if (hardDisk == null) hardDisk = new Harddisk(MEM_SIZE);
 
-            initCpu();
+            InitCpu();
 
         }
 
-        public void initCpu()
+        private void InitCpu()
         {
             if (cpu != null) return;
             cpu = new CPU(this, "ksp");
@@ -88,7 +88,7 @@ namespace kOS
         
         public static int AssignNewID()
         {
-            var config = PluginConfiguration.CreateForType<kOSProcessor>();
+            var config = PluginConfiguration.CreateForType<KOSProcessor>();
             config.load();
             var id = config.GetValue<int>("CpuIDMax") + 1;
             config.SetValue("CpuIDMax", id);
@@ -125,7 +125,7 @@ namespace kOS
             sisterProcs.Clear();
             foreach (var part in vessel.parts)
             {
-                kOSProcessor sisterProc;
+                KOSProcessor sisterProc;
                 if (part == this.part || !PartIsKosProc(part, out sisterProc)) continue;
                 sisterProcs.Add(sisterProc);
                 attachedVolumes.Add(sisterProc.hardDisk);
@@ -136,9 +136,9 @@ namespace kOS
             vesselPartCount = vessel.parts.Count;
         }
 
-        public bool PartIsKosProc(Part input, out kOSProcessor proc)
+        public bool PartIsKosProc(Part input, out KOSProcessor proc)
         {
-            foreach (var module in input.Modules.OfType<kOSProcessor>())
+            foreach (var module in input.Modules.OfType<KOSProcessor>())
             {
                 proc = module;
                 return true;
@@ -165,7 +165,7 @@ namespace kOS
 
             Debug.Log("******************************* ON LOAD ");
 
-            initCpu();
+            InitCpu();
 
             Debug.Log("******************************* CPU Inited ");
 

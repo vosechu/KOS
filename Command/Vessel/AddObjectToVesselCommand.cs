@@ -18,7 +18,7 @@ namespace kOS.Command.Vessel
             }
             else
             {
-                throw new kOSException("Supplied object ineligible for adding", this);
+                throw new KOSException("Supplied object ineligible for adding", this);
             }
 
             State = ExecutionState.DONE;

@@ -33,14 +33,14 @@ namespace kOS
 
             var line = 0;
             int comandLineStart;
-            while (parseNext(ref commandBuffer, out nextCmd, ref line, out comandLineStart))
+            while (ParseNext(ref commandBuffer, out nextCmd, ref line, out comandLineStart))
             {
                 try
                 {
                     var cmd = Command.Command.Get(nextCmd, this, comandLineStart);
                     queue.Enqueue(cmd);
                 }
-                catch (kOSException e)
+                catch (KOSException e)
                 {
                     StdOut(e.Message);
                     queue.Clear(); // HALT!!
@@ -201,7 +201,7 @@ namespace kOS
                         Push(currentCmd);
                         currentCmd.Evaluate();
                     }
-                    catch (kOSException e)
+                    catch (KOSException e)
                     {
                         StdOut(e.Message);
                         queue.Clear();          // Halt all pending instructions
@@ -232,7 +232,7 @@ namespace kOS
             {
                 base.Update(time);
             }
-            catch (kOSException e)
+            catch (KOSException e)
             {
                 StdOut(e.Message);
                 ChildContext = null;

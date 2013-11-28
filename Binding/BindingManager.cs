@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using kOS.Stats;
 
 namespace kOS.Binding
 {
@@ -10,10 +9,8 @@ namespace kOS.Binding
     {
         public CPU Cpu;
 
-        private Dictionary<string, BindingSetDlg> Setters = new Dictionary<string, BindingSetDlg>();
-        private Dictionary<string, BindingGetDlg> Getters = new Dictionary<string, BindingGetDlg>();
-	private readonly List<SmoothVariable> Updatable = new List<SmoothVariable>(); 
-        private readonly List<Binding> Bindings = new List<Binding>();
+	private readonly List<SmoothVariable> updatable = new List<SmoothVariable>(); 
+        private readonly List<Binding> bindings = new List<Binding>();
         
         public delegate void BindingSetDlg      (CPU cpu, object val);
         public delegate object BindingGetDlg    (CPU cpu);
@@ -32,7 +29,7 @@ namespace kOS.Binding
                               select (Binding)Activator.CreateInstance(t))
             {
                 b.AddTo(this);
-                Bindings.Add(b);
+                bindings.Add(b);
             }
         }
 
@@ -58,7 +55,7 @@ namespace kOS.Binding
 	public void AddSmooth(string name, BindingGetDlg dlg)
 	{
 	    AddGetter(name, dlg);
-	    var smoothName = name + ":SMOOTH";
+	    var smoothName = "SMOOTH#" + name;
 
 		var v = Cpu.FindVariable(smoothName) ?? Cpu.FindVariable(smoothName.Split(":".ToCharArray())[0]);
 
@@ -74,14 +71,15 @@ namespace kOS.Binding
 		{
 		    var bv = Cpu.CreateBoundVariable<SmoothVariable>(smoothName);
 		    bv.Get = dlg;
-		    Updatable.Add(bv);
-		}
+		    updatable.Add(bv);
+		   UnityEngine.Debug.Log("Binding: " + smoothName);
 	    
+		}
 	}
 
         public void AddSetter(String name, BindingSetDlg dlg)
         {
-            var v = Cpu.FindVariable(name.ToLower());
+            var v = Cpu.FindVariable(name);
             if (v != null)
             {
                 var variable = v as BoundVariable;
@@ -99,11 +97,11 @@ namespace kOS.Binding
 
         public void Update(float time)
         {
-            foreach (var b in Bindings)
+            foreach (var b in bindings)
             {
                 b.Update(time);
             }
-            foreach (var smoothVariable in Updatable)
+            foreach (var smoothVariable in updatable)
             {
                 smoothVariable.Update();
             }

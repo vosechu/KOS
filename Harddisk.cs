@@ -27,7 +27,7 @@ namespace kOS
 
             foreach (var fileNode in node.GetNodes("file"))
             {
-                files.Add(new File(fileNode));
+                Files.Add(new File(fileNode));
             }
         }
 
@@ -38,7 +38,7 @@ namespace kOS
 
         public override int GetFreeSpace()
         {
-            var totalOccupied = files.Sum(p => p.GetSize());
+            var totalOccupied = Files.Sum(p => p.GetSize());
 
             return Math.Max(Capacity - totalOccupied, 0);
         }
@@ -46,7 +46,7 @@ namespace kOS
         public override bool IsRoomFor(File newFile)
         {
             var totalOccupied = newFile.GetSize();
-            foreach (File existingFile in files)
+            foreach (File existingFile in Files)
             {
                 // Consider only existing files that don't share a name with the proposed new file
                 // Because this could be an overwrite situation
@@ -63,7 +63,7 @@ namespace kOS
         {
             foreach (var p in programsToLoad)
             {
-                files.Add(p);
+                Files.Add(p);
             }
         }
 
@@ -73,7 +73,7 @@ namespace kOS
             node.AddValue("capacity", Capacity);
             node.AddValue("volumeName", Name);
 
-            foreach (var file in files)
+            foreach (var file in Files)
             {
                 node.AddNode(file.Save("file"));
             }

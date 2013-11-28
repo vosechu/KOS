@@ -13,7 +13,7 @@ namespace kOS.Command.BasicIO
             String varName = RegexMatch.Groups[1].Value;
             Variable v = FindOrCreateVariable(varName);
 
-            if (v == null) throw new kOSException("Can't create variable '" + varName + "'", this);
+            if (v == null) throw new KOSException("Can't create variable '" + varName + "'", this);
             
             State = ExecutionState.DONE;
         }

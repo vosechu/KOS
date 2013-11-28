@@ -2,22 +2,22 @@
 
 namespace kOS
 {
-    public struct kOSExternalFunction
+    public struct KOSExternalFunction
     {
         public String Name;
         public object Parent;
         public String MethodName;
         public int ParameterCount;
-        public String regex;
+        public String Regex;
 
-        public kOSExternalFunction(String name, object parent, String methodName, int parameterCount)
+        public KOSExternalFunction(String name, object parent, String methodName, int parameterCount)
         {
             Name = name;
             Parent = parent;
             ParameterCount = parameterCount;
             MethodName = methodName;
 
-            regex = Utils.BuildRegex(name + "_(" + parameterCount + ")");
+            Regex = Utils.BuildRegex(name + "_(" + parameterCount + ")");
         }
     }
 }

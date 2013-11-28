@@ -14,7 +14,7 @@ namespace kOS.Command.BasicIO
 
             if (v == null)
             {
-                throw new kOSException("Can't find or create variable '" + varName + "'", this);
+                throw new KOSException("Can't find or create variable '" + varName + "'", this);
             }
             if (v.Value is bool)
             {
@@ -29,7 +29,7 @@ namespace kOS.Command.BasicIO
             }
             else
             {
-                throw new kOSException("That variable can't be toggled.", this);
+                throw new KOSException("That variable can't be toggled.", this);
             }
         }
     }

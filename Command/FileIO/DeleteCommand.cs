@@ -19,13 +19,13 @@ namespace kOS.Command.FileIO
             {
                 Volume targetVolume = GetVolume(volumeName);
                 file = targetVolume.GetByName(targetFile);
-                if (file == null) throw new kOSException("File '" + targetFile + "' not found", this);
+                if (file == null) throw new KOSException("File '" + targetFile + "' not found", this);
                 targetVolume.DeleteByName(targetFile);
             }
             else
             {
                 file = SelectedVolume.GetByName(targetFile);
-                if (file == null) throw new kOSException("File '" + targetFile + "' not found", this);
+                if (file == null) throw new KOSException("File '" + targetFile + "' not found", this);
                 SelectedVolume.DeleteByName(targetFile);
             }
 

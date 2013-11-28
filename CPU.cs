@@ -19,12 +19,12 @@ namespace kOS
         private readonly Dictionary<String, Variable> variables;
         private Volume selectedVolume = null;
         private readonly List<Volume> volumes = new List<Volume>();
-        private readonly List<kOSExternalFunction> externalFunctions = new List<kOSExternalFunction>();
+        private readonly List<KOSExternalFunction> externalFunctions = new List<KOSExternalFunction>();
         
-        public override sealed Vessel Vessel { get { return ((kOSProcessor)Parent).vessel; } }
+        public override sealed Vessel Vessel { get { return ((KOSProcessor)Parent).vessel; } }
         public override Dictionary<String, Variable> Variables { get { return variables; } }
         public override sealed List<Volume> Volumes { get  { return volumes; } }
-        public override List<kOSExternalFunction> ExternalFunctions { get { return externalFunctions; } }
+        public override List<KOSExternalFunction> ExternalFunctions { get { return externalFunctions; } }
 
         public static kOSRunType RunType = kOSRunType.KSP;
         public enum kOSRunType { KSP, WINFORMS };
@@ -37,8 +37,8 @@ namespace kOS
 
         public CPU(object parent, string context)
         {
-            this.Parent = parent;
-            this.Context = context;
+            Parent = parent;
+            Context = context;
             variables = new Dictionary<string, Variable>(StringComparer.OrdinalIgnoreCase);
             bindingManager = new BindingManager(this, Context);
 
@@ -54,7 +54,7 @@ namespace kOS
                 RunType = kOSRunType.WINFORMS;
             }
 
-            this.RegisterkOSExternalFunction(new object[] { "test2", this, "testFunction", 2 });
+            RegisterkOSExternalFunction(new object[] { "test2", this, "testFunction", 2 });
         }
 
         public double testFunction(double x, double y) { return x * y; }
@@ -73,7 +73,7 @@ namespace kOS
 
         public void RegisterkOSExternalFunction(String name, object parent, String methodName, int parameterCount)
         {
-            externalFunctions.Add(new kOSExternalFunction(name.ToUpper(), parent, methodName, parameterCount));
+            externalFunctions.Add(new KOSExternalFunction(name.ToUpper(), parent, methodName, parameterCount));
         }
 
         public override object CallExternalFunction(string name, string[] parameters)
@@ -130,15 +130,15 @@ namespace kOS
                         if (bool.TryParse(value, out bln)) converted = bln;
                     }
 
-                    if (converted == null) throw new kOSException("Parameter types don't match");
+                    if (converted == null) throw new KOSException("Parameter types don't match");
                     convertedParams[i] = converted;
                 }
 
                 return method.Invoke(function.Parent, convertedParams);
             }
 
-            if (!callFound) throw new kOSException("External function '" + name + "' not found");
-            if (!callAndParamCountFound) throw new kOSException("Wrong number of arguments for '" + name + "'");
+            if (!callFound) throw new KOSException("External function '" + name + "' not found");
+            if (!callAndParamCountFound) throw new KOSException("Wrong number of arguments for '" + name + "'");
 
             return null;
         }
@@ -159,7 +159,7 @@ namespace kOS
 
         public bool IsAlive()
         {
-            var partState = ((kOSProcessor)Parent).part.State;
+            var partState = ((KOSProcessor)Parent).part.State;
 
             if (partState == PartStates.DEAD)
             {
@@ -209,7 +209,7 @@ namespace kOS
                     SelectedVolume = newVolume;
                     return true;
                 }
-                throw new kOSException("Volume disconnected - out of range");
+                throw new KOSException("Volume disconnected - out of range");
             }
 
             return false;
@@ -224,7 +224,7 @@ namespace kOS
                     SelectedVolume = volume;
                     return true;
                 }
-                throw new kOSException("Volume disconnected - out of range");
+                throw new KOSException("Volume disconnected - out of range");
             }
 
             return false;
@@ -234,7 +234,7 @@ namespace kOS
         {
             if (FindVariable(varName) != null)
             {
-                throw new kOSException("Cannot bind " + varName + "; name already taken.");
+                throw new KOSException("Cannot bind " + varName + "; name already taken.");
             }
 
             var boundVariable = new T {Cpu = this};

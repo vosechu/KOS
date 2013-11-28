@@ -3,22 +3,22 @@
 namespace kOS
 {
     [Serializable]
-    public class kOSException : Exception
+    public class KOSException : Exception
     {
         public new String Message;
         public String Filename;
         public int LineNumber;
-        public Command.Command commandObj;
+        public Command.Command CommandObj;
         public ExecutionContext Context;
         public ContextRunProgram Program;
 
-        public kOSException(String message)
+        public KOSException(String message)
         {
             Message = message;
             //this.commandObj = commandObj;
         }
 
-        public kOSException(String message, ExecutionContext context) : this (message)
+        public KOSException(String message, ExecutionContext context) : this (message)
         {
             LineNumber = context.Line;
             Context = context;
@@ -26,9 +26,9 @@ namespace kOS
         }
     }
 
-    public class kOSReadOnlyException : kOSException
+    public class KOSReadOnlyException : KOSException
     {
-        public kOSReadOnlyException(String varName) : base (varName + " is read-only")
+        public KOSReadOnlyException(String varName) : base (varName + " is read-only")
         {
         }
     }

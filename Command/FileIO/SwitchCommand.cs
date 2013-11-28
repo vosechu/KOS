@@ -16,14 +16,14 @@ namespace kOS.Command.FileIO
             {
                 if (!ParentContext.SwitchToVolume(volID))
                 {
-                    throw new kOSException("Volume " + volID + " not found", this);
+                    throw new KOSException("Volume " + volID + " not found", this);
                 }
             }
             else
             {
                 if (!ParentContext.SwitchToVolume(targetVolume))
                 {
-                    throw new kOSException("Volume '" + targetVolume + "' not found", this);
+                    throw new KOSException("Volume '" + targetVolume + "' not found", this);
                 }
             }
 

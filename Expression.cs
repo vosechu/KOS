@@ -63,7 +63,7 @@ namespace kOS
                     break;
             }
             
-            throw new kOSException("Unrecognized term: '" + term.Text + "'", executionContext);
+            throw new KOSException("Unrecognized term: '" + term.Text + "'", executionContext);
         }
 
         private object RecognizeConstant(String text)
@@ -112,7 +112,7 @@ namespace kOS
                     }
                     else
                     {
-                        throw new kOSException("Expression error processing statement '" + input + "'", executionContext);
+                        throw new KOSException("Expression error processing statement '" + input + "'", executionContext);
                     }
                 }
                 else
@@ -123,45 +123,48 @@ namespace kOS
 
             #region Exponents
 
-            for (int i = 0; i < chunks.Count - 1; i++)
+            for (var i = 0; i < chunks.Count - 1; i++)
             {
                 var c1 = chunks[i];
                 var c2 = chunks[i + 1];
 
-                if (c1.Opr == "^")
-                {
-                    var resultValue = AttemptPow(c1.Value, c2.Value);
-                    if (resultValue == null) throw new kOSException("Can't use exponents with " + GetFriendlyNameOfItem(c1.Value) + " and " + GetFriendlyNameOfItem(c2.Value), executionContext);
+                if (c1.Opr != "^") continue;
+                var resultValue = AttemptPow(c1.Value, c2.Value);
+                if (resultValue == null) throw new KOSException("Can't use exponents with " + GetFriendlyNameOfItem(c1.Value) + " and " + GetFriendlyNameOfItem(c2.Value), executionContext);
 
-                    ReplaceChunkPairAt(ref chunks, i, new StatementChunk(resultValue, c2.Opr));
-                    i--;
-                }
+                ReplaceChunkPairAt(ref chunks, i, new StatementChunk(resultValue, c2.Opr));
+                i--;
             }
 
             #endregion
 
             #region Multiplication and Division
 
-            for (int i = 0; i < chunks.Count - 1; i ++)
+            for (var i = 0; i < chunks.Count - 1; i ++)
             {
                 var c1 = chunks[i];
                 var c2 = chunks[i + 1];
 
-                if (c1.Opr == "*")
+                switch (c1.Opr)
                 {
-                    var resultValue = AttemptMultiply(c1.Value, c2.Value);
-                    if (resultValue == null) throw new kOSException("Can't multiply " + GetFriendlyNameOfItem(c1.Value) + " by " + GetFriendlyNameOfItem(c2.Value), executionContext);
+                    case "*":
+                        {
+                            var resultValue = AttemptMultiply(c1.Value, c2.Value);
+                            if (resultValue == null) throw new KOSException("Can't multiply " + GetFriendlyNameOfItem(c1.Value) + " by " + GetFriendlyNameOfItem(c2.Value), executionContext);
 
-                    ReplaceChunkPairAt(ref chunks, i, new StatementChunk(resultValue, c2.Opr));
-                    i--;
-                }
-                else if (c1.Opr == "/")
-                {
-                    var resultValue = AttemptDivide(c1.Value, c2.Value);
-                    if (resultValue == null) throw new kOSException("Can't divide " + GetFriendlyNameOfItem(c1.Value) + " by " + GetFriendlyNameOfItem(c2.Value), executionContext);
+                            ReplaceChunkPairAt(ref chunks, i, new StatementChunk(resultValue, c2.Opr));
+                            i--;
+                        }
+                        break;
+                    case "/":
+                        {
+                            var resultValue = AttemptDivide(c1.Value, c2.Value);
+                            if (resultValue == null) throw new KOSException("Can't divide " + GetFriendlyNameOfItem(c1.Value) + " by " + GetFriendlyNameOfItem(c2.Value), executionContext);
 
-                    ReplaceChunkPairAt(ref chunks, i, new StatementChunk(resultValue, c2.Opr));
-                    i--;
+                            ReplaceChunkPairAt(ref chunks, i, new StatementChunk(resultValue, c2.Opr));
+                            i--;
+                        }
+                        break;
                 }
             }
 
@@ -169,26 +172,31 @@ namespace kOS
 
             #region Addition and Subtraction
 
-            for (int i = 0; i < chunks.Count - 1; i++)
+            for (var i = 0; i < chunks.Count - 1; i++)
             {
                 var c1 = chunks[i];
                 var c2 = chunks[i + 1];
 
-                if (c1.Opr == "+")
+                switch (c1.Opr)
                 {
-                    var resultValue = AttemptAdd(c1.Value, c2.Value);
-                    if (resultValue == null) throw new kOSException("Can't add " + GetFriendlyNameOfItem(c1.Value) + " and " + GetFriendlyNameOfItem(c2.Value), executionContext);
+                    case "+":
+                        {
+                            var resultValue = AttemptAdd(c1.Value, c2.Value);
+                            if (resultValue == null) throw new KOSException("Can't add " + GetFriendlyNameOfItem(c1.Value) + " and " + GetFriendlyNameOfItem(c2.Value), executionContext);
 
-                    ReplaceChunkPairAt(ref chunks, i, new StatementChunk(resultValue, c2.Opr));
-                    i--;
-                }
-                else if (c1.Opr == "-")
-                {
-                    var resultValue = AttemptSubtract(c1.Value, c2.Value);
-                    if (resultValue == null) throw new kOSException("Can't subtract " + GetFriendlyNameOfItem(c2.Value) + " from " + GetFriendlyNameOfItem(c1.Value), executionContext);
+                            ReplaceChunkPairAt(ref chunks, i, new StatementChunk(resultValue, c2.Opr));
+                            i--;
+                        }
+                        break;
+                    case "-":
+                        {
+                            var resultValue = AttemptSubtract(c1.Value, c2.Value);
+                            if (resultValue == null) throw new KOSException("Can't subtract " + GetFriendlyNameOfItem(c2.Value) + " from " + GetFriendlyNameOfItem(c1.Value), executionContext);
 
-                    ReplaceChunkPairAt(ref chunks, i, new StatementChunk(resultValue, c2.Opr));
-                    i--;
+                            ReplaceChunkPairAt(ref chunks, i, new StatementChunk(resultValue, c2.Opr));
+                            i--;
+                        }
+                        break;
                 }
             }
 
@@ -207,7 +215,7 @@ namespace kOS
         {
             var p = input.SubTerms[1].SubTerms.ToArray();
 
-            object output = TryCreateSV(input.SubTerms[0].Text, p);
+            object output = TryCreateSpecialValue(input.SubTerms[0].Text, p);
             if (output != null) return output;
 
             output = TryMathFunction(input.SubTerms[0].Text, p);
@@ -233,14 +241,15 @@ namespace kOS
                 }
 
                 var baseTermValue = GetValueOfTerm(baseTerm);
-                if (baseTermValue is SpecialValue)
+                var value = baseTermValue as SpecialValue;
+                if (value != null)
                 {
-                    output = ((SpecialValue)baseTermValue).GetSuffix(suffixTerm.Text.ToUpper());
+                    output = value.GetSuffix(suffixTerm.Text.ToUpper());
                     if (output != null) return output;
 
-                    throw new kOSException("Suffix '" + suffixTerm.Text + "' not found on object", executionContext);
+                    throw new KOSException("Suffix '" + suffixTerm.Text + "' not found on object", executionContext);
                 }
-                throw new kOSException("Values of type " + GetFriendlyNameOfItem(baseTermValue) + " cannot have suffixes", executionContext);
+                throw new KOSException("Values of type " + GetFriendlyNameOfItem(baseTermValue) + " cannot have suffixes", executionContext);
             }
 
             return null;
@@ -263,7 +272,7 @@ namespace kOS
                     }
                     else
                     {
-                        throw new kOSException("Expression error processing comparison '" + input + "'", executionContext);
+                        throw new KOSException("Expression error processing comparison '" + input + "'", executionContext);
                     }
                 }
                 else
@@ -301,7 +310,7 @@ namespace kOS
                         break;
                 }
 
-                if (resultValue == null) throw new kOSException("Can't compare " + GetFriendlyNameOfItem(c1.Value) + " to " + GetFriendlyNameOfItem(c2.Value) + " using " + c1.Opr, executionContext);
+                if (resultValue == null) throw new KOSException("Can't compare " + GetFriendlyNameOfItem(c1.Value) + " to " + GetFriendlyNameOfItem(c2.Value) + " using " + c1.Opr, executionContext);
 
                 ReplaceChunkPairAt(ref chunks, i, new StatementChunk(resultValue, c2.Opr));
                 i--;
@@ -327,7 +336,7 @@ namespace kOS
                     }
                     else
                     {
-                        throw new kOSException("Expression error processing boolean operation '" + input + "'", executionContext);
+                        throw new KOSException("Expression error processing boolean operation '" + input + "'", executionContext);
                     }
                 }
                 else
@@ -336,30 +345,32 @@ namespace kOS
                 }
             }
 
-            for (int i = 0; i < chunks.Count - 1; i++)
+            for (var i = 0; i < chunks.Count - 1; i++)
             {
                 var c1 = chunks[i];
                 var c2 = chunks[i + 1];
                 object resultValue = null;
 
-                if (c1.Opr == "AND") resultValue = AttemptAnd(c1.Value, c2.Value);
-                else if (c1.Opr == "OR") resultValue = AttemptOr(c1.Value, c2.Value);
+                switch (c1.Opr)
+                {
+                    case "AND":
+                        resultValue = AttemptAnd(c1.Value, c2.Value);
+                        break;
+                    case "OR":
+                        resultValue = AttemptOr(c1.Value, c2.Value);
+                        break;
+                }
 
-                if (resultValue == null) throw new kOSException("Can't compare " + GetFriendlyNameOfItem(c1.Value) + " to " + GetFriendlyNameOfItem(c2.Value) + " using " + c1.Opr, executionContext);
+                if (resultValue == null) throw new KOSException("Can't compare " + GetFriendlyNameOfItem(c1.Value) + " to " + GetFriendlyNameOfItem(c2.Value) + " using " + c1.Opr, executionContext);
 
                 ReplaceChunkPairAt(ref chunks, i, new StatementChunk(resultValue, c2.Opr));
                 i--;
             }
 
-            if (chunks.Count == 1)
-            {
-                return chunks[0].Value;
-            }
-
-            return null;
+            return chunks.Count == 1 ? chunks[0].Value : null;
         }
 
-        private object TryExternalFunction(String name, Term[] p)
+        private object TryExternalFunction(String name, IList<Term> p)
         {
             foreach (var f in executionContext.ExternalFunctions.Where(f => f.Name.ToUpper() == name.ToUpper()))
             {
@@ -378,63 +389,88 @@ namespace kOS
             return null;
         }
 
-        private object TryMathFunction(String name, Term[] p)
+        private object TryMathFunction(String name, IList<Term> p)
         {
             name = name.ToUpper();
 
-            if (name == "SIN") { double[] dp = GetParamsAsT<double>(p, 1); return Math.Sin(dp[0] * (Math.PI / 180)); }
-            if (name == "COS") { double[] dp = GetParamsAsT<double>(p, 1); return Math.Cos(dp[0] * (Math.PI / 180)); }
-            if (name == "TAN") { double[] dp = GetParamsAsT<double>(p, 1); return Math.Tan(dp[0] * (Math.PI / 180)); }
-            if (name == "ARCSIN") { double[] dp = GetParamsAsT<double>(p, 1); return Math.Asin(dp[0]) * (180 / Math.PI); }
-            if (name == "ARCCOS") { double[] dp = GetParamsAsT<double>(p, 1); return Math.Acos(dp[0]) * (180 / Math.PI); }
-            if (name == "ARCTAN") { double[] dp = GetParamsAsT<double>(p, 1); return Math.Atan(dp[0]) * (180 / Math.PI); }
-            if (name == "ARCTAN2") { double[] dp = GetParamsAsT<double>(p, 2); return Math.Atan2(dp[0], dp[1]) * (180 / Math.PI); }
-
-            if (name == "ABS") { double[] dp = GetParamsAsT<double>(p, 1); return Math.Abs(dp[0]); }
-            if (name == "MOD") { double[] dp = GetParamsAsT<double>(p, 2); return dp[0] % dp[1]; }
-            if (name == "FLOOR") { double[] dp = GetParamsAsT<double>(p, 1); return Math.Floor(dp[0]); }
-            if (name == "CEILING") { double[] dp = GetParamsAsT<double>(p, 1); return Math.Ceiling(dp[0]); }
-            if (name == "SQRT") { double[] dp = GetParamsAsT<double>(p, 1); return Math.Sqrt(dp[0]); }
-
-            if (name == "ROUND")
+            switch (name)
             {
-                switch (p.Count())
-                {
-                    case 1:
-                        {
-                            double[] dp = GetParamsAsT<double>(p, 1);
-                            return Math.Round(dp[0]);
-                        }
-                    case 2:
-                        {
-                            double[] dp = GetParamsAsT<double>(p, 2);
-                            return Math.Round(dp[0], (int)dp[1]);
-                        }
-                }
+                case "SIN":
+                    { var dp = GetParamsAsT<double>(p, 1); return Math.Sin(dp[0] * (Math.PI / 180)); }
+                case "COS":
+                    { var dp = GetParamsAsT<double>(p, 1); return Math.Cos(dp[0] * (Math.PI / 180)); }
+                case "TAN":
+                    { var dp = GetParamsAsT<double>(p, 1); return Math.Tan(dp[0] * (Math.PI / 180)); }
+                case "ARCSIN":
+                    { var dp = GetParamsAsT<double>(p, 1); return Math.Asin(dp[0]) * (180 / Math.PI); }
+                case "ARCCOS":
+                    { var dp = GetParamsAsT<double>(p, 1); return Math.Acos(dp[0]) * (180 / Math.PI); }
+                case "ARCTAN":
+                    { var dp = GetParamsAsT<double>(p, 1); return Math.Atan(dp[0]) * (180 / Math.PI); }
+                case "ARCTAN2":
+                    { var dp = GetParamsAsT<double>(p, 2); return Math.Atan2(dp[0], dp[1]) * (180 / Math.PI); }
+                case "ABS":
+                    { var dp = GetParamsAsT<double>(p, 1); return Math.Abs(dp[0]); }
+                case "MOD":
+                    { var dp = GetParamsAsT<double>(p, 2); return dp[0] % dp[1]; }
+                case "FLOOR":
+                    { var dp = GetParamsAsT<double>(p, 1); return Math.Floor(dp[0]); }
+                case "CEILING":
+                    { var dp = GetParamsAsT<double>(p, 1); return Math.Ceiling(dp[0]); }
+                case "SQRT":
+                    { var dp = GetParamsAsT<double>(p, 1); return Math.Sqrt(dp[0]); }
+                case "ROUND":
+                    {
+			switch (p.Count())
+			{
+			    case 1:
+				{
+				    var dp = GetParamsAsT<double>(p, 1);
+				    return Math.Round(dp[0]);
+				}
+			    case 2:
+				{
+				    var dp = GetParamsAsT<double>(p, 2);
+				    return Math.Round(dp[0], (int)dp[1]);
+				}
+			}
+                    }
+		    break;
             }
 
             return null;
         }
 
-        private SpecialValue TryCreateSV(String name, Term[] p)
+        private SpecialValue TryCreateSpecialValue(String name, Term[] p)
         {
             name = name.ToUpper();
 
-            if (name == "NODE") { double[] dp = GetParamsAsT<double>(p, 4); return new Node(dp[0], dp[1], dp[2], dp[3]); }
-            if (name == "V") { double[] dp = GetParamsAsT<double>(p, 3); return new Vector(dp[0], dp[1], dp[2]); }
-            if (name == "R") { double[] dp = GetParamsAsT<double>(p, 3); return new Direction(new Vector3d(dp[0], dp[1], dp[2]), true); }
-            if (name == "Q") { double[] dp = GetParamsAsT<double>(p, 4); return new Direction(new UnityEngine.Quaternion((float)dp[0], (float)dp[1], (float)dp[2], (float)dp[3])); }
-            if (name == "T") { double[] dp = GetParamsAsT<double>(p, 1); return new TimeSpan(dp[0]); }
-            if (name == "LATLNG") { double[] dp = GetParamsAsT<double>(p, 2); return new GeoCoordinates(executionContext.Vessel, dp[0], dp[1]); }
-            if (name == "VESSEL") { String[] sp = GetParamsAsT<String>(p, 1); return new VesselTarget(executionContext.Vessel.GetVesselByName(sp[0]), executionContext); }
-            if (name == "BODY") { String[] sp = GetParamsAsT<String>(p, 1); return new BodyTarget(sp[0], executionContext); }
+            switch (name)
+            {
+                case "NODE":
+                    { var dp = GetParamsAsT<double>(p, 4); return new Node(dp[0], dp[1], dp[2], dp[3]); }
+                case "V":
+                    { var dp = GetParamsAsT<double>(p, 3); return new Vector(dp[0], dp[1], dp[2]); }
+                case "R":
+                    { var dp = GetParamsAsT<double>(p, 3); return new Direction(new Vector3d(dp[0], dp[1], dp[2]), true); }
+                case "Q":
+                    { var dp = GetParamsAsT<double>(p, 4); return new Direction(new UnityEngine.Quaternion((float)dp[0], (float)dp[1], (float)dp[2], (float)dp[3])); }
+                case "T":
+                    { var dp = GetParamsAsT<double>(p, 1); return new TimeSpan(dp[0]); }
+                case "LATLNG":
+                    { var dp = GetParamsAsT<double>(p, 2); return new GeoCoordinates(executionContext.Vessel, dp[0], dp[1]); }
+                case "VESSEL":
+                    { var sp = GetParamsAsT<String>(p, 1); return new VesselTarget(executionContext.Vessel.GetVesselByName(sp[0]), executionContext); }
+                case "BODY":
+                    { var sp = GetParamsAsT<String>(p, 1); return new BodyTarget(sp[0], executionContext); }
+            }
 
             if (name == "HEADING")
             {
-                int pCount = p.Count();
-                if (pCount < 2 || pCount > 3) throw new kOSException("Wrong number of arguments supplied, expected 2 or 3", executionContext);
+                var pCount = p.Count();
+                if (pCount < 2 || pCount > 3) throw new KOSException("Wrong number of arguments supplied, expected 2 or 3", executionContext);
 
-                double[] dp = GetParamsAsT<double>(p, pCount);
+                var dp = GetParamsAsT<double>(p, pCount);
                 var q = UnityEngine.Quaternion.LookRotation(executionContext.Vessel.GetNorthVector(), executionContext.Vessel.upAxis);
                 q *= UnityEngine.Quaternion.Euler(new UnityEngine.Vector3((float)-dp[0], (float)dp[1], (float)(dp.Count() > 2 ? dp[2] : 0)));
 
@@ -446,21 +482,21 @@ namespace kOS
 
         private T GetParamAsT<T>(Term input)
         {
-            object value = GetValueOfTerm(input);
+            var value = GetValueOfTerm(input);
             if (value is T) return (T)value;
 
-            if (typeof(T) == typeof(double)) throw new kOSException("Supplied parameter '" + input.Text + "' is not a number", executionContext);
-            if (typeof(T) == typeof(String)) throw new kOSException("Supplied parameter '" + input.Text + "' is not a string", executionContext);
-            if (typeof(T) == typeof(bool)) throw new kOSException("Supplied parameter '" + input.Text + "' is not a boolean", executionContext);
+            if (typeof(T) == typeof(double)) throw new KOSException("Supplied parameter '" + input.Text + "' is not a number", executionContext);
+            if (typeof(T) == typeof(String)) throw new KOSException("Supplied parameter '" + input.Text + "' is not a string", executionContext);
+            if (typeof(T) == typeof(bool)) throw new KOSException("Supplied parameter '" + input.Text + "' is not a boolean", executionContext);
 
-            throw new kOSException("Supplied parameter '" + input.Text + "' is not of the correct type", executionContext);
+            throw new KOSException("Supplied parameter '" + input.Text + "' is not of the correct type", executionContext);
         }
 
-        private T[] GetParamsAsT<T>(Term[] input, int size)
+        private T[] GetParamsAsT<T>(IList<Term> input, int size)
         {
             if (input.Count() != size)
             {
-                throw new kOSException("Wrong number of arguments supplied, expected " + size, executionContext);
+                throw new KOSException("Wrong number of arguments supplied, expected " + size, executionContext);
             }
 
             var retVal = new T[size];
@@ -488,8 +524,10 @@ namespace kOS
         private object AttemptMultiply(object val1, object val2)
         {
             if ((val1 is double || val1 is float || val1 is int) && (val2 is double || val2 is float || val2 is int)) { return (double)val1 * (double)val2; }
-            if (val1 is SpecialValue) { return ((SpecialValue)val1).TryOperation("*", val2, false); }
-            if (val2 is SpecialValue) { return ((SpecialValue)val2).TryOperation("*", val1, true); }
+            var specialValue = val1 as SpecialValue;
+            if (specialValue != null) { return specialValue.TryOperation("*", val2, false); }
+            var value = val2 as SpecialValue;
+            if (value != null) { return value.TryOperation("*", val1, true); }
 
             return null;
         }
@@ -497,19 +535,23 @@ namespace kOS
         private object AttemptDivide(object val1, object val2)
         {
             if ((val1 is double || val1 is float || val1 is int) && (val2 is double || val2 is float || val2 is int)) { return (double)val1 / (double)val2; }
-            if (val1 is SpecialValue) { return ((SpecialValue)val1).TryOperation("/", val2, false); }
-            if (val2 is SpecialValue) { return ((SpecialValue)val2).TryOperation("/", val1, true); }
+            var specialValue = val1 as SpecialValue;
+            if (specialValue != null) { return specialValue.TryOperation("/", val2, false); }
+            var value = val2 as SpecialValue;
+            if (value != null) { return value.TryOperation("/", val1, true); }
 
             return null;
         }
 
         private object AttemptAdd(object val1, object val2)
         {
-            if (val1 is String || val2 is String) { return val1.ToString() + val2.ToString(); }
+            if (val1 is String || val2 is String) { return val1 + val2.ToString(); }
 
             if ((val1 is double || val1 is float || val1 is int) && (val2 is double || val2 is float || val2 is int)) { return (double)val1 + (double)val2; }
-            if (val1 is SpecialValue) { return ((SpecialValue)val1).TryOperation("+", val2, false); }
-            if (val2 is SpecialValue) { return ((SpecialValue)val2).TryOperation("+", val1, true); }
+            var specialValue = val1 as SpecialValue;
+            if (specialValue != null) { return specialValue.TryOperation("+", val2, false); }
+            var value = val2 as SpecialValue;
+            if (value != null) { return value.TryOperation("+", val1, true); }
 
             return null;
         }
@@ -517,8 +559,10 @@ namespace kOS
         private object AttemptSubtract(object val1, object val2)
         {
             if ((val1 is double || val1 is float || val1 is int) && (val2 is double || val2 is float || val2 is int)) { return (double)val1 - (double)val2; }
-            if (val1 is SpecialValue) { return ((SpecialValue)val1).TryOperation("-", val2, false); }
-            if (val2 is SpecialValue) { return ((SpecialValue)val2).TryOperation("-", val1, true); }
+            var specialValue = val1 as SpecialValue;
+            if (specialValue != null) { return specialValue.TryOperation("-", val2, false); }
+            var value = val2 as SpecialValue;
+            if (value != null) { return value.TryOperation("-", val1, true); }
 
             return null;
         }
@@ -533,25 +577,27 @@ namespace kOS
         private object AttemptGetVariableValue(string varName)
         {
             executionContext.UpdateLock(varName);
-            Variable v = executionContext.FindVariable(varName);
+            var v = executionContext.FindVariable(varName);
             
             return v == null ? null : (v.Value is float ? (double)((float)v.Value) : v.Value);
         }
 
         private object AttemptEq(object val1, object val2)
         {
-            if ((val1 is double || val1 is float || val1 is int) && (val2 is double || val2 is float || val2 is int)) { return (double)val1 == (double)val2; }
+            if ((val1 is double || val1 is float || val1 is int) && (val2 is double || val2 is float || val2 is int)) { return Math.Abs((double)val1 - (double)val2) < 0.00001; }
             if (val1 is String || val2 is String) { return val1.ToString() == val2.ToString(); }
-            if (val1 is SpecialValue) { return ((SpecialValue)val1).TryOperation("=", val2, false); }
+            var value = val1 as SpecialValue;
+            if (value != null) { return value.TryOperation("=", val2, false); }
 
             return null;
         }
 
         private object AttemptNotEq(object val1, object val2)
         {
-            if ((val1 is double || val1 is float || val1 is int) && (val2 is double || val2 is float || val2 is int)) { return (double)val1 != (double)val2; }
+            if ((val1 is double || val1 is float || val1 is int) && (val2 is double || val2 is float || val2 is int)) { return Math.Abs((double)val1 - (double)val2) > 0.00001; }
             if (val1 is String || val2 is String) { return val1.ToString() != val2.ToString(); }
-            if (val1 is SpecialValue) { return ((SpecialValue)val1).TryOperation("!=", val2, false); }
+            var value = val1 as SpecialValue;
+            if (value != null) { return value.TryOperation("!=", val2, false); }
 
             return null;
         }
@@ -559,8 +605,11 @@ namespace kOS
         private object AttemptGT(object val1, object val2)
         {
             if ((val1 is double || val1 is float || val1 is int) && (val2 is double || val2 is float || val2 is int)) { return (double)val1 > (double)val2; }
-            if (val1 is SpecialValue) { return ((SpecialValue)val1).TryOperation(">", val2, false); }
-            if (val2 is SpecialValue) { return ((SpecialValue)val2).TryOperation(">", val1, true); }
+
+            var specialValue = val1 as SpecialValue;
+            if (specialValue != null) { return specialValue.TryOperation(">", val2, false); }
+            var value = val2 as SpecialValue;
+            if (value != null) { return value.TryOperation(">", val1, true); }
 
             return null;
         }
@@ -568,8 +617,11 @@ namespace kOS
         private object AttemptLT(object val1, object val2)
         {
             if ((val1 is double || val1 is float || val1 is int) && (val2 is double || val2 is float || val2 is int)) { return (double)val1 < (double)val2; }
-            if (val1 is SpecialValue) { return ((SpecialValue)val1).TryOperation("<", val2, false); }
-            if (val2 is SpecialValue) { return ((SpecialValue)val2).TryOperation("<", val1, true); }
+
+            var specialValue = val1 as SpecialValue;
+            if (specialValue != null) { return specialValue.TryOperation("<", val2, false); }
+            var value = val2 as SpecialValue;
+            if (value != null) { return value.TryOperation("<", val1, true); }
 
             return null;
         }
@@ -577,8 +629,11 @@ namespace kOS
         private object AttemptGTE(object val1, object val2)
         {
             if ((val1 is double || val1 is float || val1 is int) && (val2 is double || val2 is float || val2 is int)) { return (double)val1 >= (double)val2; }
-            if (val1 is SpecialValue) { return ((SpecialValue)val1).TryOperation(">=", val2, false); }
-            if (val2 is SpecialValue) { return ((SpecialValue)val2).TryOperation(">=", val1, true); }
+
+            var specialValue = val1 as SpecialValue;
+            if (specialValue != null) { return specialValue.TryOperation(">=", val2, false); }
+            var value = val2 as SpecialValue;
+            if (value != null) { return value.TryOperation(">=", val1, true); }
 
             return null;
         }
@@ -586,8 +641,11 @@ namespace kOS
         private object AttemptLTE(object val1, object val2)
         {
             if ((val1 is double || val1 is float || val1 is int) && (val2 is double || val2 is float || val2 is int)) { return (double)val1 <= (double)val2; }
-            if (val1 is SpecialValue) { return ((SpecialValue)val1).TryOperation("<=", val2, false); }
-            if (val2 is SpecialValue) { return ((SpecialValue)val2).TryOperation("<=", val1, true); }
+
+            var specialValue = val1 as SpecialValue;
+            if (specialValue != null) { return specialValue.TryOperation("<=", val2, false); }
+            var value = val2 as SpecialValue;
+            if (value != null) { return value.TryOperation("<=", val1, true); }
 
             return null;
         }
@@ -596,11 +654,13 @@ namespace kOS
         {
             if (input is bool) { result = (bool)input; return true; }
             if (input is double) { result = (double)input > 0; return true; }
-            if (input is String)
+
+            var s = input as string;
+            if (s != null)
             {
-                if (bool.TryParse((String)input, out result)) return true;
+                if (bool.TryParse(s, out result)) return true;
                 double dblVal;
-                if (double.TryParse((String)input, out dblVal))
+                if (double.TryParse(s, out dblVal))
                 {
                     result = dblVal > 0;
                     return true;
@@ -645,15 +705,16 @@ namespace kOS
             if (value == null) return false;
             if (value is bool) return (bool)value;
             if (value is double) return (double)value > 0;
-            if (value is string)
+            var str = value as string;
+            if (str != null)
             {
                 bool boolVal;
-                if (bool.TryParse((string)value, out boolVal)) return boolVal;
+                if (bool.TryParse(str, out boolVal)) return boolVal;
 
                 double numberVal;
-                if (double.TryParse((string)value, out numberVal)) return (double)numberVal > 0;
+                if (double.TryParse(str, out numberVal)) return numberVal > 0;
 
-                return ((string)value).Trim() != "";
+                return str.Trim() != "";
             }
             return value is SpecialValue;
         }
@@ -665,12 +726,11 @@ namespace kOS
             if (value == null) return 0;
             if (value is bool) return (bool)value ? 1 : 0;
             if (value is double) return (double)value;
-            if (value is string)
+            var str = value as string;
+            if (str != null)
             {
                 double numberVal;
-                if (double.TryParse((string)value, out numberVal)) return (double)numberVal;
-
-                return 0;
+                return double.TryParse(str, out numberVal) ? numberVal : 0;
             }
 
             return 0;

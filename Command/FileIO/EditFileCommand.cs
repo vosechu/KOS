@@ -17,7 +17,7 @@ namespace kOS.Command.FileIO
             }
             else
             {
-                throw new kOSException("Edit can only be used when in immediate mode.", this);
+                throw new KOSException("Edit can only be used when in immediate mode.", this);
             }
         }
     }

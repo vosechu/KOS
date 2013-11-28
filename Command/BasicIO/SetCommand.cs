@@ -16,18 +16,19 @@ namespace kOS.Command.BasicIO
             {
                 var baseObj = new Expression(targetTerm.SubTerms[0], ParentContext).GetValue();
 
-                if (baseObj is SpecialValue)
+                var value = baseObj as SpecialValue;
+                if (value != null)
                 {
-                    if (((SpecialValue)baseObj).SetSuffix(targetTerm.SubTerms[1].Text.ToUpper(), e.GetValue()))
+                    if (value.SetSuffix(targetTerm.SubTerms[1].Text.ToUpper(), e.GetValue()))
                     {
                         State = ExecutionState.DONE;
                         return;
                     }
-                    throw new kOSException("Suffix '" + targetTerm.SubTerms[1].Text + "' doesn't exist or is read only", this);
+                    throw new KOSException("Suffix '" + targetTerm.SubTerms[1].Text + "' doesn't exist or is read only", this);
                 }
-                throw new kOSException("Can't set subvalues on a " + Expression.GetFriendlyNameOfItem(baseObj), this);
+                throw new KOSException("Can't set subvalues on a " + Expression.GetFriendlyNameOfItem(baseObj), this);
             }
-            Variable v = FindOrCreateVariable(targetTerm.Text);
+            var v = FindOrCreateVariable(targetTerm.Text);
 
             if (v == null) return;
             v.Value = e.GetValue();

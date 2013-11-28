@@ -40,7 +40,7 @@ namespace kOS
             string cmd;
             var lineNumber = 0;
             int commandLineStart;
-            while (parseNext(ref commandBuffer, out cmd, ref lineNumber, out commandLineStart))
+            while (ParseNext(ref commandBuffer, out cmd, ref lineNumber, out commandLineStart))
             {
                 try
                 {
@@ -48,7 +48,7 @@ namespace kOS
                     var cmdObj = Command.Command.Get(cmd, this, commandLineStart);
                     commands.Add(cmdObj);
                 }
-                catch (kOSException e)
+                catch (KOSException e)
                 {
                     if (ParentContext.FindClosestParentOfType<ContextRunProgram>() != null)
                     {
@@ -110,7 +110,7 @@ namespace kOS
                 base.Update(time);
                 EvaluateNextCommand();
             }
-            catch (kOSException e)
+            catch (KOSException e)
             {
                 if (ParentContext.FindClosestParentOfType<ContextRunProgram>() != null)
                 {
@@ -160,7 +160,7 @@ namespace kOS
                 return retValue;
             }
 
-            throw new kOSException("Wrong number of parameters supplied");
+            throw new KOSException("Wrong number of parameters supplied");
         }
     }
 }

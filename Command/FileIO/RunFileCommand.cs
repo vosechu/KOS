@@ -23,7 +23,7 @@ namespace kOS.Command.FileIO
 
             if (file == null)
             {
-                throw new kOSException("File not found '" + fileName + "'.", this);
+                throw new KOSException("File not found '" + fileName + "'.", this);
             }
             var runContext = new ContextRunProgram(this, parameters, fileName);
             Push(runContext);

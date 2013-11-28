@@ -5,8 +5,8 @@ namespace kOS
 {
     public class BodyTarget : SpecialValue
     {
-        public ExecutionContext context;
-        public CelestialBody target;
+        private CelestialBody target;
+        private readonly ExecutionContext context;
 
         public BodyTarget(String name, ExecutionContext context) : this(VesselUtils.GetBodyByName(name), context) { }
 
@@ -16,6 +16,12 @@ namespace kOS
             this.target = target;
         }
 
+        public CelestialBody Target
+        {
+            get { return target; }
+            set { target = value; }
+        }
+
         public double GetDistance()
         {
             return Vector3d.Distance(context.Vessel.GetWorldPos3D(), target.position) - target.Radius;
@@ -23,7 +29,7 @@ namespace kOS
 
         public override object GetSuffix(string suffixName)
         {
-            if (target == null) throw new kOSException("BODY structure appears to be empty!");
+            if (target == null) throw new KOSException("BODY structure appears to be empty!");
 
             switch (suffixName)
             {

@@ -28,7 +28,7 @@ namespace kOS.Binding.Flight
         
         public void OnFlyByWire(FlightCtrlState c)
         {
-            foreach (LockableControl control in controls)
+            foreach (var control in controls)
             {
                 control.OnFlyByWire(ref c);
             }
@@ -50,7 +50,7 @@ namespace kOS.Binding.Flight
                     vessel = cpu.Vessel;
                     vessel.OnFlyByWire += OnFlyByWire;
 
-                    foreach (LockableControl c in controls)
+                    foreach (var c in controls)
                     {
                         c.UpdateVessel(vessel);
                     }

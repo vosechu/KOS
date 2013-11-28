@@ -39,7 +39,7 @@ namespace kOS.Command
 
                 return retCommand;
             }
-            catch (kOSException e)
+            catch (KOSException e)
             {
                 e.LineNumber = line;
                 throw;
@@ -60,7 +60,7 @@ namespace kOS.Command
                 }
             }
 
-            throw new kOSException("Syntax Error.", context);
+            throw new KOSException("Syntax Error.", context);
         }
 
         public virtual void Refresh()

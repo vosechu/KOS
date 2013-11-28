@@ -62,7 +62,7 @@ namespace kOS.Command.FileIO
                 return;
             }
 
-            throw new kOSException("List type '" + listType + "' not recognized.", this);
+            throw new KOSException("List type '" + listType + "' not recognized.", this);
         }
     }
 }

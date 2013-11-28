@@ -19,10 +19,10 @@ namespace kOS.Command.FileIO
                 var targetVolume = GetVolume(identifier); // Will throw if not found
 
                 int intTry;
-                if (int.TryParse(newName.Substring(0, 1), out intTry)) throw new kOSException("Volume name cannot start with numeral", this);
+                if (int.TryParse(newName.Substring(0, 1), out intTry)) throw new KOSException("Volume name cannot start with numeral", this);
 
                 if (targetVolume.Renameable) targetVolume.Name = newName;
-                else throw new kOSException("Volume cannot be renamed", this);
+                else throw new KOSException("Volume cannot be renamed", this);
 
                 State = ExecutionState.DONE;
                 return;
@@ -30,22 +30,22 @@ namespace kOS.Command.FileIO
             if (operation.ToUpper() == "FILE" || String.IsNullOrEmpty(operation))
             {
                 File f = SelectedVolume.GetByName(identifier);
-                if (f == null) throw new kOSException("File '" + identifier + "' not found", this);
+                if (f == null) throw new KOSException("File '" + identifier + "' not found", this);
 
                 if (SelectedVolume.GetByName(newName) != null)
                 {
-                    throw new kOSException("File '" + newName + "' already exists.", this);
+                    throw new KOSException("File '" + newName + "' already exists.", this);
                 }
 
                 int intTry;
-                if (int.TryParse(newName.Substring(0, 1), out intTry)) throw new kOSException("Filename cannot start with numeral", this);
+                if (int.TryParse(newName.Substring(0, 1), out intTry)) throw new KOSException("Filename cannot start with numeral", this);
 
                 f.Filename = newName;
                 State = ExecutionState.DONE;
                 return;
             }
 
-            throw new kOSException("Unrecognized renamable object type '" + operation + "'", this);
+            throw new KOSException("Unrecognized renamable object type '" + operation + "'", this);
         }
     }
 }

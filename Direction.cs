@@ -42,24 +42,31 @@ namespace kOS
             euler = q.eulerAngles;
         }
 
-        public Direction(Vector3d v3d, bool isEuler)
+        public Direction(Vector3d vector, bool isEuler)
         {
             if (isEuler)
             {
-                Euler = v3d;
+                Euler = vector;
             }
             else
             {
-                Vector = v3d; 
+                Vector = vector; 
             }
         }
 
         public override object GetSuffix(string suffixName)
         {
-            if (suffixName == "PITCH") return euler.x;
-            if (suffixName == "YAW") return euler.y;
-            if (suffixName == "ROLL") return euler.z;
-            if (suffixName == "VECTOR") return new Vector(vector);
+            switch (suffixName)
+            {
+                case "PITCH":
+                    return euler.x;
+                case "YAW":
+                    return euler.y;
+                case "ROLL":
+                    return euler.z;
+                case "VECTOR":
+                    return new Vector(vector);
+            }
 
             return base.GetSuffix(suffixName);
         }

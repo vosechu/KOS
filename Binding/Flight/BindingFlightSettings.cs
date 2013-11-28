@@ -7,34 +7,42 @@ namespace kOS.Binding.Flight
     {
         public override void AddTo(BindingManager manager)
         {
-            manager.AddSetter("TARGET", delegate(CPU cpu, object val) 
+            manager.AddSetter("TARGET", delegate(CPU cpu, object val)
                 {
-                    if (val is ITargetable)
+                    var targetable = val as ITargetable;
+                    if (targetable != null)
                     {
-                        VesselUtils.SetTarget((ITargetable)val);
-                    }
-                    else if (val is VesselTarget)
-                    {
-                        VesselUtils.SetTarget(((VesselTarget)val).target);
-                    }
-                    else if (val is BodyTarget)
-                    {
-                        VesselUtils.SetTarget(((BodyTarget)val).target);
+                        VesselUtils.SetTarget(targetable);
                     }
                     else
                     {
-                        var body = VesselUtils.GetBodyByName(val.ToString());
-                        if (body != null)
+                        var vesselTarget = val as VesselTarget;
+                        if (vesselTarget != null)
                         {
-                            VesselUtils.SetTarget(body);
-                            return;
+                            VesselUtils.SetTarget(vesselTarget.target);
                         }
-
-                        var vessel = cpu.Vessel.GetVesselByName(val.ToString());
-                        if (vessel != null)
+                        else
                         {
-                            VesselUtils.SetTarget(vessel);
-                            return;
+                            var target = val as BodyTarget;
+                            if (target != null)
+                            {
+                                VesselUtils.SetTarget(target.Target);
+                            }
+                            else
+                            {
+                                var body = VesselUtils.GetBodyByName(val.ToString());
+                                if (body != null)
+                                {
+                                    VesselUtils.SetTarget(body);
+                                    return;
+                                }
+
+                                var vessel = cpu.Vessel.GetVesselByName(val.ToString());
+                                if (vessel != null)
+                                {
+                                    VesselUtils.SetTarget(vessel);
+                                }
+                            }
                         }
                     }
                 });
@@ -43,16 +51,13 @@ namespace kOS.Binding.Flight
                 {
                     var currentTarget = FlightGlobals.fetch.VesselTarget;
 
-                    if (currentTarget is Vessel)
+                    var vessel = currentTarget as Vessel;
+                    if (vessel != null)
                     {
-                        return new VesselTarget((Vessel)currentTarget, cpu);
+                        return new VesselTarget(vessel, cpu);
                     }
-                    else if (currentTarget is CelestialBody)
-                    {
-                        return new BodyTarget((CelestialBody)currentTarget, cpu);
-                    }
-
-                    return null;
+                    var body = currentTarget as CelestialBody;
+                    return body != null ? new BodyTarget(body, cpu) : null;
                 });
         }
     }

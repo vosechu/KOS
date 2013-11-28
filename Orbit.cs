@@ -26,7 +26,7 @@
 
         public override string ToString()
         {
-            return orbitRef != null ? orbitRef.referenceBody.name : "";
+            return orbitRef != null ? (string) orbitRef.referenceBody.name : "";
         }
     }
 }

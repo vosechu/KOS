@@ -26,7 +26,7 @@
 
         public override string ToString()
         {
-            return Major.ToString() + "." + Minor.ToString("0.0");
+            return Major + "." + Minor.ToString("0.0");
         }
     }
 }

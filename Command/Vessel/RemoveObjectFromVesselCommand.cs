@@ -18,7 +18,7 @@ namespace kOS.Command.Vessel
             }
             else
             {
-                throw new kOSException("Supplied object ineligible for removal", this);
+                throw new KOSException("Supplied object ineligible for removal", this);
             }
 
             State = ExecutionState.DONE;
