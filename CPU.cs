@@ -15,10 +15,10 @@ namespace kOS
         public BindingManager bindingManager;
         public float SessionTime;
         public int ClockSpeed = 5;
-        
-        private readonly Dictionary<String, Variable> variables = new Dictionary<String, Variable>();
+
+        private readonly Dictionary<String, Variable> variables;
         private Volume selectedVolume = null;
-        private List<Volume> volumes = new List<Volume>();
+        private readonly List<Volume> volumes = new List<Volume>();
         private readonly List<kOSExternalFunction> externalFunctions = new List<kOSExternalFunction>();
         
         public override sealed Vessel Vessel { get { return ((kOSProcessor)Parent).vessel; } }
@@ -39,7 +39,7 @@ namespace kOS
         {
             this.Parent = parent;
             this.Context = context;
-            
+            variables = new Dictionary<string, Variable>(StringComparer.OrdinalIgnoreCase);
             bindingManager = new BindingManager(this, Context);
 
             if (context == "ksp")
@@ -230,16 +230,16 @@ namespace kOS
             return false;
         }
 
-        public override BoundVariable CreateBoundVariable(string varName)
+        public override T CreateBoundVariable<T>(string varName)
         {
-            varName = varName.ToLower();
-
             if (FindVariable(varName) != null)
             {
                 throw new kOSException("Cannot bind " + varName + "; name already taken.");
             }
-            variables.Add(varName, new BoundVariable());
-            return (BoundVariable) variables[varName];
+
+            var boundVariable = new T {Cpu = this};
+            variables.Add(varName,boundVariable);
+            return boundVariable;
         }
 
         public override void Update(float time)

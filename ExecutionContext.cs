@@ -33,16 +33,13 @@ namespace kOS
 
         public ExecutionContext()
         {
-            Locks = new Dictionary<string, Expression>();
+            Locks = new Dictionary<string, Expression>(StringComparer.OrdinalIgnoreCase);
             State = ExecutionState.NEW;
             Line = 0;
         }
 
-        public ExecutionContext(ExecutionContext parent)
+        public ExecutionContext(ExecutionContext parent) :this()
         {
-            Locks = new Dictionary<string, Expression>();
-            State = ExecutionState.NEW;
-            Line = 0;
             ParentContext = parent;
         }
 
@@ -113,9 +110,8 @@ namespace kOS
 
         public Variable FindVariable(string varName)
         {
-            varName = varName.ToLower();
-
-            var v = Variables.ContainsKey(varName) ? Variables[varName] : null;
+            Variable v;
+            Variables.TryGetValue(varName, out v);
 
             if (v == null && ParentContext != null)
             {
@@ -132,8 +128,6 @@ namespace kOS
 
         public Variable CreateVariable(string varName)
         {
-            varName = varName.ToLower();
-
             var v = new Variable();
             Variables.Add(varName, v);
             return v;
@@ -141,16 +135,12 @@ namespace kOS
 
         public Variable FindOrCreateVariable(string varName)
         {
-            varName = varName.ToLower();
-
-            var v = FindVariable(varName) ?? CreateVariable(varName);
-
-            return v;
+            return FindVariable(varName) ?? CreateVariable(varName);
         }
 
-        public virtual BoundVariable CreateBoundVariable(string varName)
+        public virtual T CreateBoundVariable<T>(string varName) where T : BoundVariable, new()
         {
-            return ParentContext.CreateBoundVariable(varName);
+            return ParentContext.CreateBoundVariable<T>(varName);
         }
 
         public virtual bool SwitchToVolume(int volID)
@@ -227,8 +217,6 @@ namespace kOS
 
         public virtual void Lock(String name, Expression expression)
         {
-            name = name.ToLower();
-
             FindOrCreateVariable(name);
 
             if (!Locks.ContainsKey(name.ToUpper()))

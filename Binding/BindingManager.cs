@@ -40,16 +40,16 @@ namespace kOS.Binding
 
             if (v != null)
             {
-                if (v is BoundVariable)
+                var variable = v as BoundVariable;
+                if (variable != null)
                 {
-                    ((BoundVariable)v).Get = dlg;
+                    variable.Get = dlg;
                 }
             }
             else
             {
-                var bv = Cpu.CreateBoundVariable(name);
+                var bv = Cpu.CreateBoundVariable<BoundVariable>(name);
                 bv.Get = dlg;
-                bv.Cpu = Cpu;
             }
         }
 
@@ -58,16 +58,16 @@ namespace kOS.Binding
             var v = Cpu.FindVariable(name.ToLower());
             if (v != null)
             {
-                if (v is BoundVariable)
+                var variable = v as BoundVariable;
+                if (variable != null)
                 {
-                    ((BoundVariable)v).Set = dlg;
+                    variable.Set = dlg;
                 }
             }
             else
             {
-                var bv = Cpu.CreateBoundVariable(name.ToLower());
+                var bv = Cpu.CreateBoundVariable<BoundVariable>(name);
                 bv.Set = dlg;
-                bv.Cpu = Cpu;
             }
         }
 
