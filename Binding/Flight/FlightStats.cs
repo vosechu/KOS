@@ -24,7 +24,6 @@ namespace kOS.Binding.Flight
             manager.AddSmooth("OBT:ECCENTRICITY", cpu => cpu.Vessel.orbit.eccentricity);
             manager.AddSmooth("OBT:SEMIMAJORAXIS", cpu => cpu.Vessel.orbit.semiMajorAxis);
             manager.AddSmooth("OBT:SEMIMINORAXIS", cpu => cpu.Vessel.orbit.semiMinorAxis);
-            manager.AddSmooth("OBT:SEMIMINORAXIS", cpu => cpu.Vessel.orbit.semiMinorAxis);
 
             manager.AddGetter("MISSIONTIME", cpu => cpu.Vessel.missionTime);
             manager.AddGetter("TIME", cpu => new TimeSpan(Planetarium.GetUniversalTime()));
