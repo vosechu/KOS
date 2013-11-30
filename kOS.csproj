@@ -96,6 +96,7 @@
     <Compile Include="Command\Vessel\RemoveObjectFromVesselCommand.cs" />
     <Compile Include="Command\Vessel\VesselStageCommand.cs" />
     <Compile Include="ContextRunProgram.cs" />
+    <Compile Include="Craft\PartExtension.cs" />
     <Compile Include="DebugTools.cs" />
     <Compile Include="Direction.cs" />
     <Compile Include="ExecutionContext.cs" />
