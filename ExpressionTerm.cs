@@ -133,6 +133,11 @@ namespace kOS
             return SubTerms.Aggregate(retString, (current, t) => current + t.Demo(tabIndent + 1));
         }
 
+        public override string ToString()
+        {
+            return Text ?? "Empty Term";
+        }
+
         private void processSymbols()
         {
             // Is the input empty?
