@@ -131,7 +131,9 @@ namespace kOS.Craft
 
             // Is this a resource?
             double dblValue;
-            return target.TryGetResource(suffixName, out dblValue) ? dblValue : base.GetSuffix(suffixName);
+            if (target.TryGetResource(suffixName, out dblValue)) return dblValue;
+            
+            return null;
         }
     }
 }

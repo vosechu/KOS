@@ -61,30 +61,10 @@ namespace kOS.Binding.Flight
                 manager.AddGetter(scName, cpu => new VesselTarget(cpu.Vessel, cpu).GetSuffix(name));
             }
 
-            manager.AddSetter("VESSELNAME", delegate(CPU cpu, object value) { cpu.Vessel.vesselName = value.ToString(); });
+            manager.AddSetter("VESSELNAME",	delegate(CPU cpu, object value) { cpu.Vessel.vesselName = value.ToString(); });
             }
 
-            private static float getLattitude(CPU cpu)
-            {
-                var retVal = (float)cpu.Vessel.latitude;
-
-                if (retVal > 90) return 90;
-                if (retVal < -90) return -90;
-
-                return retVal;
-            }
-
-            private static float getLongitude(CPU cpu)
-            {
-                var retVal = (float)cpu.Vessel.longitude;
-
-                while (retVal > 180) retVal -= 360;
-                while (retVal < -180) retVal += 360;
-
-                return retVal;
-            }
-
-            private static bool CheckCommRange(Vessel vessel)
+        private static bool CheckCommRange(Vessel vessel)
             {
                 return (vessel.GetDistanceToKerbinSurface() < vessel.GetCommRange());
             }

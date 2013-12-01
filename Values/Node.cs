@@ -114,9 +114,9 @@ namespace kOS.Values
                 case "PERIAPSIS":
                     if (nodeRef == null) throw new kOSException("Node must be added to flight plan first");
                     return nodeRef.nextPatch.PeA;
+                default:
+                    return null;
             }
-
-            return base.GetSuffix(suffixName);
         }
 
         public override bool SetSuffix(string suffixName, object value)

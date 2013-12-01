@@ -19,9 +19,9 @@
                     return orbitRef.PeA;
                 case "BODY":
                     return orbitRef.referenceBody.name;
+                default:
+                    return null;
             }
-
-            return base.GetSuffix(suffixName);
         }
 
         public override string ToString()

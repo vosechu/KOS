@@ -18,7 +18,11 @@ namespace kOS.Values
 
         public override object GetSuffix(string suffixName)
         {
-            return suffixName == "A" ? cpu.SessionTime : base.GetSuffix(suffixName);
+            if (suffixName == "A")
+            {
+                return cpu.SessionTime;
+            }
+            return null;
         }
     }
 }

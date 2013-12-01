@@ -48,9 +48,9 @@ namespace kOS.Values
                     return new Vector3d(x, y, z).magnitude;
                 case "VEC":
                     return new Vector(x, y, z);
+                default:
+                    return null;
             }
-
-            return base.GetSuffix(suffixName);
         }
 
         public override bool SetSuffix(string suffixName, object value)

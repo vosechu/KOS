@@ -56,12 +56,19 @@ namespace kOS.Values
 
         public override object GetSuffix(string suffixName)
         {
-            if (suffixName == "PITCH") return euler.x;
-            if (suffixName == "YAW") return euler.y;
-            if (suffixName == "ROLL") return euler.z;
-            if (suffixName == "VECTOR") return new Vector(vector);
-
-            return base.GetSuffix(suffixName);
+            switch (suffixName)
+            {
+                case "PITCH":
+                    return euler.x;
+                case "YAW":
+                    return euler.y;
+                case "ROLL":
+                    return euler.z;
+                case "VECTOR":
+                    return new Vector(vector);
+                default:
+                    return null;
+            }
         }
 
         public void RedefineUp(Vector3d up)

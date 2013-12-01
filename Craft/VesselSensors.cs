@@ -46,15 +46,21 @@ namespace kOS.Craft
         }
         public override object GetSuffix(string suffixName)
         {
-            if (suffixName == "ACC") return acceleration;
-            if (suffixName == "PRES") return pressure;
-            if (suffixName == "TEMP") return temperature;
-            if (suffixName == "GRAV") return geeForce;
-            if (suffixName == "LIGHT") return kerbolExposure;
-
-
-
-            return base.GetSuffix(suffixName);
+            switch (suffixName)
+            {
+                case "ACC":
+                    return acceleration;
+                case "PRES":
+                    return pressure;
+                case "TEMP":
+                    return temperature;
+                case "GRAV":
+                    return geeForce;
+                case "LIGHT":
+                    return kerbolExposure;
+                default:
+                    return null;
+            }
         }
     }
 }

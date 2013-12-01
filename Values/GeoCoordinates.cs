@@ -62,15 +62,23 @@ namespace kOS.Values
 
         public override object GetSuffix(string suffixName)
         {
-            if (suffixName == "LAT") return Lat;
-            if (suffixName == "LNG") return Lng;
-            if (suffixName == "DISTANCE") return DistanceFrom(Vessel);
-            if (suffixName == "HEADING") return (double)GetHeadingFromVessel(Vessel);
-            if (suffixName == "BEARING") return (double)GetBearing(Vessel);
-            
-            return base.GetSuffix(suffixName);
+            switch (suffixName)
+            {
+                case "LAT":
+                    return Lat;
+                case "LNG":
+                    return Lng;
+                case "DISTANCE":
+                    return DistanceFrom(Vessel);
+                case "HEADING":
+                    return (double)GetHeadingFromVessel(Vessel);
+                case "BEARING":
+                    return (double)GetBearing(Vessel);
+                default:
+                    return null;
+            }
         }
-        
+
         public override string ToString()
         {
             return "LATLNG(" + Lat + ", " + Lng + ")";

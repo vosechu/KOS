@@ -28,18 +28,27 @@ namespace kOS.Values
 
         public override object GetSuffix(string suffixName)
         {
-            if (suffixName == "YEAR") return Year();
-            if (suffixName == "DAY") return Day();
-            if (suffixName == "HOUR") return span.Hours;
-            if (suffixName == "MINUTE") return span.Minutes;
-            if (suffixName == "SECOND") return span.Seconds;
-
-            if (suffixName == "SECONDS") return span.TotalSeconds;
-
-            if (suffixName == "CLOCK") return span.Hours + ":" + String.Format(span.Minutes.ToString("00") + ":" + String.Format(span.Seconds.ToString("00")));
-            if (suffixName == "CALENDAR") return "Year " + Year() + ", day " + Day();
-
-            return base.GetSuffix(suffixName);
+            switch (suffixName)
+            {
+                case "YEAR":
+                    return Year();
+                case "DAY":
+                    return Day();
+                case "HOUR":
+                    return span.Hours;
+                case "MINUTE":
+                    return span.Minutes;
+                case "SECOND":
+                    return span.Seconds;
+                case "SECONDS":
+                    return span.TotalSeconds;
+                case "CLOCK":
+                    return span.Hours + ":" + String.Format(span.Minutes.ToString("00") + ":" + String.Format(span.Seconds.ToString("00")));
+                case "CALENDAR":
+                    return "Year " + Year() + ", day " + Day();
+                default:
+                    return null;
+            }
         }
 
         public static TimeSpan operator +(TimeSpan a, TimeSpan b) { return new TimeSpan(a.ToUnixStyleTime() + b.ToUnixStyleTime()); }

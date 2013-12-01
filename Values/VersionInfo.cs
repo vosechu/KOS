@@ -19,9 +19,9 @@
                     return Major;
                 case "MINOR":
                     return Minor;
+                default:
+                    return null;
             }
-
-            return base.GetSuffix(suffixName);
         }
 
         public override string ToString()

@@ -2,17 +2,14 @@
 
 namespace kOS.Values
 {
-    public class SpecialValue : ISpecialValue
+    public abstract class SpecialValue : ISpecialValue
     {
         public virtual bool SetSuffix(String suffixName, object value)
         {
             return false;
         }
 
-        public virtual object GetSuffix(String suffixName)
-        {
-            return null;
-        }
+        public abstract object GetSuffix(String suffixName);
 
         public virtual object TryOperation(string op, object other, bool reverseOrder)
         {

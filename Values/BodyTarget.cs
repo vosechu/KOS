@@ -49,9 +49,9 @@ namespace kOS.Values
                     return GetDistance();
                 case "BODY":
                     return new BodyTarget(target.orbit.referenceBody, context);
+                default:
+                    return null;
             }
-
-            return base.GetSuffix(suffixName);
         }
 
         public override string ToString()
