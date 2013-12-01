@@ -9,11 +9,12 @@ namespace kOS.Binding
     public class BindingManager
     {
         public CPU Cpu;
-        public delegate void BindingSetDlg      (CPU cpu, object val);
-        public delegate object BindingGetDlg    (CPU cpu);
 
 	private readonly List<SmoothVariable> updatable = new List<SmoothVariable>(); 
         private readonly List<Binding> bindings = new List<Binding>();
+        
+        public delegate void BindingSetDlg      (CPU cpu, object val);
+        public delegate object BindingGetDlg    (CPU cpu);
 
         public BindingManager(CPU cpu, String context)
         {

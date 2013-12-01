@@ -112,6 +112,7 @@
     <Compile Include="kOSProcessor.cs" />
     <Compile Include="Binding\Flight\FlightControl.cs" />
     <Compile Include="File.cs" />
+    <Compile Include="Values\MovingValue.cs" />
     <Compile Include="Values\Node.cs" />
     <Compile Include="Values\Orbit.cs" />
     <Compile Include="Values\SpecialValue.cs" />

@@ -37,6 +37,10 @@ namespace kOS
         {
             object output;
 
+            if (term.Text.Contains("ETA"))
+            {
+                UnityEngine.Debug.Log("Processing " + term.Text +" Type:" + term.Type);
+            }
             switch (term.Type)
             {
                 case Term.TermTypes.FINAL:
@@ -539,7 +543,10 @@ namespace kOS
         {
             executionContext.UpdateLock(varName);
             Variable v = executionContext.FindVariable(varName);
-            
+            if (varName.Contains("ETA"))
+            {
+                UnityEngine.Debug.Log("Variable: " +varName +" Value: " + v.Value);
+            }
             return v == null ? null : (v.Value is float ? (double)((float)v.Value) : v.Value);
         }
 

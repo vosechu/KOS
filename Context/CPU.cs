@@ -241,6 +241,7 @@ namespace kOS.Context
 
             var boundVariable = new T {Cpu = this};
             variables.Add(varName,boundVariable);
+	    UnityEngine.Debug.Log("kOS:BoundVariable: " + varName);
             return boundVariable;
         }
 
