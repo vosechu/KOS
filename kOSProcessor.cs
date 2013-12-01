@@ -2,6 +2,7 @@
 using KSP.IO;
 using System.Collections.Generic;
 using UnityEngine;
+using kOS.Context;
 
 namespace kOS
 {
@@ -11,10 +12,8 @@ namespace kOS
         public Harddisk hardDisk = null;
         private int vesselPartCount;
         private readonly List<kOSProcessor> sisterProcs = new List<kOSProcessor>();
-        private Dictionary<uint, uint> partIdentifiers;
 
         private const int MemSize = 10000;
-        private static int cpuIdMax;
 
         [KSPEvent(guiActive = true, guiName = "Open Terminal")]
         public void Activate()
@@ -70,22 +69,11 @@ namespace kOS
 
         public void RegisterkOSExternalFunction(object[] parameters)
         {
-            Debug.Log("*** External Function Registration Succeeded");
+            UnityEngine.Debug.Log("*** External Function Registration Succeeded");
 
             cpu.RegisterkOSExternalFunction(parameters);
         }
-        
-        private void assignPartIdentifiers()
-        {
-            foreach (var part in vessel.parts)
-            {
-                if (!partIdentifiers.ContainsKey(part.flightID))
-                {
 
-                }
-            }
-        }
-        
         public static int AssignNewID()
         {
             var config = PluginConfiguration.CreateForType<kOSProcessor>();
@@ -163,11 +151,11 @@ namespace kOS
                 hardDisk = newDisk;
             }
 
-            Debug.Log("******************************* ON LOAD ");
+            UnityEngine.Debug.Log("******************************* ON LOAD ");
 
             initCpu();
 
-            Debug.Log("******************************* CPU Inited ");
+            UnityEngine.Debug.Log("******************************* CPU Inited ");
 
             if (cpu != null) cpu.OnLoad(node);
             

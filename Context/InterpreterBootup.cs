@@ -1,12 +1,12 @@
 ﻿using System;
 
-namespace kOS
+namespace kOS.Context
 {
     public class InterpreterBootup : ExecutionContext
     {
         private float bootTime;
         private float animationTime;
-        private new readonly char[,] buffer = new char[COLUMNS, ROWS];
+        private readonly char[,] buffer = new char[COLUMNS, ROWS];
 
         public InterpreterBootup(ExecutionContext parent)
             : base(parent) 

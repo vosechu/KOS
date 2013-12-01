@@ -1,4 +1,6 @@
 using System.Text.RegularExpressions;
+using kOS.Context;
+using kOS.Debug;
 
 namespace kOS.Command.BasicIO
 {

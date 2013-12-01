@@ -1,4 +1,7 @@
 using System.Text.RegularExpressions;
+using kOS.Context;
+using kOS.Debug;
+using kOS.Values;
 
 namespace kOS.Command.BasicIO
 {
@@ -16,9 +19,10 @@ namespace kOS.Command.BasicIO
             {
                 var baseObj = new Expression(targetTerm.SubTerms[0], ParentContext).GetValue();
 
-                if (baseObj is SpecialValue)
+                var value = baseObj as ISpecialValue;
+                if (value != null)
                 {
-                    if (((SpecialValue)baseObj).SetSuffix(targetTerm.SubTerms[1].Text.ToUpper(), e.GetValue()))
+                    if (value.SetSuffix(targetTerm.SubTerms[1].Text.ToUpper(), e.GetValue()))
                     {
                         State = ExecutionState.DONE;
                         return;
@@ -27,7 +31,7 @@ namespace kOS.Command.BasicIO
                 }
                 throw new kOSException("Can't set subvalues on a " + Expression.GetFriendlyNameOfItem(baseObj), this);
             }
-            Variable v = FindOrCreateVariable(targetTerm.Text);
+            var v = FindOrCreateVariable(targetTerm.Text);
 
             if (v == null) return;
             v.Value = e.GetValue();

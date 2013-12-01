@@ -1,6 +1,7 @@
 ﻿using System;
+using kOS.Context;
 
-namespace kOS
+namespace kOS.Debug
 {
     [Serializable]
     public class kOSException : Exception

@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace kOS
+namespace kOS.Values
 {
-    public class SpecialValue
+    public class SpecialValue : ISpecialValue
     {
         public virtual bool SetSuffix(String suffixName, object value)
         {
@@ -18,5 +18,12 @@ namespace kOS
         {
             return null;
         }
+    }
+
+    public interface ISpecialValue
+    {
+        bool SetSuffix(String suffixName, object value);
+        object GetSuffix(String suffixName);
+        object TryOperation(string op, object other, bool reverseOrder);
     }
 }

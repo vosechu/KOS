@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using kOS.Binding;
+using kOS.Command;
+using kOS.Debug;
 
-namespace kOS
+namespace kOS.Context
 {
     public class CPU : ExecutionContext
     {

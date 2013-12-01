@@ -1,4 +1,6 @@
+using kOS.Context;
 using kOS.Craft;
+using kOS.Values;
 
 namespace kOS.Binding.Flight
 {

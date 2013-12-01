@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text.RegularExpressions;
+using kOS.Context;
 using kOS.Craft;
 
 namespace kOS.Command.Vessel

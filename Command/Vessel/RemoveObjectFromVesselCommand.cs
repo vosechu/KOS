@@ -1,4 +1,7 @@
 using System.Text.RegularExpressions;
+using kOS.Context;
+using kOS.Debug;
+using kOS.Values;
 
 namespace kOS.Command.Vessel
 {
@@ -12,7 +15,7 @@ namespace kOS.Command.Vessel
             Expression ex = new Expression(RegexMatch.Groups[1].Value, this);
             object obj = ex.GetValue();
 
-            if (obj is kOS.Node)
+            if (obj is Node)
             {
                 ((Node)obj).Remove();
             }

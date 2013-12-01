@@ -1,4 +1,4 @@
-﻿namespace kOS
+﻿namespace kOS.Values
 {
     public class OrbitInfo : SpecialValue
     {

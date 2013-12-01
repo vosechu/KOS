@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace kOS
+namespace kOS.Context
 {
     public sealed class InterpreterEdit : ExecutionContext
     {
@@ -17,7 +17,7 @@ namespace kOS
         int cursorX;
         int cursorY;
 
-        private new readonly char[,] buffer = new char[COLUMNS, ROWS];
+        private readonly char[,] buffer = new char[COLUMNS, ROWS];
 
         String statusAnimString = "";
         float statusAnimProg;

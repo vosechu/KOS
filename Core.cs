@@ -1,5 +1,7 @@
 ﻿using System;
 using UnityEngine;
+using kOS.Context;
+using kOS.Values;
 
 
 namespace kOS
@@ -10,7 +12,6 @@ namespace kOS
 
         public static Core Fetch; 
         public TermWindow Window;
-        private int CPUIdAccumulator;
         
         public void Awake()
         {
@@ -19,7 +20,7 @@ namespace kOS
                 Fetch = this;
 
                 var gObj = new GameObject("kOSTermWindow", typeof(TermWindow));
-                UnityEngine.Object.DontDestroyOnLoad(gObj);
+                DontDestroyOnLoad(gObj);
                 Window = (TermWindow)gObj.GetComponent(typeof(TermWindow));
                 Window.Core = this;
             }

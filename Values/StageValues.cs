@@ -1,7 +1,7 @@
 ﻿using System;
 using kOS.Craft;
 
-namespace kOS
+namespace kOS.Values
 {
     public class StageValues : SpecialValue
     {

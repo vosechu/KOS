@@ -1,4 +1,6 @@
-﻿namespace kOS.Craft
+﻿using kOS.Values;
+
+namespace kOS.Craft
 {
     public class VesselVelocity : SpecialValue
     {

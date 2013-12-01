@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using kOS.Binding;
+using kOS.Command;
+using kOS.Debug;
 
-namespace kOS
+namespace kOS.Context
 {
     public enum ExecutionState { NEW, DONE, WAIT };
     public enum SpecialKey { HOME, END, DELETE };

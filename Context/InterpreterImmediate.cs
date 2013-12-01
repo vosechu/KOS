@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using kOS.Debug;
 
-namespace kOS
+namespace kOS.Context
 {
     public sealed class ImmediateMode : ExecutionContext
     {
@@ -16,7 +17,7 @@ namespace kOS
         private int cursorY;
         private readonly Queue<Command.Command> queue = new Queue<Command.Command>();
 
-        private new readonly char[,] buffer = new char[COLUMNS, ROWS];
+        private readonly char[,] buffer = new char[COLUMNS, ROWS];
 
         public ImmediateMode(ExecutionContext parent) : base(parent) 
         {

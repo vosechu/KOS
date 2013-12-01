@@ -2,8 +2,7 @@
 using System.Reflection;
 using System.Text;
 
-
-namespace kOS
+namespace kOS.Debug
 {
     public static class DebugTools
     {

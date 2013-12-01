@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace kOS
+namespace kOS.Values
 {
     public class TimeSpan : SpecialValue
     {

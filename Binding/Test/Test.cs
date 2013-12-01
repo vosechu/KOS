@@ -1,4 +1,6 @@
-﻿namespace kOS.Binding.Test
+﻿using kOS.Values;
+
+namespace kOS.Binding.Test
 {
     [kOSBinding("ksp", "testTerm")]
     public class BindingsTest : Binding

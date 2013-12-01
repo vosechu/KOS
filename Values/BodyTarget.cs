@@ -1,7 +1,9 @@
 ﻿using System;
+using kOS.Context;
 using kOS.Craft;
+using kOS.Debug;
 
-namespace kOS
+namespace kOS.Values
 {
     public class BodyTarget : SpecialValue
     {

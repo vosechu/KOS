@@ -2,21 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using kOS.Stats;
+using kOS.Context;
 
 namespace kOS.Binding
 {
     public class BindingManager
     {
         public CPU Cpu;
-
-        private Dictionary<string, BindingSetDlg> Setters = new Dictionary<string, BindingSetDlg>();
-        private Dictionary<string, BindingGetDlg> Getters = new Dictionary<string, BindingGetDlg>();
-	private readonly List<SmoothVariable> Updatable = new List<SmoothVariable>(); 
-        private readonly List<Binding> Bindings = new List<Binding>();
-        
         public delegate void BindingSetDlg      (CPU cpu, object val);
         public delegate object BindingGetDlg    (CPU cpu);
+
+	private readonly List<SmoothVariable> updatable = new List<SmoothVariable>(); 
+        private readonly List<Binding> bindings = new List<Binding>();
 
         public BindingManager(CPU cpu, String context)
         {
@@ -32,7 +29,7 @@ namespace kOS.Binding
                               select (Binding)Activator.CreateInstance(t))
             {
                 b.AddTo(this);
-                Bindings.Add(b);
+                bindings.Add(b);
             }
         }
 
@@ -74,7 +71,7 @@ namespace kOS.Binding
 		{
 		    var bv = Cpu.CreateBoundVariable<SmoothVariable>(smoothName);
 		    bv.Get = dlg;
-		    Updatable.Add(bv);
+		    updatable.Add(bv);
 		}
 	    
 	}
@@ -99,11 +96,11 @@ namespace kOS.Binding
 
         public void Update(float time)
         {
-            foreach (var b in Bindings)
+            foreach (var b in bindings)
             {
                 b.Update(time);
             }
-            foreach (var smoothVariable in Updatable)
+            foreach (var smoothVariable in updatable)
             {
                 smoothVariable.Update();
             }

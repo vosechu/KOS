@@ -1,4 +1,6 @@
-﻿namespace kOS
+﻿using kOS.Context;
+
+namespace kOS.Values
 {
     public class SpecialValueTester : SpecialValue
     {

@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Linq;
 using UnityEngine;
+using kOS.Context;
 using kOS.Craft;
+using kOS.Debug;
+using kOS.Values;
+using TimeSpan = kOS.Values.TimeSpan;
 
 namespace kOS.Binding.Flight
 {
