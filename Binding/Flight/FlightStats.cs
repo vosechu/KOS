@@ -23,11 +23,13 @@ namespace kOS.Binding.Flight
             manager.AddSmooth("ALT:PERIAPSIS", cpu => cpu.Vessel.orbit.PeA);
             manager.AddSmooth("ETA:APOAPSIS", cpu => cpu.Vessel.orbit.timeToAp);
             manager.AddSmooth("ETA:PERIAPSIS", cpu => cpu.Vessel.orbit.timeToPe);
+            manager.AddGetter("ETA:TRANSITION", cpu => cpu.Vessel.orbit.EndUT);
             manager.AddSmooth("OBT:PERIOD", cpu => cpu.Vessel.orbit.period);
             manager.AddSmooth("OBT:INCLINATION", cpu => cpu.Vessel.orbit.inclination);
             manager.AddSmooth("OBT:ECCENTRICITY", cpu => cpu.Vessel.orbit.eccentricity);
             manager.AddSmooth("OBT:SEMIMAJORAXIS", cpu => cpu.Vessel.orbit.semiMajorAxis);
             manager.AddSmooth("OBT:SEMIMINORAXIS", cpu => cpu.Vessel.orbit.semiMinorAxis);
+            manager.AddGetter("OBT:TRANSITION", cpu => cpu.Vessel.orbit.patchEndTransition);
 
             manager.AddGetter("MISSIONTIME", cpu => cpu.Vessel.missionTime);
             manager.AddGetter("TIME", cpu => new TimeSpan(Planetarium.GetUniversalTime()));
