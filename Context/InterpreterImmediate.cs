@@ -34,7 +34,7 @@ namespace kOS.Context
 
             var line = 0;
             int comandLineStart;
-            while (parseNext(ref commandBuffer, out nextCmd, ref line, out comandLineStart))
+            while (ParseNext(ref commandBuffer, out nextCmd, ref line, out comandLineStart))
             {
                 try
                 {

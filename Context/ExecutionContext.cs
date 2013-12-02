@@ -26,7 +26,7 @@ namespace kOS.Context
         public virtual Vessel Vessel { get { return ParentContext != null ? ParentContext.Vessel : null; } }
         public virtual List<Volume> Volumes { get { return ParentContext != null ? ParentContext.Volumes : null; } }
         public virtual Dictionary<String, Variable> Variables { get { return ParentContext != null ? ParentContext.Variables : null; } }
-        public virtual List<kOSExternalFunction> ExternalFunctions { get { return ParentContext != null ? ParentContext.ExternalFunctions : null; } }
+        public virtual List<KOSExternalFunction> ExternalFunctions { get { return ParentContext != null ? ParentContext.ExternalFunctions : null; } }
         public int Line { get; protected set; }
         public ExecutionState State { get; set; }
         public Dictionary<string, Expression> Locks { get; set; }
@@ -165,7 +165,7 @@ namespace kOS.Context
             {
                 var volName = volID.ToString().ToUpper();
 
-                foreach (Volume targetVolume in Volumes)
+                foreach (var targetVolume in Volumes)
                 {
                     if (targetVolume.Name.ToUpper() == volName)
                     {
@@ -253,7 +253,7 @@ namespace kOS.Context
             if (ParentContext != null) ParentContext.UnlockAll();
         }
 
-        public bool parseNext(ref string buffer, out string cmd, ref int lineCount, out int lineStart)
+        public bool ParseNext(ref string buffer, out string cmd, ref int lineCount, out int lineStart)
         {
             lineStart = -1;
 

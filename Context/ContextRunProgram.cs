@@ -40,7 +40,7 @@ namespace kOS.Context
             string cmd;
             var lineNumber = 0;
             int commandLineStart;
-            while (parseNext(ref commandBuffer, out cmd, ref lineNumber, out commandLineStart))
+            while (ParseNext(ref commandBuffer, out cmd, ref lineNumber, out commandLineStart))
             {
                 try
                 {

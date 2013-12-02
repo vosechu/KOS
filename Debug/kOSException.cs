@@ -9,7 +9,7 @@ namespace kOS.Debug
         public new String Message;
         public String Filename;
         public int LineNumber;
-        public Command.Command commandObj;
+        public Command.Command CommandObj;
         public ExecutionContext Context;
         public ContextRunProgram Program;
 

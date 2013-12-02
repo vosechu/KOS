@@ -63,10 +63,10 @@ namespace kOS.Binding.Flight
                 manager.AddGetter(scName, cpu => new VesselTarget(cpu.Vessel, cpu).GetSuffix(name));
             }
 
-            manager.AddSetter("VESSELNAME",	delegate(CPU cpu, object value) { cpu.Vessel.vesselName = value.ToString(); });
+            manager.AddSetter("VESSELNAME", delegate(CPU cpu, object value) { cpu.Vessel.vesselName = value.ToString(); });
             }
 
-        private static bool CheckCommRange(Vessel vessel)
+            private static bool CheckCommRange(Vessel vessel)
             {
                 return (vessel.GetDistanceToKerbinSurface() < vessel.GetCommRange());
             }

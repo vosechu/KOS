@@ -9,9 +9,10 @@ namespace kOS
     public class kOSProcessor : PartModule
     {
         private CPU cpu;
-        private Harddisk hardDisk;
+        private Harddisk hardDisk = null;
         private int vesselPartCount;
         private readonly List<kOSProcessor> sisterProcs = new List<kOSProcessor>();
+        private Dictionary<uint, uint> partIdentifiers;
 
         private const int MEM_SIZE = 10000;
 
@@ -55,11 +56,11 @@ namespace kOS
 
             if (hardDisk == null) hardDisk = new Harddisk(MEM_SIZE);
 
-            initCpu();
+            InitCpu();
 
         }
 
-        public void initCpu()
+        private void InitCpu()
         {
             if (cpu != null) return;
             cpu = new CPU(this, "ksp");
@@ -73,7 +74,7 @@ namespace kOS
 
             cpu.RegisterkOSExternalFunction(parameters);
         }
-
+        
         public static int AssignNewID()
         {
             var config = PluginConfiguration.CreateForType<kOSProcessor>();
@@ -153,7 +154,7 @@ namespace kOS
 
             UnityEngine.Debug.Log("******************************* ON LOAD ");
 
-            initCpu();
+            InitCpu();
 
             UnityEngine.Debug.Log("******************************* CPU Inited ");
 

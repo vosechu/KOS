@@ -7,8 +7,8 @@ namespace kOS.Values
 {
     public class BodyTarget : SpecialValue
     {
-        public ExecutionContext context;
-        public CelestialBody target;
+        private CelestialBody target;
+        private readonly ExecutionContext context;
 
         public BodyTarget(String name, ExecutionContext context) : this(VesselUtils.GetBodyByName(name), context) { }
 
@@ -16,6 +16,12 @@ namespace kOS.Values
         {
             this.context = context;
             this.target = target;
+        }
+
+        public CelestialBody Target
+        {
+            get { return target; }
+            set { target = value; }
         }
 
         public double GetDistance()

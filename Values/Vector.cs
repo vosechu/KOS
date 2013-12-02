@@ -124,20 +124,24 @@ namespace kOS.Values
             switch (op)
             {
                 case "+":
-                    if (other is Vector) return this + (Vector)other;
+                    var vector = other as Vector;
+                    if (vector != null) return this + vector;
                     break;
                 case "*":
-                    if (other is Vector) return this * (Vector)other;
+                    var other1 = other as Vector;
+                    if (other1 != null) return this * other1;
                     if (other is double) return this * (double)other;
                     break;
                 case "-":
                     if (!reverseOrder)
                     {
-                        if (other is Vector) return this - (Vector)other;
+                        var vector1 = other as Vector;
+                        if (vector1 != null) return this - vector1;
                     }
                     else
                     {
-                        if (other is Vector) return (Vector)other - this;
+                        var vector1 = other as Vector;
+                        if (vector1 != null) return vector1 - this;
                     }
                     break;
             }

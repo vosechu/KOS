@@ -12,13 +12,13 @@ namespace kOS
     {
         public int Capacity = -1;
         public String Name = "";
-        protected List<File> files = new List<File>();
+        protected List<File> Files = new List<File>();
 
         public bool Renameable = true;
 
         public virtual File GetByName(String name)
         {
-            return files.FirstOrDefault(p => p.Filename.ToUpper() == name.ToUpper());
+            return Files.FirstOrDefault(p => p.Filename.ToUpper() == name.ToUpper());
         }
 
         public virtual void AppendToFile(string name, string str) 
@@ -32,9 +32,9 @@ namespace kOS
 
         public virtual void DeleteByName(String name)
         {
-            foreach (var p in files.Where(p => p.Filename.ToUpper() == name.ToUpper()))
+            foreach (var p in Files.Where(p => p.Filename.ToUpper() == name.ToUpper()))
             {
-                files.Remove(p);
+                Files.Remove(p);
                 return;
             }
         }
@@ -42,7 +42,7 @@ namespace kOS
         public virtual bool SaveFile(File file)
         {
             DeleteByName(file.Filename);
-            files.Add(file);
+            Files.Add(file);
 
             return true;
         }
@@ -54,7 +54,7 @@ namespace kOS
 
         public virtual List<FileInfo> GetFileList()
         {
-            return files.Select(file => new FileInfo(file.Filename, file.GetSize())).ToList();
+            return Files.Select(file => new FileInfo(file.Filename, file.GetSize())).ToList();
         }
 
         public virtual bool CheckRange()
@@ -105,7 +105,7 @@ namespace kOS
                     var file = new File(filename);
                     file.Deserialize(body);
 
-                    files.Add(file);
+                    Files.Add(file);
                     SaveFile(file);
                 }
                 catch (EndOfStreamException)
@@ -131,7 +131,7 @@ namespace kOS
                     retFile.Deserialize(fileBody);
                     
                     base.DeleteByName(name);
-                    files.Add(retFile);
+                    Files.Add(retFile);
 
                     return retFile;
                 }

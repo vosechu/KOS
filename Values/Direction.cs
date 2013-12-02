@@ -42,15 +42,15 @@ namespace kOS.Values
             euler = q.eulerAngles;
         }
 
-        public Direction(Vector3d v3d, bool isEuler)
+        public Direction(Vector3d vector, bool isEuler)
         {
             if (isEuler)
             {
-                Euler = v3d;
+                Euler = vector;
             }
             else
             {
-                Vector = v3d; 
+                Vector = vector; 
             }
         }
 

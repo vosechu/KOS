@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using kOS.Stats;
 using kOS.Context;
 
 namespace kOS.Binding
@@ -56,7 +57,7 @@ namespace kOS.Binding
 	public void AddSmooth(string name, BindingGetDlg dlg)
 	{
 	    AddGetter(name, dlg);
-	    var smoothName = name + ":SMOOTH";
+	    var smoothName = "SMOOTH#" + name;
 
 		var v = Cpu.FindVariable(smoothName) ?? Cpu.FindVariable(smoothName.Split(":".ToCharArray())[0]);
 
@@ -73,13 +74,14 @@ namespace kOS.Binding
 		    var bv = Cpu.CreateBoundVariable<SmoothVariable>(smoothName);
 		    bv.Get = dlg;
 		    updatable.Add(bv);
-		}
+		   UnityEngine.Debug.Log("Binding: " + smoothName);
 	    
+		}
 	}
 
         public void AddSetter(String name, BindingSetDlg dlg)
         {
-            var v = Cpu.FindVariable(name.ToLower());
+            var v = Cpu.FindVariable(name);
             if (v != null)
             {
                 var variable = v as BoundVariable;

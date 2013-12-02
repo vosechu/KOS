@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 using kOS.Context;
 
@@ -8,33 +7,27 @@ namespace kOS
     // Blockotronix 550 Computor Monitor
     public class TermWindow : MonoBehaviour
     {
-        private static readonly string root = KSPUtil.ApplicationRootPath.Replace("\\", "/");
-
+        public Core Core;
+        private readonly string root = KSPUtil.ApplicationRootPath.Replace("\\", "/");
         private Rect windowRect = new Rect(60, 50, 470, 395);
         private Texture2D fontImage = new Texture2D(0, 0, TextureFormat.DXT1, false);
         private Texture2D terminalImage = new Texture2D(0, 0, TextureFormat.DXT1, false);
         private bool isOpen;
-        private bool showPilcrows;
         private CameraManager cameraManager;
-        private CameraManager.CameraMode cameraModeWhenOpened;
         private bool isLocked;
         private float cursorBlinkTime;
-        public static int CHARSIZE = 8;
-        public static int CHARS_PER_ROW = 16;
-        public static int XOFFSET = 15;
-        public static int YOFFSET = 35;
-        public static int XBGOFFSET = 15;
-        public static int YBGOFFSET = 35;
-        public static Color COLOR = new Color(1,1,1,1);
-        public static Color COLOR_ALPHA = new Color(0.9f, 0.9f, 0.9f, 0.2f);
-        public static Color TEXTCOLOR = new Color(0.45f, 0.92f, 0.23f, 0.9f);
-        public static Color TEXTCOLOR_ALPHA = new Color(0.45f, 0.92f, 0.23f, 0.5f);
-        public static Rect CLOSEBUTTON_RECT = new Rect(398, 359, 59, 30);
+        private const int CHARSIZE = 8;
+        private const int CHARS_PER_ROW = 16;
+        private readonly Color color = new Color(1,1,1,1);
+        private readonly Color colorAlpha = new Color(0.9f, 0.9f, 0.9f, 0.2f);
+        private readonly Color textcolor = new Color(0.45f, 0.92f, 0.23f, 0.9f);
+        private readonly Color textcolorAlpha = new Color(0.45f, 0.92f, 0.23f, 0.5f);
+        private Rect closebuttonRect = new Rect(398, 359, 59, 30);
+        private bool allTexturesFound = true;
+        private CPU cpu;
+        private CameraManager.CameraMode cameraModeWhenOpened;
+        private bool showPilcrows;
 
-        public bool allTexturesFound = true;
-
-        public Core Core;
-        public CPU Cpu;
 
         public void Awake()
         {
@@ -115,14 +108,14 @@ namespace kOS
             if (!isOpen) return;
             
             GUI.skin = HighLogic.Skin;
-            GUI.color = isLocked ? COLOR : COLOR_ALPHA;
+            GUI.color = isLocked ? color : colorAlpha;
 
             windowRect = GUI.Window(0, windowRect, TerminalGui, "");
         }
 
         void Update()
         {
-            if (Cpu == null || Cpu.Vessel == null || Cpu.Vessel.parts.Count == 0)
+            if (cpu == null || cpu.Vessel == null || cpu.Vessel.parts.Count == 0)
             {
                 // Holding onto a vessel instance that no longer exists?
                 Close();
@@ -243,21 +236,21 @@ namespace kOS
         
         void Type(char ch)
         {
-            if (Cpu != null) Cpu.KeyInput(ch);
+            if (cpu != null) cpu.KeyInput(ch);
         }
 
         void SpecialKey(kOSKeys key)
         {
-            if (Cpu != null) Cpu.SpecialKey(key);
+            if (cpu != null) cpu.SpecialKey(key);
         }
 
-        void TerminalGui(int windowID)
+        void TerminalGui(int windowId)
         {
             if (Input.GetMouseButtonDown(0))
             {
                 var mousePos = new Vector2(Event.current.mousePosition.x, Event.current.mousePosition.y);
 
-                if (CLOSEBUTTON_RECT.Contains(mousePos))
+                if (closebuttonRect.Contains(mousePos))
                 {
                     Close();
                 }
@@ -276,14 +269,14 @@ namespace kOS
                 GUI.Label(new Rect(15, 15, 450, 300), "Error: Some or all kOS textures were not found. Please " +
                            "go to the following folder: \n\n<Your KSP Folder>\\GameData\\kOS\\GFX\\ \n\nand ensure that the png texture files are there.");
 
-                GUI.Label(CLOSEBUTTON_RECT, "Close");
+                GUI.Label(closebuttonRect, "Close");
 
                 return;
             }
 
-            if (Cpu == null) return;
+            if (cpu == null) return;
 
-            GUI.color = isLocked ? COLOR : COLOR_ALPHA;
+            GUI.color = isLocked ? color : colorAlpha;
             GUI.DrawTexture(new Rect(10, 10, terminalImage.width, terminalImage.height), terminalImage);
 
             if (GUI.Button(new Rect(580, 10, 80, 30), "Close"))
@@ -294,15 +287,15 @@ namespace kOS
 
             GUI.DragWindow(new Rect(0, 0, 10000, 500));
 
-            if (Cpu == null || Cpu.Mode != CPU.Modes.READY || !Cpu.IsAlive()) return;
+            if (cpu == null || cpu.Mode != CPU.Modes.READY || !cpu.IsAlive()) return;
 
-            var textColor = isLocked ? TEXTCOLOR : TEXTCOLOR_ALPHA;
+            var textColor = isLocked ? textcolor : textcolorAlpha;
 
             GUI.BeginGroup(new Rect(31, 38, 420, 340));
 
-            if (Cpu != null)
+            if (cpu != null)
             {
-                var buffer = Cpu.GetBuffer();
+                var buffer = cpu.GetBuffer();
 
                 for (var x = 0; x < buffer.GetLength(0); x++)
                     for (var y = 0; y < buffer.GetLength(1); y++)
@@ -313,9 +306,9 @@ namespace kOS
                     }
 
                 var blinkOn = cursorBlinkTime < 0.5f;
-                if (blinkOn && Cpu.GetCursorX() > -1)
+                if (blinkOn && cpu.GetCursorX() > -1)
                 {
-                    ShowCharacterByAscii((char)1, Cpu.GetCursorX(), Cpu.GetCursorY(), textColor);
+                    ShowCharacterByAscii((char)1, cpu.GetCursorX(), cpu.GetCursorY(), textColor);
                 }
             }
 
@@ -345,7 +338,7 @@ namespace kOS
 
         internal void AttachTo(CPU cpu)
         {
-            Cpu = cpu;
+            this.cpu = cpu;
         }
 
         internal void PrintLine(string line)

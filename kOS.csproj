@@ -57,6 +57,9 @@
     <Compile Include="Binding\Test\Test.cs" />
     <Compile Include="Binding\Test\TestBindings.cs" />
     <Compile Include="Binding\Environment\Universe.cs" />
+    <Compile Include="Context\ContextRunProgram.cs" />
+    <Compile Include="Context\ExecutionContext.cs" />
+    <Compile Include="Debug\DebugTools.cs" />
     <Compile Include="Values\BodyTarget.cs" />
     <Compile Include="Command\Command.cs" />
     <Compile Include="Command\BasicIO\ClearScreenCommand.cs" />
@@ -95,12 +98,10 @@
     <Compile Include="Command\Temporal\WhenCommand.cs" />
     <Compile Include="Command\Vessel\RemoveObjectFromVesselCommand.cs" />
     <Compile Include="Command\Vessel\VesselStageCommand.cs" />
-    <Compile Include="Context\ContextRunProgram.cs" />
-    <Compile Include="Debug\DebugTools.cs" />
-    <Compile Include="Values\Direction.cs" />
-    <Compile Include="Context\ExecutionContext.cs" />
+    <Compile Include="Craft\PartExtension.cs" />
     <Compile Include="Expression.cs" />
     <Compile Include="ExpressionTerm.cs" />
+    <Compile Include="Values\Direction.cs" />
     <Compile Include="Values\GeoCoordinates.cs" />
     <Compile Include="Harddisk.cs" />
     <Compile Include="Context\InterpreterBootup.cs" />

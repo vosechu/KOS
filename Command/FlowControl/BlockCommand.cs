@@ -23,7 +23,7 @@ namespace kOS.Command.FlowControl
             var lineCount = Line;
             var commandLineStart = 0;
 
-            while (parseNext(ref innerText, out cmd, ref lineCount, out commandLineStart))
+            while (ParseNext(ref innerText, out cmd, ref lineCount, out commandLineStart))
             {
                 commands.Add(Get(cmd, this, commandLineStart));
             }
