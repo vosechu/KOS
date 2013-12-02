@@ -8,12 +8,12 @@ namespace kOS
 {
     public class kOSProcessor : PartModule
     {
-        public CPU cpu;
-        public Harddisk hardDisk = null;
+        private CPU cpu;
+        private Harddisk hardDisk;
         private int vesselPartCount;
         private readonly List<kOSProcessor> sisterProcs = new List<kOSProcessor>();
 
-        private const int MemSize = 10000;
+        private const int MEM_SIZE = 10000;
 
         [KSPEvent(guiActive = true, guiName = "Open Terminal")]
         public void Activate()
@@ -53,7 +53,7 @@ namespace kOS
                 return;
             }
 
-            if (hardDisk == null) hardDisk = new Harddisk(MemSize);
+            if (hardDisk == null) hardDisk = new Harddisk(MEM_SIZE);
 
             initCpu();
 
