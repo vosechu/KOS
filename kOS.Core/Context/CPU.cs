@@ -19,8 +19,8 @@ namespace kOS.Context
         public float SessionTime { get; private set; }
         public override Vessel Vessel { get { return ((IProcessorModule)parent).vessel; } }
         public override IDictionary<string, Variable> Variables { get { return variables; } }
-        public override List<IVolume> Volumes { get { return volumes; } }
-        public override List<KOSExternalFunction> ExternalFunctions { get { return externalFunctions; } }
+        public override IList<IVolume> Volumes { get { return volumes; } }
+        public override IList<KOSExternalFunction> ExternalFunctions { get { return externalFunctions; } }
 
 
         private const int CLOCK_SPEED = 5;

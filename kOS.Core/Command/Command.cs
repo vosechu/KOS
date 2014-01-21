@@ -2,6 +2,7 @@
 using System.Text.RegularExpressions;
 using kOS.Context;
 using kOS.Debug;
+using kOS.Expression;
 
 namespace kOS.Command
 {
@@ -67,7 +68,7 @@ namespace kOS.Command
             if (ParentContext != null) ParentContext.Lock(command);
         }
 
-        public override void Lock(string name, Expression.Expression expression)
+        public override void Lock(string name, IExpression expression)
         {
             if (ParentContext != null) ParentContext.Lock(name, expression);
         }

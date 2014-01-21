@@ -11,12 +11,12 @@ using TimeSpan = kOS.Suffixed.TimeSpan;
 
 namespace kOS.Expression
 {
-    public class Expression
+    public class Expression : IExpression
     {
-        readonly Term rootTerm;
+        readonly ITerm rootTerm;
         readonly IExecutionContext executionContext;
 
-        public Expression(Term term, IExecutionContext context)
+        public Expression(ITerm term, IExecutionContext context)
         {
             rootTerm = term;
             executionContext = context;
@@ -33,39 +33,39 @@ namespace kOS.Expression
             return GetValueOfTerm(rootTerm);
         }
 
-        public object GetValueOfTerm(Term term)
+        public object GetValueOfTerm(ITerm term)
         {
             object output;
 
             switch (term.Type)
             {
-                case Term.TermTypes.FINAL:
+                case TermType.FINAL:
                     output = RecognizeConstant(term.Text);
                     if (output != null) return output;
                     output = AttemptGetVariableValue(term.Text);
                     if (output != null) return output;
                     break;
-                case Term.TermTypes.REGULAR:
+                case TermType.REGULAR:
                     output = TryProcessMathStatement(term);
                     if (output != null) return output;
                     break;
-                case Term.TermTypes.FUNCTION:
+                case TermType.FUNCTION:
                     output = TryProcessFunction(term);
                     if (output != null) return output;
                     break;
-                case Term.TermTypes.STRUCTURE:
+                case TermType.STRUCTURE:
                     output = TryProcessStructure(term);
                     if (output != null) return output;
                     break;
-                case Term.TermTypes.COMPARISON:
+                case TermType.COMPARISON:
                     output = TryProcessComparison(term);
                     if (output != null) return output;
                     break;
-                case Term.TermTypes.BOOLEAN:
+                case TermType.BOOLEAN:
                     output = TryProcessBoolean(term);
                     if (output != null) return output;
                     break;
-                case Term.TermTypes.INDEX:
+                case TermType.INDEX:
                     output = TryProcessIndex(term);
                     if (output != null) return output;
                     break;
@@ -74,7 +74,7 @@ namespace kOS.Expression
             throw new KOSException("Unrecognized term: '" + term.Text + "', Type:" + term.Type, executionContext);
         }
 
-        private object TryProcessIndex(Term input)
+        private object TryProcessIndex(ITerm input)
         {
             var chunks = new List<StatementChunk>();
 
@@ -85,7 +85,7 @@ namespace kOS.Expression
                 if (i + 1 < input.SubTerms.Count)
                 {
                     var opTerm = input.SubTerms[i + 1];
-                    if (opTerm.Type == Term.TermTypes.INDEX_OPERATOR)
+                    if (opTerm.Type == TermType.INDEX_OPERATOR)
                     {
                         chunks.Add(new StatementChunk(termValue, opTerm.Text));
                     }
@@ -158,7 +158,7 @@ namespace kOS.Expression
             chunks.Insert(index, replace);
         }
 
-        private object TryProcessMathStatement(Term input)
+        private object TryProcessMathStatement(ITerm input)
         {
             var chunks = new List<StatementChunk>();
 
@@ -169,7 +169,7 @@ namespace kOS.Expression
                 if (i + 1 < input.SubTerms.Count)
                 {
                     var opTerm = input.SubTerms[i + 1];
-                    if (opTerm.Type == Term.TermTypes.MATH_OPERATOR)
+                    if (opTerm.Type == TermType.MATH_OPERATOR)
                     {
                         chunks.Add(new StatementChunk(termValue, opTerm.Text));
                     }
@@ -261,7 +261,7 @@ namespace kOS.Expression
             return chunks.Count == 1 ? chunks[0].Value : null;
         }
 
-        private object TryProcessFunction(Term input)
+        private object TryProcessFunction(ITerm input)
         {
             var p = input.SubTerms[1].SubTerms.ToArray();
 
@@ -275,12 +275,12 @@ namespace kOS.Expression
             return output;
         }
 
-        private object TryProcessStructure(Term input)
+        private object TryProcessStructure(ITerm input)
         {   
             var baseTerm = input.SubTerms[0];
             var suffixTerm = input.SubTerms[1];
 
-            if (suffixTerm.Type == Term.TermTypes.SUFFIX)
+            if (suffixTerm.Type == TermType.SUFFIX)
             {
                 // First, see if this is just a variable with a comma in it (old-style structure)
                 object output;
@@ -305,7 +305,7 @@ namespace kOS.Expression
             return null;
         }
 
-        private object TryProcessComparison(Term input)
+        private object TryProcessComparison(ITerm input)
         {
             var chunks = new List<StatementChunk>();
 
@@ -316,7 +316,7 @@ namespace kOS.Expression
                 if (i + 1 < input.SubTerms.Count)
                 {
                     var opTerm = input.SubTerms[i + 1];
-                    if (opTerm.Type == Term.TermTypes.COMPARISON_OPERATOR)
+                    if (opTerm.Type == TermType.COMPARISON_OPERATOR)
                     {
                         chunks.Add(new StatementChunk(termValue, opTerm.Text));
                     }
@@ -369,7 +369,7 @@ namespace kOS.Expression
             return chunks.Count == 1 ? chunks[0].Value : null;
         }
 
-        private object TryProcessBoolean(Term input)
+        private object TryProcessBoolean(ITerm input)
         {
             var chunks = new List<StatementChunk>();
 
@@ -380,7 +380,7 @@ namespace kOS.Expression
                 if (i + 1 < input.SubTerms.Count)
                 {
                     var opTerm = input.SubTerms[i + 1];
-                    if (opTerm.Type == Term.TermTypes.BOOLEAN_OPERATOR)
+                    if (opTerm.Type == TermType.BOOLEAN_OPERATOR)
                     {
                         chunks.Add(new StatementChunk(termValue, opTerm.Text));
                     }
@@ -420,7 +420,7 @@ namespace kOS.Expression
             return chunks.Count == 1 ? chunks[0].Value : null;
         }
 
-        private object TryExternalFunction(string name, IList<Term> p)
+        private object TryExternalFunction(string name, IList<ITerm> p)
         {
             foreach (var f in executionContext.ExternalFunctions.Where(f => f.Name.ToUpper() == name.ToUpper()))
             {
@@ -439,7 +439,7 @@ namespace kOS.Expression
             return null;
         }
 
-        private object TryMathFunction(string name, Term[] p)
+        private object TryMathFunction(string name, ITerm[] p)
         {
             name = name.ToUpper();
 
@@ -492,7 +492,7 @@ namespace kOS.Expression
             return null;
         }
 
-        private ISuffixed TryCreateSuffixed(string name, Term[] p)
+        private ISuffixed TryCreateSuffixed(string name, ITerm[] p)
         {
             name = name.ToUpper();
 
@@ -536,7 +536,7 @@ namespace kOS.Expression
             return null;
         }
 
-        private T GetParamAsT<T>(Term input)
+        private T GetParamAsT<T>(ITerm input)
         {
             var value = GetValueOfTerm(input);
             if (value is T) return (T)value;
@@ -548,7 +548,7 @@ namespace kOS.Expression
             throw new KOSException("Supplied parameter '" + input.Text + "' is not of the correct type", executionContext);
         }
 
-        private T[] GetParamsAsT<T>(IList<Term> input, int size)
+        private T[] GetParamsAsT<T>(IList<ITerm> input, int size)
         {
             if (input.Count() != size)
             {

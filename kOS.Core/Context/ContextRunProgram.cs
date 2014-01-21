@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using kOS.Command;
 using kOS.Debug;
+using kOS.Expression;
 using kOS.Persistance;
 using kOS.Utilities;
 
@@ -13,13 +14,13 @@ namespace kOS.Context
         private File file;
         private string commandBuffer;
         private readonly List<ICommand> commands = new List<ICommand>();
-        private readonly List<Expression.Expression> parameters = new List<Expression.Expression>();
+        private readonly List<IExpression> parameters = new List<IExpression>();
         private const int EXECUTION_LINE = 0;
 
 
         public string Filename { get; private set; }
 
-        public ContextRunProgram(IExecutionContext parent, List<Expression.Expression> parameters, string filename) : base(parent) 
+        public ContextRunProgram(IExecutionContext parent, List<IExpression> parameters, string filename) : base(parent) 
         {
             this.parameters = parameters;
             Filename = filename;

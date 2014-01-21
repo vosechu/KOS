@@ -63,6 +63,8 @@
     <Compile Include="Context\IContextRunProgram.cs" />
     <Compile Include="Context\ICPU.cs" />
     <Compile Include="Context\IExecutionContext.cs" />
+    <Compile Include="Expression\IExpression.cs" />
+    <Compile Include="Expression\ITerm.cs" />
     <Compile Include="Module\IProcessorModule.cs" />
     <Compile Include="Persistance\IVolume.cs" />
     <Compile Include="Suffixed\ConstantValue.cs" />
@@ -126,8 +128,6 @@
     <Compile Include="Module\kOSProcessor.cs" />
     <Compile Include="Binding\FlightControl.cs" />
     <Compile Include="Persistance\File.cs" />
-    <Compile Include="Suffixed\IOperatable.cs" />
-    <Compile Include="Suffixed\ISuffixed.cs" />
     <Compile Include="Suffixed\ListValue.cs" />
     <Compile Include="Suffixed\Node.cs" />
     <Compile Include="Suffixed\Orbit.cs" />
@@ -152,7 +152,12 @@
   <ItemGroup>
     <Compile Include="Utilities\VesselUtils.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\kOS.Safe\kOS.Safe.csproj">
+      <Project>{d2393c4b-2ee2-4b64-907e-40c8d8947890}</Project>
+      <Name>kOS.Safe</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

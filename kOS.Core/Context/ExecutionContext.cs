@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using kOS.Binding;
@@ -29,15 +28,15 @@ namespace kOS.Context
         }
 
         public virtual Vessel Vessel { get { return ParentContext != null ? ParentContext.Vessel : null; } }
-        public virtual List<IVolume> Volumes { get { return ParentContext != null ? ParentContext.Volumes : null; } }
+        public virtual IList<IVolume> Volumes { get { return ParentContext != null ? ParentContext.Volumes : null; } }
         public virtual IDictionary<string, Variable> Variables { get { return ParentContext != null ? ParentContext.Variables : null; } }
-        public virtual List<KOSExternalFunction> ExternalFunctions { get { return ParentContext != null ? ParentContext.ExternalFunctions : null; } }
+        public virtual IList<KOSExternalFunction> ExternalFunctions { get { return ParentContext != null ? ParentContext.ExternalFunctions : null; } }
 
         public IExecutionContext ParentContext { get; set; }
         public IExecutionContext ChildContext { get; set; }
         public ExecutionState State { get; set; }
 
-        public Dictionary<string, Expression.Expression> Locks = new Dictionary<string, Expression.Expression>();
+        public Dictionary<string, IExpression> Locks = new Dictionary<string, IExpression>();
         public List<ICommand> CommandLocks = new List<ICommand>();
 
         public ExecutionContext()
@@ -223,7 +222,7 @@ namespace kOS.Context
             v.Value = e.GetValue();
         }
 
-        public virtual Expression.Expression GetLock(string name)
+        public virtual IExpression GetLock(string name)
         {
             if (Locks.ContainsKey(name.ToUpper()))
             {
@@ -237,7 +236,7 @@ namespace kOS.Context
             CommandLocks.Add(command);
         }
 
-        public virtual void Lock(string name, Expression.Expression expression)
+        public virtual void Lock(string name, IExpression expression)
         {
             name = name.ToLower();
 

@@ -9,11 +9,14 @@ namespace kOS.Context
 {
     public interface IExecutionContext
     {
-        IVolume SelectedVolume { get; set; }
         Vessel Vessel { get; }
-        List<IVolume> Volumes { get; }
+        void OnSave(ConfigNode node);
+        void OnLoad(ConfigNode node);
+
+        IVolume SelectedVolume { get; set; }
+        IList<IVolume> Volumes { get; }
         IDictionary<string, Variable> Variables { get; }
-        List<KOSExternalFunction> ExternalFunctions { get; }
+        IList<KOSExternalFunction> ExternalFunctions { get; }
         IExecutionContext ParentContext { get; set; }
         IExecutionContext ChildContext { get; set; }
         ExecutionState State { get; set; }
@@ -38,9 +41,9 @@ namespace kOS.Context
         IExecutionContext GetDeepestChildContext();
         T FindClosestParentOfType<T>() where T : class, IExecutionContext;
         void UpdateLock(string name);
-        Expression.Expression GetLock(string name);
+        IExpression GetLock(string name);
         void Lock(ICommand command);
-        void Lock(string name, Expression.Expression expression);
+        void Lock(string name, IExpression expression);
         void Unlock(ICommand command);
         void Unlock(string name);
         void UnlockAll();
@@ -52,8 +55,6 @@ namespace kOS.Context
         int GetCursorY();
         object CallExternalFunction(string name, string[] parameters);
         bool FindExternalFunction(string name);
-        void OnSave(ConfigNode node);
-        void OnLoad(ConfigNode node);
         string GetVolumeBestIdentifier(IVolume selectedVolume);
     }
 }

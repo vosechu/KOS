@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using kOS.Context;
 using kOS.Debug;
+using kOS.Expression;
 using kOS.Interpreter;
 using kOS.Utilities;
 
@@ -17,12 +18,12 @@ namespace kOS.Command.File
         {
             var fileName = RegexMatch.Groups[1].Value;
             var file = SelectedVolume.GetByName(fileName);
-            var parameters = new List<Expression.Expression>();
+            var parameters = new List<IExpression>();
 
             if (RegexMatch.Groups.Count > 1)
             {
                 var paramstring = RegexMatch.Groups[3].Value;
-                parameters.AddRange(Utils.ProcessParams(paramstring).Select(param => new Expression.Expression(param, this)));
+                parameters.AddRange((IEnumerable<IExpression>) Utils.ProcessParams(paramstring).Select(param => new Expression.Expression(param, this)));
             }
 
             if (file == null)

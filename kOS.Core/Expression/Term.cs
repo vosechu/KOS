@@ -6,14 +6,11 @@ using kOS.Utilities;
 
 namespace kOS.Expression
 {
-    public class Term
+    public enum TermType { REGULAR, FINAL, FUNCTION, PARAMETER_LIST, COMPARISON, BOOLEAN, SUFFIX, STRUCTURE, MATH_OPERATOR, COMPARISON_OPERATOR, BOOLEAN_OPERATOR, INDEX, INDEX_OPERATOR }
+    public class Term : ITerm
     {
-        public string Text;
-        public List<Term> SubTerms;
+        private string text;
         public bool TermsAreParameters;
-
-        public enum TermTypes { REGULAR, FINAL, FUNCTION, PARAMETER_LIST, COMPARISON, BOOLEAN, SUFFIX, STRUCTURE, MATH_OPERATOR, COMPARISON_OPERATOR, BOOLEAN_OPERATOR, INDEX, INDEX_OPERATOR }
-        public TermTypes Type;
 
         private static List<string> comparisonSymbols;
         private static List<string> booleanSymbols;
@@ -57,46 +54,56 @@ namespace kOS.Expression
             allSymbols.AddRange(delimeterSymbols.ToArray());
         }
 
-        public Term(string input) : this (input, TermTypes.REGULAR, true) {}
-        
-        public Term(string input, TermTypes type) : this(input, type, true) { }
+        public Term(string input) : this(input, TermType.REGULAR, true) { }
 
-        public Term(string input, TermTypes type, bool autoTrim)
+        public Term(string input, TermType type) : this(input, type, true) { }
+
+        public Term(string input, TermType type, bool autoTrim)
         {
             TermsAreParameters = false;
-            Text = autoTrim ? input.Trim() : input;
+            text = autoTrim ? input.Trim() : input;
             Type = type;
-            SubTerms = new List<Term>();
+            SubTerms = new List<ITerm>();
 
-            if (Type != TermTypes.SUFFIX && type != TermTypes.BOOLEAN_OPERATOR) processSymbols();
+            if (Type != TermType.SUFFIX && type != TermType.BOOLEAN_OPERATOR) processSymbols();
         }
 
-        public void CopyFrom(ref Term from)
+        public TermType Type { get; set; }
+
+        public string Text
         {
-            this.Text = from.Text;
-            this.SubTerms = from.SubTerms;
-            this.Type = from.Type;
+            get { return text; }
+            set { text = value; }
         }
 
-        public Term Merge(params Term[] terms)
-        {
-            Term output = new Term("");
+        public List<ITerm> SubTerms { get; set; }
 
-            foreach (Term t in terms)
+        public void CopyFrom(ref ITerm from)
+        {
+            text = from.Text;
+            SubTerms = from.SubTerms;
+            Type = from.Type;
+        }
+
+        public ITerm Merge(params ITerm[] terms)
+        {
+            var output = new Term("");
+
+            foreach (var t in terms)
             {
                 switch (t.Type)
                 {
-                    case TermTypes.PARAMETER_LIST:
-                        output.Text += "(" + t.Text + ")";
+                    case TermType.PARAMETER_LIST:
+                        output.text += "(" + t.Text + ")";
                         break;
-                    case TermTypes.SUFFIX:
-                        output.Text += ":" + t.Text;
+                    case TermType.SUFFIX:
+                        output.text += ":" + t.Text;
                         break;
-                    case TermTypes.INDEX:
-                        output.Text += "#" + t.Text;
+                    case TermType.INDEX:
+                        output.text += "#" + t.Text;
                         break;
                     default:
-                        output.Text += t.Text;
+                        output.text += t.Text;
                         break;
                 }
 
@@ -117,38 +124,38 @@ namespace kOS.Expression
 
             switch (Type)
             {
-                case TermTypes.FUNCTION:
+                case TermType.FUNCTION:
                     retstring += "FUNCTION->";
                     break;
-                case TermTypes.PARAMETER_LIST:
+                case TermType.PARAMETER_LIST:
                     retstring += "PARAMS->";
                     break;
-                case TermTypes.COMPARISON:
+                case TermType.COMPARISON:
                     retstring += "COMPARISON->";
                     break;
-                case TermTypes.BOOLEAN:
+                case TermType.BOOLEAN:
                     retstring += "BOOLEAN->";
                     break;
-                case TermTypes.STRUCTURE:
+                case TermType.STRUCTURE:
                     retstring += "STRUCTURE->";
                     break;
-                case TermTypes.MATH_OPERATOR:
+                case TermType.MATH_OPERATOR:
                     retstring += "MATH ";
                     break;
-                case TermTypes.COMPARISON_OPERATOR:
+                case TermType.COMPARISON_OPERATOR:
                     retstring += "COMP ";
                     break;
-                case TermTypes.BOOLEAN_OPERATOR:
+                case TermType.BOOLEAN_OPERATOR:
                     retstring += "BOOL ";
                     break;
-                case TermTypes.SUFFIX:
+                case TermType.SUFFIX:
                     retstring += ":";
                     break;
             }
 
-            retstring += Text + Environment.NewLine;
+            retstring += text + Environment.NewLine;
 
-            foreach (Term t in SubTerms)
+            foreach (var t in SubTerms)
             {
                 retstring += t.Demo(tabIndent + 1);
             }
@@ -159,34 +166,34 @@ namespace kOS.Expression
         private void processSymbols()
         {
             // Is the input empty?
-            if (string.IsNullOrEmpty(Text)) return;
-            
+            if (string.IsNullOrEmpty(text)) return;
+
             // HEADING.. BY is now deprecated in favor of HEADING(x,y), but here it is if you're using it still
-            Text = Regex.Replace(Text, "HEADING ([ :@A-Za-z0-9\\.\\-\\+\\*/]+) BY ([ :@A-Za-z0-9\\.\\-\\+\\*/]+)", "HEADING($2,$1)", RegexOptions.IgnoreCase);
+            text = Regex.Replace(text, "HEADING ([ :@A-Za-z0-9\\.\\-\\+\\*/]+) BY ([ :@A-Za-z0-9\\.\\-\\+\\*/]+)", "HEADING($2,$1)", RegexOptions.IgnoreCase);
 
             //enables scientific notation eg 6.6E-11 -> 6.6*10^-11
-            Text = Regex.Replace(Text, "(\\d)E([-+]{1}[0-9]+)", "$1*10^$2");
-           
+            text = Regex.Replace(text, "(\\d)E([-+]{1}[0-9]+)", "$1*10^$2");
+
             // Resource tags are now deprecated in favor of SHIP:ResourceName
-            Text = Regex.Replace(Text, "(\\s|^)<([a-zA-Z]+)>(\\s|$)", " SHIP:$2 ", RegexOptions.IgnoreCase);
+            text = Regex.Replace(text, "(\\s|^)<([a-zA-Z]+)>(\\s|$)", " SHIP:$2 ", RegexOptions.IgnoreCase);
 
             // Is this JUST a matched symbol?                
-            string s = MatchAt(ref Text, 0, allSymbols);
-            if (s != null && Text.Length == s.Length)
+            string s = MatchAt(ref text, 0, allSymbols);
+            if (s != null && text.Length == s.Length)
             {
-                if (mathSymbols.Contains(s)) Type = TermTypes.MATH_OPERATOR;
-                else if (comparisonSymbols.Contains(s)) Type = TermTypes.COMPARISON_OPERATOR;
-                else if (booleanSymbols.Contains(s)) Type = TermTypes.BOOLEAN_OPERATOR;
+                if (mathSymbols.Contains(s)) Type = TermType.MATH_OPERATOR;
+                else if (comparisonSymbols.Contains(s)) Type = TermType.COMPARISON_OPERATOR;
+                else if (booleanSymbols.Contains(s)) Type = TermType.BOOLEAN_OPERATOR;
 
                 return;
             }
 
-            SubTerms = new List<Term>();
+            SubTerms = new List<ITerm>();
 
             // If this is a parameter list, grab the parameters
-            if (Type == TermTypes.PARAMETER_LIST)
+            if (Type == TermType.PARAMETER_LIST)
             {
-                var parameterList = parseParameters(Text);
+                var parameterList = parseParameters(text);
                 if (parameterList != null)
                 {
                     foreach (string param in parameterList)
@@ -199,16 +206,16 @@ namespace kOS.Expression
             }
 
             // Does this thing contain a boolean operation?
-            var booleanElements = splitByListIgnoreBracket(Text, ref booleanSymbols);
+            var booleanElements = splitByListIgnoreBracket(text, ref booleanSymbols);
             if (booleanElements != null)
             {
-                Type = TermTypes.BOOLEAN;
+                Type = TermType.BOOLEAN;
 
                 foreach (string element in booleanElements)
                 {
                     if (booleanSymbols.Contains(element))
                     {
-                        SubTerms.Add(new Term(element, TermTypes.BOOLEAN_OPERATOR));
+                        SubTerms.Add(new Term(element, TermType.BOOLEAN_OPERATOR));
                     }
                     else
                     {
@@ -220,10 +227,10 @@ namespace kOS.Expression
             }
 
             // Does this thing contain a comparison?
-            var comparisonElements = splitByListIgnoreBracket(Text, ref comparisonSymbols);
+            var comparisonElements = splitByListIgnoreBracket(text, ref comparisonSymbols);
             if (comparisonElements != null)
             {
-                Type = TermTypes.COMPARISON;
+                Type = TermType.COMPARISON;
 
                 foreach (string element in comparisonElements)
                 {
@@ -234,16 +241,16 @@ namespace kOS.Expression
             }
 
             // Does this thing contain an Index?
-            var listElements = splitByListIgnoreBracket(Text, ref listaccessSymbols);
+            var listElements = splitByListIgnoreBracket(text, ref listaccessSymbols);
             if (listElements != null)
             {
-                Type = TermTypes.INDEX;
+                Type = TermType.INDEX;
 
                 foreach (var element in listElements)
                 {
                     if (listaccessSymbols.Contains(element))
                     {
-                        SubTerms.Add(new Term(element, TermTypes.INDEX_OPERATOR));
+                        SubTerms.Add(new Term(element, TermType.INDEX_OPERATOR));
                     }
                     else
                     {
@@ -257,45 +264,45 @@ namespace kOS.Expression
 
             // Parse this as a normal term
             string buffer = "";
-            for (int i = 0; i < Text.Length; i++)
+            for (int i = 0; i < text.Length; i++)
             {
-                s = MatchAt(ref Text, i, allSymbols);
+                s = MatchAt(ref text, i, allSymbols);
 
                 if (s == null)
                 {
-                    buffer += Text[i];
+                    buffer += text[i];
                 }
                 else if (s == "(")
                 {
                     int startI = i;
-                    Utils.Balance(ref Text, ref i, ')');
-                    
+                    Utils.Balance(ref text, ref i, ')');
+
                     if (buffer.Trim() != "")
                     {
                         string functionName = buffer.Trim();
                         buffer = "";
 
-                        Term bracketTerm = new Term(Text.Substring(startI + 1, i - startI - 1), TermTypes.PARAMETER_LIST);
-                        Term functionTerm = Merge(new Term(functionName), bracketTerm);
-                        functionTerm.Type = TermTypes.FUNCTION;
+                        var bracketTerm = new Term(text.Substring(startI + 1, i - startI - 1), TermType.PARAMETER_LIST);
+                        var functionTerm = Merge(new Term(functionName), bracketTerm);
+                        functionTerm.Type = TermType.FUNCTION;
 
                         SubTerms.Add(functionTerm);
                     }
                     else
                     {
-                        SubTerms.Add(new Term(Text.Substring(startI + 1, i - startI - 1)));
+                        SubTerms.Add(new Term(text.Substring(startI + 1, i - startI - 1)));
                     }
                 }
                 else if (s == "\"")
                 {
                     int startI = i;
-                    i = Utils.FindEndOfstring(Text, i + 1);
-                    buffer += Text.Substring(startI, i - startI + 1); 
+                    i = Utils.FindEndOfstring(text, i + 1);
+                    buffer += text.Substring(startI, i - startI + 1);
                 }
                 else if (s == ":")
                 {
-                    int end = findEndOfSuffix(Text, i + 1);
-                    string suffixName = Text.Substring(i + 1, end - i);
+                    int end = findEndOfSuffix(text, i + 1);
+                    string suffixName = text.Substring(i + 1, end - i);
                     i += end - i;
 
                     if (buffer.Trim() != "")
@@ -306,19 +313,19 @@ namespace kOS.Expression
 
                     if (SubTerms.Count > 0)
                     {
-                        Term last = SubTerms.Last();
+                        var last = SubTerms.Last();
                         SubTerms.Remove(last);
 
-                        Term structureTerm = Merge(last, new Term(suffixName, TermTypes.SUFFIX));
-                        structureTerm.Type = TermTypes.STRUCTURE;
+                        var structureTerm = Merge(last, new Term(suffixName, TermType.SUFFIX));
+                        structureTerm.Type = TermType.STRUCTURE;
                         SubTerms.Add(structureTerm);
                     }
                 }
                 else if (s == "-")
                 {
-                    if (buffer.Trim() != "" || 
-                        (SubTerms.Count > 0 && SubTerms.Last().Type != TermTypes.MATH_OPERATOR 
-                        && SubTerms.Last().Type != TermTypes.COMPARISON_OPERATOR))
+                    if (buffer.Trim() != "" ||
+                        (SubTerms.Count > 0 && SubTerms.Last().Type != TermType.MATH_OPERATOR
+                        && SubTerms.Last().Type != TermType.COMPARISON_OPERATOR))
                     {
                         // Not a sign, treat as operator
                         if (buffer.Trim() != "") SubTerms.Add(new Term(buffer.Trim()));
@@ -329,7 +336,7 @@ namespace kOS.Expression
                     }
                     else
                     {
-                        buffer += Text[i];
+                        buffer += text[i];
                     }
                 }
                 else
@@ -345,16 +352,16 @@ namespace kOS.Expression
             // If there's only one term, we're done!
             if (SubTerms.Count == 0)
             {
-                Type = TermTypes.FINAL;
+                Type = TermType.FINAL;
                 return;
             }
 
             if (buffer.Trim() != "") SubTerms.Add(new Term(buffer));
 
             // If I end up with exactly one subTerm, then I AM that subterm. Exception: If I already have a special type
-            if (SubTerms.Count == 1 && this.Type == TermTypes.REGULAR)
+            if (SubTerms.Count == 1 && this.Type == TermType.REGULAR)
             {
-                Term child = SubTerms[0];
+                var child = SubTerms[0];
                 SubTerms.Clear();
 
                 CopyFrom(ref child);
@@ -391,14 +398,14 @@ namespace kOS.Expression
                 if (input[i] == '(')
                 {
                     int startI = i;
-                    Utils.Balance(ref Text, ref i, ')');
-                    buffer += Text.Substring(startI, i - startI + 1);
+                    Utils.Balance(ref text, ref i, ')');
+                    buffer += text.Substring(startI, i - startI + 1);
                 }
                 else if (input[i] == '"')
                 {
                     int startI = i;
-                    i = Utils.FindEndOfstring(Text, i + 1);
-                    buffer += Text.Substring(startI, i - startI + 1);
+                    i = Utils.FindEndOfstring(text, i + 1);
+                    buffer += text.Substring(startI, i - startI + 1);
                 }
                 else
                 {

@@ -16,7 +16,7 @@ namespace kOS.Command.BasicIO
             var targetTerm = new Term(RegexMatch.Groups[1].Value);
             var e = new Expression.Expression(RegexMatch.Groups[2].Value, ParentContext);
 
-            if (targetTerm.Type == Term.TermTypes.STRUCTURE)
+            if (targetTerm.Type == TermType.STRUCTURE)
             {
                 var baseObj = new Expression.Expression(targetTerm.SubTerms[0], ParentContext).GetValue();
 
