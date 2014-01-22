@@ -1,8 +1,10 @@
 ﻿using System.Text.RegularExpressions;
 using kOS.Context;
 using kOS.Debug;
-using kOS.Expression;
+using kOS.Safe.Expression;
+using kOS.Safe.Suffixed;
 using kOS.Suffixed;
+using Term = kOS.Expression.Term;
 
 namespace kOS.Command.BasicIO
 {

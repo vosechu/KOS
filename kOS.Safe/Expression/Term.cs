@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using kOS.Utilities;
+using kOS.Safe.Utilities;
 
-namespace kOS.Expression
+namespace kOS.Safe.Expression
 {
-    public enum TermType { REGULAR, FINAL, FUNCTION, PARAMETER_LIST, COMPARISON, BOOLEAN, SUFFIX, STRUCTURE, MATH_OPERATOR, COMPARISON_OPERATOR, BOOLEAN_OPERATOR, INDEX, INDEX_OPERATOR }
     public class Term : ITerm
     {
         private string text;
@@ -359,7 +358,7 @@ namespace kOS.Expression
             if (buffer.Trim() != "") SubTerms.Add(new Term(buffer));
 
             // If I end up with exactly one subTerm, then I AM that subterm. Exception: If I already have a special type
-            if (SubTerms.Count == 1 && this.Type == TermType.REGULAR)
+            if (SubTerms.Count == 1 && Type == TermType.REGULAR)
             {
                 var child = SubTerms[0];
                 SubTerms.Clear();

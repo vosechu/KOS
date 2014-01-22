@@ -1,4 +1,5 @@
 ﻿using System;
+using kOS.Safe.Suffixed;
 
 namespace kOS.Suffixed
 {

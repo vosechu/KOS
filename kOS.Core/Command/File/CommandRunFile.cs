@@ -5,7 +5,9 @@ using kOS.Context;
 using kOS.Debug;
 using kOS.Expression;
 using kOS.Interpreter;
-using kOS.Utilities;
+using kOS.Safe.Expression;
+using kOS.Safe.Utilities;
+using Utils = kOS.Utilities.Utils;
 
 namespace kOS.Command.File
 {

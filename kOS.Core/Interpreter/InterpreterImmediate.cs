@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using kOS.Context;
 using kOS.Debug;
+using kOS.Safe.Utilities;
 using kOS.Utilities;
 
 namespace kOS.Interpreter

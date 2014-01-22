@@ -1,8 +1,9 @@
 using System.Text.RegularExpressions;
 using kOS.Context;
 using kOS.Debug;
+using kOS.Safe.Utilities;
 using kOS.Suffixed;
-using kOS.Utilities;
+using Utils = kOS.Utilities.Utils;
 
 namespace kOS.Command.FlowControl
 {

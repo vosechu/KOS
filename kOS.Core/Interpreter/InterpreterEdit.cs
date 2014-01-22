@@ -2,6 +2,7 @@
 using System.Linq;
 using kOS.Context;
 using kOS.Persistance;
+using kOS.Safe.Utilities;
 using kOS.Utilities;
 
 namespace kOS.Interpreter

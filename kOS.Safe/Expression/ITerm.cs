@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace kOS.Expression
+namespace kOS.Safe.Expression
 {
     public interface ITerm
     {

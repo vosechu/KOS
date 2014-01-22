@@ -31,9 +31,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Assembly-CSharp, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\KSP_LIB\Assembly-CSharp.dll</HintPath>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\..\..\KSP_LIB\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -41,9 +40,8 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\KSP_LIB\UnityEngine.dll</HintPath>
+    <Reference Include="UnityEngine">
+      <HintPath>..\..\..\KSP_LIB\UnityEngine.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -63,8 +61,6 @@
     <Compile Include="Context\IContextRunProgram.cs" />
     <Compile Include="Context\ICPU.cs" />
     <Compile Include="Context\IExecutionContext.cs" />
-    <Compile Include="Expression\IExpression.cs" />
-    <Compile Include="Expression\ITerm.cs" />
     <Compile Include="Module\IProcessorModule.cs" />
     <Compile Include="Persistance\IVolume.cs" />
     <Compile Include="Suffixed\ConstantValue.cs" />
@@ -116,7 +112,6 @@
     <Compile Include="Suffixed\Direction.cs" />
     <Compile Include="Context\ExecutionContext.cs" />
     <Compile Include="Expression\Expression.cs" />
-    <Compile Include="Expression\Term.cs" />
     <Compile Include="Suffixed\GeoCoordinates.cs" />
     <Compile Include="Persistance\Harddisk.cs" />
     <Compile Include="Interpreter\InterpreterBootup.cs" />

@@ -5,6 +5,8 @@ using System.Text.RegularExpressions;
 using System.Globalization;
 using kOS.Context;
 using kOS.Debug;
+using kOS.Safe.Expression;
+using kOS.Safe.Suffixed;
 using kOS.Suffixed;
 using kOS.Utilities;
 using TimeSpan = kOS.Suffixed.TimeSpan;

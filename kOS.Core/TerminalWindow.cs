@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using kOS.Context;
+using kOS.Safe.Utilities;
 using kOS.Utilities;
 
 namespace kOS

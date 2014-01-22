@@ -1,4 +1,4 @@
-﻿namespace kOS.Suffixed
+﻿namespace kOS.Safe.Suffixed
 {
     public interface ISuffixed
     {

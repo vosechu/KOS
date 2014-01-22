@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using kOS.Context;
 using kOS.Debug;
 using kOS.Expression;
+using kOS.Safe.Expression;
 
 namespace kOS.Command
 {

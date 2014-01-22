@@ -3,6 +3,8 @@ using kOS.Binding;
 using kOS.Command;
 using kOS.Expression;
 using kOS.Persistance;
+using kOS.Safe.Expression;
+using kOS.Safe.Utilities;
 using kOS.Utilities;
 
 namespace kOS.Context
