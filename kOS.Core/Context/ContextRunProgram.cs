@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using kOS.Command;
 using kOS.Debug;
-using kOS.Expression;
 using kOS.Persistance;
 using kOS.Safe.Expression;
-using kOS.Utilities;
+using kOS.Safe.Utilities;
 
 namespace kOS.Context
 {

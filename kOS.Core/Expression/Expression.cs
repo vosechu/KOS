@@ -10,6 +10,7 @@ using kOS.Safe.Suffixed;
 using kOS.Suffixed;
 using kOS.Utilities;
 using TimeSpan = kOS.Suffixed.TimeSpan;
+using Utils = kOS.Safe.Utilities.Utils;
 
 namespace kOS.Expression
 {

@@ -8,7 +8,6 @@ using kOS.Expression;
 using kOS.Persistance;
 using kOS.Safe.Expression;
 using kOS.Safe.Utilities;
-using Utils = kOS.Utilities.Utils;
 
 namespace kOS.Context
 {

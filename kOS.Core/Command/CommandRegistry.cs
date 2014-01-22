@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using kOS.Utilities;
+using kOS.Safe.Utilities;
 
 namespace kOS.Command
 {

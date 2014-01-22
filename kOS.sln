@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "kOS.Core", "kOS.Core\kOS.Core.csproj", "{B972AB0D-D76B-4274-B41E-ED93CBEA1AD5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "kOS.Unity", "kOS.Core\kOS.Unity.csproj", "{B972AB0D-D76B-4274-B41E-ED93CBEA1AD5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "kOS.Safe", "kOS.Safe\kOS.Safe.csproj", "{D2393C4B-2EE2-4B64-907E-40C8D8947890}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "kOS.Base", "kOS.Safe\kOS.Base.csproj", "{D2393C4B-2EE2-4B64-907E-40C8D8947890}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

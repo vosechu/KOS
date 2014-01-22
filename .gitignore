@@ -1,4 +1,3 @@
-bin/Debug/
-bin/Release/
+bin/
 obj/
 *.suo

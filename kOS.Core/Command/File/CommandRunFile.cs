@@ -3,11 +3,9 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using kOS.Context;
 using kOS.Debug;
-using kOS.Expression;
 using kOS.Interpreter;
 using kOS.Safe.Expression;
 using kOS.Safe.Utilities;
-using Utils = kOS.Utilities.Utils;
 
 namespace kOS.Command.File
 {

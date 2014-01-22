@@ -3,7 +3,6 @@ using kOS.Context;
 using kOS.Debug;
 using kOS.Safe.Utilities;
 using kOS.Suffixed;
-using Utils = kOS.Utilities.Utils;
 
 namespace kOS.Command.FlowControl
 {

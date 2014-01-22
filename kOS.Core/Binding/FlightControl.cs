@@ -4,6 +4,7 @@ using UnityEngine;
 using kOS.Context;
 using kOS.Suffixed;
 using kOS.Utilities;
+using Utils = kOS.Safe.Utilities.Utils;
 
 namespace kOS.Binding
 {

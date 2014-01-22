@@ -148,9 +148,9 @@
     <Compile Include="Utilities\VesselUtils.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\kOS.Safe\kOS.Safe.csproj">
+    <ProjectReference Include="..\kOS.Safe\kOS.Base.csproj">
       <Project>{d2393c4b-2ee2-4b64-907e-40c8d8947890}</Project>
-      <Name>kOS.Safe</Name>
+      <Name>kOS.Base</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
