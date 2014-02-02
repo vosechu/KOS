@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using kOS.Context;
 using kOS.Utilities;
 
@@ -123,12 +124,19 @@ namespace kOS.Suffixed
                     return Target.orbit.ApA;
                 case "PERIAPSIS":
                     return Target.orbit.PeA;
-                case "SENSOR":
+                case "SENSORS":
                     return new VesselSensors(Target);
                 case "TERMVELOCITY":
                     return VesselUtils.GetTerminalVelocity(Target);
                 case "OBT":
                     return new OrbitInfo(Target.orbit, Target);
+                case "SITUATION":
+                    return Target.situation;
+                case "SCI:SURFACEBIOME":
+                    const double degrees = Math.PI/180;
+                    var latDeg = Target.latitude*degrees;
+                    var longDeg = Target.longitude*degrees;
+                    return Target.mainBody.BiomeMap.GetAtt(latDeg, longDeg).name;
             }
 
             // Is this a resource?

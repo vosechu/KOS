@@ -34,6 +34,10 @@ namespace kOS.Suffixed
                     return Target.name;
                 case "DESCRIPTION":
                     return Target.bodyDescription;
+                case "SCI:FLYINGTHRESHOLD":
+                    return Target.scienceValues.flyingAltitudeThreshold;
+                case "SCI:SPACETHRESHOLD":
+                    return Target.scienceValues.spaceAltitudeThreshold;
                 case "MASS":
                     return Target.Mass;
                 case "POSITION":
