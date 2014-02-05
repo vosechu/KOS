@@ -123,35 +123,35 @@ namespace kOS.Utilities
 
         public static double GetThrustTorque(Part p, Vessel vessel)
         {
-            var centerOfMass = vessel.CoM;
-
             if (p.State == PartStates.ACTIVE)
             {
-                if (p is LiquidEngine)
+                ModuleEngines moduleEngine = null;
+                ModuleGimbal moduleGimbal = null;
+                foreach (PartModule partModule in p.Modules)
                 {
-                    if (((LiquidEngine) p).thrustVectoringCapable)
+                    var foundModuleEngine = partModule as ModuleEngines;
+                    var foundModuleGimbal = partModule as ModuleGimbal;
+                    if (foundModuleEngine != null)
                     {
-                        return Math.Sin(Math.Abs(((LiquidEngine) p).gimbalRange)*Math.PI/180)*
-                               ((LiquidEngine) p).maxThrust*(p.Rigidbody.worldCenterOfMass - centerOfMass).magnitude;
+                        moduleEngine = foundModuleEngine;
+                    }
+                    else if (foundModuleGimbal != null)
+                    {
+                        moduleGimbal = foundModuleGimbal;
                     }
                 }
-                else if (p is LiquidFuelEngine)
+                if (moduleGimbal == null || moduleEngine == null)
                 {
-                    if (((LiquidFuelEngine) p).thrustVectoringCapable)
-                    {
-                        return Math.Sin(Math.Abs(((LiquidFuelEngine) p).gimbalRange)*Math.PI/180)*
-                               ((LiquidFuelEngine) p).maxThrust*(p.Rigidbody.worldCenterOfMass - centerOfMass).magnitude;
-                    }
+                    return 0;
                 }
-                else if (p is AtmosphericEngine)
-                {
-                    if (((AtmosphericEngine) p).thrustVectoringCapable)
-                    {
-                        return Math.Sin(Math.Abs(((AtmosphericEngine) p).gimbalRange)*Math.PI/180)*
-                               ((AtmosphericEngine) p).maximumEnginePower*((AtmosphericEngine) p).totalEfficiency*
-                               (p.Rigidbody.worldCenterOfMass - centerOfMass).magnitude;
-                    }
-                }
+
+                var gimbalRange = Math.Sin(Math.Abs(moduleGimbal.gimbalRange));
+                var maxTrust = moduleEngine.maxThrust;
+                var magnitude = (p.Rigidbody.worldCenterOfMass - vessel.CoM).magnitude;
+
+                var output = gimbalRange*maxTrust*magnitude;
+                UnityEngine.Debug.Log("EngineTorque Found: " + output);
+                return output;
             }
 
             return 0;
