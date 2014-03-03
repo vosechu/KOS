@@ -95,13 +95,13 @@ namespace kOS.Suffixed.Part
             switch (suffixName)
             {
                 case "MAXTHRUST":
-                    return moduleEngines.maxThrust;
+                    return (double)moduleEngines.maxThrust;
                 case "THRUST":
-                    return moduleEngines.finalThrust;
+                    return (double)moduleEngines.finalThrust;
                 case "FUELFLOW":
-                    return moduleEngines.fuelFlowGui;
+                    return (double)moduleEngines.fuelFlowGui;
                 case "ISP":
-                    return moduleEngines.realIsp;
+                    return (double)moduleEngines.realIsp;
                 case "FLAMEOUT":
                     return moduleEngines.getFlameoutState;
                 case "IGNITION":
@@ -113,7 +113,7 @@ namespace kOS.Suffixed.Part
                 case "THROTTLELOCK":
                     return moduleEngines.throttleLocked;
                 case "THRUSTLIMIT":
-                    return moduleEngines.thrustPercentage;
+                    return (double)moduleEngines.thrustPercentage;
             }
             return base.GetSuffix(suffixName);
         }
@@ -123,13 +123,13 @@ namespace kOS.Suffixed.Part
             switch (suffixName)
             {
                 case "MAXTHRUST":
-                    return moduleEngines.maxThrust;
+                    return (double)moduleEngines.maxThrust;
                 case "THRUST":
-                    return moduleEngines.finalThrust;
+                    return (double)moduleEngines.finalThrust;
                 case "FUELFLOW":
-                    return moduleEngines.fuelFlowGui;
+                    return (double)moduleEngines.fuelFlowGui;
                 case "ISP":
-                    return moduleEngines.realIsp;
+                    return (double)moduleEngines.realIsp;
                 case "FLAMEOUT":
                     return moduleEngines.getFlameoutState;
                 case "IGNITION":
@@ -141,7 +141,7 @@ namespace kOS.Suffixed.Part
                 case "THROTTLELOCK":
                     return moduleEngines.throttleLocked;
                 case "THRUSTLIMIT":
-                    return moduleEngines.thrustPercentage;
+                    return (double)moduleEngines.thrustPercentage;
             }
             return base.GetSuffix(suffixName);
         }

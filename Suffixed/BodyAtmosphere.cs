@@ -17,7 +17,7 @@
         protected double SeaLevelPressure { get; set; }
         protected string BodyName { get; set; }
         protected double Scale { get; set; }
-        protected float Height { get; set; }
+        protected double Height { get; set; }
         protected bool Exists { get; set; }
 
         public bool Oxygen { get; set; }
