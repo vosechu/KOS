@@ -19,12 +19,20 @@ namespace kOS.Utilities
                 foreach (PartModule module in part.Modules)
                 {
                     var engineModule = module as ModuleEngines;
-                    if (engineModule == null) continue;
-                    var engineMod = engineModule;
+                    if (engineModule != null) {
+                        if (engineModule.getIgnitionState)
+                        {
+                            retList.Add(part);
+                        }
+                    }
 
-                    if (engineMod.getIgnitionState)
-                    {
-                        retList.Add(part);
+                    var engineModuleFx = module as ModuleEnginesFX;
+                    if (engineModuleFx != null) {
+                        var engineMod = engineModuleFx;
+                        if (engineModuleFx.getIgnitionState)
+                        {
+                            retList.Add(part);
+                        }
                     }
                 }
             }
