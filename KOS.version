@@ -1,0 +1,14 @@
+{
+  "NAME": "KOS",
+  "URL": "https://raw.githubusercontent.com/erendrake/KOS/master/KOS.version",
+  "VERSION": {
+    "MAJOR": 0,
+    "MINOR": 11,
+    "PATCH": "1RC"
+  },
+  "KSP_VERSION": {
+    "MAJOR": 0,
+    "MINOR": 23,
+    "PATCH": 5
+  }
+}
